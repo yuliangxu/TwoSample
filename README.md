@@ -4,6 +4,11 @@ Reproducible code for the microbiome case study in *Two-sample Comparison
 through Additive Tree Models for Density Ratios*. Script names and PDF names
 follow the paper: Figures 6, 7, and S8–S12.
 
+The [updated BATTS rerun report](results/batts_909ea357/REPORT.md) contains
+new results, comparisons with the paper, and all seven regenerated PDFs for
+commit `909ea357`. The commands below distinguish redrawing the original
+results from performing the new refit.
+
 ## Reproduce all seven figures
 
 Install the plotting dependencies in R:
@@ -37,6 +42,59 @@ The grouped commands `recreate_figures_6_7.R` and
 `recreate_figures_S10_S11.R` are also available in `scripts/`.
 Shared implementations live in `scripts/lib/` so individual entry points use
 identical analysis and styling.
+
+## Refit with the updated BATTS package
+
+The complete rerun uses BATTS commit
+[`909ea357bdb3f97018613552ef13430d1bb60c6e`](https://github.com/nawaya040/BATTS/tree/909ea357bdb3f97018613552ef13430d1bb60c6e).
+Install that exact commit and the plotting dependencies with a working R/C++
+build toolchain:
+
+```r
+install.packages(c("remotes", "ggplot2", "vegan", "patchwork", "scales"))
+remotes::install_github("nawaya040/BATTS@909ea357bdb3f97018613552ef13430d1bb60c6e", upgrade = "never")
+```
+
+```sh
+Rscript scripts/reproduce_case_study_batts.R 2
+```
+
+The optional integer controls independent comparison workers on macOS/Linux;
+Windows runs sequentially. This command refits all four generators against
+each real split, reruns the held-out null experiment, exports comparison
+tables, and renders Figures 6, 7, and S8–S12. Outputs are under
+`output/batts_909ea357/`; the bundled paper results are preserved.
+
+Each of the eight comparisons uses seed 1, 200 Bayesian trees, 2,000 burn-in
+iterations, 1,000 retained draws, thinning 1, and fixed lambda 5. Both boosting
+estimators use five-fold CV over up to 1,000 trees, depth 4, learning rate 0.01,
+and 32 bins. The comparisons retain the original `margin_scale = 0.1`;
+all 123 columns vary in each combined real/generated dataset. The null fit
+retains its separate seed 2026, 500 burn-in and 500 retained iterations, and
+`margin_scale = -1` for compositions in [0,1].
+
+Train and test comparisons are **separately fitted two-sample analyses**, as
+in the original case-study workflow. The null experiment alone fits on a
+random split of the training data and evaluates on held-out test data.
+Generated compositions are fixed inputs; BATTS does not train their generators.
+
+The refit checks the installed commit and input checksums. Completed individual
+fits are cached with their inputs/settings so interrupted runs can resume.
+Posterior draws, fitted objects, CV summaries, interval classifications,
+comparisons with the paper, and session information are retained. New package
+fixes and floating-point differences can change estimates; numerical equality
+with the historical paper results is not assumed.
+
+Individual stages are also available:
+
+```sh
+Rscript scripts/refit_case_study.R 2
+Rscript scripts/summarize_case_study_refit.R
+```
+
+The summary command requires the null output from the complete rerun. To plot
+alternative fits, set `TWO_SAMPLE_RATIO_ROOT`, `TWO_SAMPLE_FIGURE_DIR`, and
+`TWO_SAMPLE_NULL_INTERVALS` before invoking the existing figure scripts.
 
 ## Figure conventions
 

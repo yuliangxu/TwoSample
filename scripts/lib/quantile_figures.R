@@ -1,6 +1,7 @@
 suppressPackageStartupMessages({ library(ggplot2); library(vegan); library(patchwork); library(scales) })
 data_dir <- file.path(project_root, "data")
-output_dir <- file.path(project_root, "output", "case_study")
+ratio_root <- Sys.getenv("TWO_SAMPLE_RATIO_ROOT", file.path(project_root, "data", "revision"))
+output_dir <- Sys.getenv("TWO_SAMPLE_FIGURE_DIR", file.path(project_root, "output", "case_study"))
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 cache_dir <- file.path(output_dir, "cache")
 dir.create(cache_dir, showWarnings = FALSE)
@@ -43,7 +44,7 @@ for (number in figures) {
       anchor <- which.max(abs(points[, axis]))
       points[, axis] <- points[, axis] * sign(points[anchor, axis]) * axis_signs[[split]][[key]][axis]
     }
-    z <- as.matrix(read.csv(file.path(data_dir, "revision", split, paste0("log_w_", key, ".csv")), header = FALSE))
+    z <- as.matrix(read.csv(file.path(ratio_root, split, paste0("log_w_", key, ".csv")), header = FALSE))
     stopifnot(nrow(z) == nrow(points), ncol(z) >= 10)
     data.frame(PC1 = points[, 1], PC2 = points[, 2],
       source = rep(c("Real", "Generated"), c(nrow(real), nrow(generated))),
@@ -68,11 +69,12 @@ for (number in figures) {
                    expression(10^-1), expression(10^0), expression(10^1))) +
       labs(x = "PCoA 1", y = "PCoA 2", color = "log(w)", shape = NULL,
            title = paste0(if (split == "train") "Train" else "Test", " vs. Generated: ", titles[[quantity]])) +
-      guides(color = guide_colorbar(position = "right", barheight = grid::unit(36, "mm")),
+      guides(color = guide_colorbar(position = "right", barheight = grid::unit(52, "mm")),
              shape = guide_legend(position = "bottom", override.aes = list(color = "#222222", size = 2, alpha = 1))) +
       theme_bw(base_size = 11) + theme(panel.grid = element_blank(),
         strip.background = element_rect(fill = "white"), strip.text = element_text(face = "bold"),
-        plot.title = element_text(hjust = 0.5), legend.box = "vertical")
+        plot.title = element_text(hjust = 0.5), legend.text = element_text(size = 8),
+        legend.box = "vertical")
   })
   combined <- wrap_plots(plots, ncol = 1)
   ggsave(file.path(output_dir, paste0("figure", number, "_ggplot2.pdf")), combined, width = 12, height = 10)

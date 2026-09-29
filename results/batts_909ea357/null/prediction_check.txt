@@ -1,0 +1,1 @@
+Training prediction/draw agreement; max abs log-ratio difference 2.60673427288083e-13

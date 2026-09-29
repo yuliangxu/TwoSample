@@ -1,0 +1,17 @@
+"split","generator","estimator","selected_trees","minimum_cv_loss","selected_at_search_limit"
+"train","d","gradient",1000,0.22837967834339,TRUE
+"train","d","hellinger",1000,0.2685518564903,TRUE
+"train","dt","gradient",1000,0.252538266961182,TRUE
+"train","dt","hellinger",1000,0.194388867687823,TRUE
+"train","icfm","gradient",1000,0.989733178538549,TRUE
+"train","icfm","hellinger",1000,1.00718059481877,TRUE
+"train","mbgan","gradient",1000,1.76244595586126,TRUE
+"train","mbgan","hellinger",1000,1.78613083172538,TRUE
+"test","d","gradient",972,0.790519841558345,FALSE
+"test","d","hellinger",901,0.543591379060898,FALSE
+"test","dt","gradient",513,0.600856554796704,FALSE
+"test","dt","hellinger",591,0.459946134590038,FALSE
+"test","icfm","gradient",912,1.21430258104545,FALSE
+"test","icfm","hellinger",688,1.25001663273156,FALSE
+"test","mbgan","gradient",646,1.89615234595876,FALSE
+"test","mbgan","hellinger",336,1.9342753483864,FALSE

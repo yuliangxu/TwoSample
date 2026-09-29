@@ -6,10 +6,10 @@ project_root <- normalizePath(file.path(script_dir, ".."))
 suppressPackageStartupMessages(library(ggplot2))
 
 args <- commandArgs(trailingOnly = TRUE)
-results_dir <- file.path(project_root, "output", "case_study")
+results_dir <- Sys.getenv("TWO_SAMPLE_FIGURE_DIR", file.path(project_root, "output", "case_study"))
 dir.create(results_dir, recursive = TRUE, showWarnings = FALSE)
 interval_path <- if (length(args)) normalizePath(gsub("~+~", " ", args[[1]], fixed = TRUE), mustWork = TRUE) else
-  file.path(project_root, "data", "figure_S12", "test_pointwise_credible_intervals.csv")
+  Sys.getenv("TWO_SAMPLE_NULL_INTERVALS", file.path(project_root, "data", "figure_S12", "test_pointwise_credible_intervals.csv"))
 if (!file.exists(interval_path)) stop("Missing interval table: ", interval_path)
 
 results <- read.csv(interval_path)

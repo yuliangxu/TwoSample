@@ -10,7 +10,7 @@ suppressPackageStartupMessages(library(BATTS))
 seed <- 2026L
 train_path <- file.path(project_root, "data", "sample_train.csv")
 test_path <- file.path(project_root, "data", "sample_test.csv")
-output_dir <- file.path(project_root, "output", "figure_S12_refit")
+output_dir <- Sys.getenv("TWO_SAMPLE_NULL_OUTPUT", file.path(project_root, "output", "figure_S12_refit"))
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
 train <- as.matrix(read.csv(train_path, header = FALSE, check.names = FALSE))
@@ -46,6 +46,15 @@ fit <- batts(
 
 evaluation <- eval_balance_weight(fit, test, is_Bayes = TRUE)
 log_ratio_draws <- 2 * log(evaluation$balancing_weight_BART)
+stopifnot(all(is.finite(log_ratio_draws)))
+# Check the package's prediction normalization against its stored draws.
+training_evaluation <- eval_balance_weight(fit, train, is_Bayes = TRUE)
+prediction_difference <- max(abs(2 * log(training_evaluation$balancing_weight_BART) -
+                                 2 * log(fit$balance_weight_BART_data)))
+stopifnot(is.finite(prediction_difference), prediction_difference < 1e-10)
+writeLines(paste("Training prediction/draw agreement; max abs log-ratio difference",
+                 prediction_difference), file.path(output_dir, "prediction_check.txt"))
+rm(training_evaluation)
 posterior_mean <- rowMeans(log_ratio_draws)
 ci <- t(apply(log_ratio_draws, 1, quantile, probs = c(0.025, 0.975), names = FALSE))
 covers_zero <- ci[, 1] <= 0 & ci[, 2] >= 0
