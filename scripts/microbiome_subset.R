@@ -1,3 +1,6 @@
+# Original collection-wide filtering workflow.
+# To reproduce the published train/test matrices, run reprocess_microbiome.R;
+# see ../data/provenance/README.md and ../data/CITATIONS.md.
 library(curatedMetagenomicData)
 library(dplyr)
 library(DT)

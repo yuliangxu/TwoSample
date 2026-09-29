@@ -20,9 +20,16 @@ and lower/upper 95% pointwise posterior interval endpoints.
 
 The real compositions originate from `curatedMetagenomicData`; the other
 sample matrices and fitted summaries were produced for this analysis.
-The CSVs do not contain study names, sample IDs, or taxon names. Absence of
-identifiers alone does not establish redistribution permission.
-See [DATA_TERMS.md](DATA_TERMS.md) for the outstanding provenance questions.
+Run `Rscript scripts/reprocess_microbiome.R` from the repository root to
+reproduce the real training/testing matrices from the package's dated
+resources. Outputs and numerical verification are described in
+[provenance/README.md](provenance/README.md).
+
+Please cite the package and all four contributing studies listed in
+[CITATIONS.md](CITATIONS.md). See [DATA_TERMS.md](DATA_TERMS.md) for the
+study-specific release-terms assessment. The numerical matrices have no
+identifiers; their recovered sample and taxon ordering is provided separately
+in `provenance/`.
 
 ## Figure S12 null experiment
 

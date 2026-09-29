@@ -96,23 +96,40 @@ bundled summary for the published numerical result.
 
 ## Inputs and provenance
 
-See [data/README.md](data/README.md) for matrix conventions and
-[data/DATA_TERMS.md](data/DATA_TERMS.md) for the initial release-terms review.
-The real and generated sample matrices and existing fitted density ratios
-are unchanged. `scripts/microbiome_subset.R` is upstream filtering context;
-it does not reconstruct the final sample selection, train/test split, or
-synthetic generation. The plotting workflow is reproducible from the bundled
-inputs, not a complete regeneration of the original generative-model fits.
+The real training and testing compositions can be reproduced from the
+`curatedMetagenomicData` R package using our preprocessing script and the
+bundled sample/taxon manifests:
 
-The sample-matching audit identifies four source studies in the real CSVs:
-HMP_2019_ibdmdb (931), HMP_2019_t2d (277), HallAB_2017 (209), and
-HanniganGD_2017 (41). These counts supersede the initial terms note's unresolved
-HMP-only hypothesis; no blanket dataset license is asserted here.
+```r
+install.packages("BiocManager")
+BiocManager::install("curatedMetagenomicData")
+```
 
+```sh
+Rscript scripts/reprocess_microbiome.R
+```
+
+The command downloads four dated resources, restores the published sample and
+taxon ordering, normalizes over the retained taxa, converts to float32, and
+checks the numerical contents against the published matrices. It writes
+`sample_train.csv` and `sample_test.csv` to `output/reprocessed_data/`.
+Validation used curatedMetagenomicData 3.20.0. See
+[data/provenance/README.md](data/provenance/README.md) for resource versions,
+selection details, and duplicate-profile ambiguity.
+
+The original `scripts/microbiome_subset.R` records the upstream filtering;
+`scripts/reprocess_microbiome.R` completes reconstruction of the final real
+matrices using the recovered selection. These scripts do not regenerate the
+synthetic samples or refit the generative models.
+
+See [data/README.md](data/README.md) for matrix conventions,
+[data/CITATIONS.md](data/CITATIONS.md) for the package and all four contributing
+studies, and [data/DATA_TERMS.md](data/DATA_TERMS.md) for source terms.
 `plot_revision1.py` and `utils/` are retained as the legacy Python workflow.
 
 ## Citation
 
-Pasolli E, et al. *Accessible, curated metagenomic data through ExperimentHub.*
-Nature Methods. 2017;14:1023–1024. <https://doi.org/10.1038/nmeth.4468>.
-Also cite the original contributing studies.
+Please cite **curatedMetagenomicData and all four source studies** when using
+the real microbiome data. Full references and DOI links are in
+[data/CITATIONS.md](data/CITATIONS.md). The source mixture comprises IBDMDB
+(931 rows), T2D (277), Hall (209), and Hannigan (41), rather than IBDMDB alone.
