@@ -3,5 +3,5 @@ file_arg <- grep("^--file=", commandArgs(FALSE), value = TRUE)
 script_path <- gsub("~+~", " ", sub("^--file=", "", file_arg[[1]]), fixed = TRUE)
 script_dir <- dirname(normalizePath(script_path, mustWork = TRUE))
 project_root <- normalizePath(file.path(script_dir, ".."))
-figures <- c("6", "7")
+figures <- "6"
 source(file.path(script_dir, "lib", "case_study_figures.R"))

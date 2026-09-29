@@ -23,3 +23,9 @@ sample matrices and fitted summaries were produced for this analysis.
 The CSVs do not contain study names, sample IDs, or taxon names. Absence of
 identifiers alone does not establish redistribution permission.
 See [DATA_TERMS.md](DATA_TERMS.md) for the outstanding provenance questions.
+
+## Figure S12 null experiment
+
+`figure_S12/test_pointwise_credible_intervals.csv` contains the original
+292-row null-experiment posterior summary. See [figure_S12/README.md](figure_S12/README.md)
+for provenance and the plotting/refitting commands.
