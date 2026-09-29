@@ -15,7 +15,7 @@ install.packages(c("ggplot2", "vegan", "patchwork", "scales"))
 From the repository root, run these commands in order:
 
 ```sh
-Rscript scripts/recreate_figures_5_7.R
+Rscript scripts/recreate_figures_6_7.R
 Rscript scripts/recreate_figures_13_14.R
 ```
 
@@ -26,12 +26,14 @@ when invoked by absolute path from another directory. No model fitting,
 Python installation, or new microbiome download is required.
 
 The first script computes Bray–Curtis PCoA with an additive correction and
-writes `output/figures_5_7/`:
+writes `output/figures_6_7/`:
 
-- `figure5_train_ggplot2.pdf` and `figure5_test_ggplot2.pdf`: real/generated comparisons.
-- `train_ggplot2.pdf` (Figure 6) and `test_ggplot2.pdf` (Figure 7): posterior means,
-  interval classifications, and intervals for 20 selected generated-sample rows.
-- `pcoa_coordinates.rds`, `train_plot_data.csv`, and `test_plot_data.csv`.
+- `figure6_ggplot2.pdf`: test versus generated samples in PCoA space (Figure 6).
+- `figure7_ggplot2.pdf`: test-sample posterior means, interval classifications,
+  and intervals for 20 selected generated-sample rows (Figure 7).
+- `figureS8_ggplot2.pdf`: training versus generated samples in PCoA space (Figure S8).
+- `figureS9_ggplot2.pdf`: training-sample density-ratio results (Figure S9).
+- `pcoa_coordinates.rds`, `figure7_plot_data.csv`, and `figureS9_plot_data.csv`.
 
 The second script uses those coordinates and writes `output/figures_13_14/`:
 
@@ -42,7 +44,7 @@ The second script uses those coordinates and writes `output/figures_13_14/`:
 
 PCoA is recomputed on each first-script run to avoid stale coordinates. This can
 take several minutes. Generated outputs are ignored by Git.
-In Figures 6–7, the 20 rows are selected by the across-method average absolute
+In Figures 7 and S9, the 20 rows are selected by the across-method average absolute
 posterior mean. Matching row numbers across generators are display indices,
 not matched biological subjects.
 

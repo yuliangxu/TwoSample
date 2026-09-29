@@ -4,10 +4,10 @@ project_root <- normalizePath(file.path(script_dir, ".."))
 suppressPackageStartupMessages({ library(ggplot2); library(scales) })
 
 ratio_root <- file.path(project_root, "data", "revision")
-pcoa_path <- file.path(project_root, "output", "figures_5_7", "pcoa_coordinates.rds")
+pcoa_path <- file.path(project_root, "output", "figures_6_7", "pcoa_coordinates.rds")
 output_dir <- file.path(project_root, "output", "figures_13_14")
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
-if (!file.exists(pcoa_path)) stop("Run recreate_figures_5_7.R first to create PCoA coordinates.")
+if (!file.exists(pcoa_path)) stop("Run recreate_figures_6_7.R first to create PCoA coordinates.")
 
 keys <- c("d", "dt", "icfm", "mbgan")
 method_labels <- c(d = "Dirichlet", dt = "Dirichlet Tree", icfm = "ICFM", mbgan = "MB-GAN")

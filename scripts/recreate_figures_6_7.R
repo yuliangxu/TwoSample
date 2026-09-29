@@ -5,7 +5,7 @@ suppressPackageStartupMessages({ library(ggplot2); library(vegan); library(patch
 
 data_dir <- file.path(project_root, "data")
 ratio_root <- file.path(project_root, "data", "revision")
-output_dir <- file.path(project_root, "output", "figures_5_7")
+output_dir <- file.path(project_root, "output", "figures_6_7")
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
 keys <- c("d", "dt", "icfm", "mbgan")
@@ -48,7 +48,7 @@ ordination_path <- file.path(output_dir, "pcoa_coordinates.rds")
 }
 ord_df$method <- factor(ord_df$method, levels = unname(method_labels))
 
-make_figure5 <- function(split) {
+make_pcoa_figure <- function(split, number) {
   plot_data <- ord_df[ord_df$split == split, ]
   plot_data$method <- factor(plot_data$method, levels = unname(method_labels))
   p <- ggplot(plot_data, aes(PC1, PC2, color = sample, shape = sample)) +
@@ -64,11 +64,11 @@ make_figure5 <- function(split) {
       shape = "none"
     ) +
     theme(legend.key.width = unit(8, "mm"), legend.spacing.x = unit(3, "mm"))
-  ggsave(file.path(output_dir, paste0("figure5_", split, "_ggplot2.pdf")),
+  ggsave(file.path(output_dir, paste0("figure", number, "_ggplot2.pdf")),
          p, width = 14, height = 5.2)
 }
-make_figure5("train")
-make_figure5("test")
+make_pcoa_figure("train", "S8")
+make_pcoa_figure("test", 6)
 
 load_ratio <- function(split, key) {
   z <- as.matrix(read.csv(file.path(ratio_root, split, paste0("log_w_", key, ".csv")), header = FALSE))
@@ -162,13 +162,13 @@ make_result_figure <- function(split, number) {
                                 override.aes = list(size = 3)))
   combined <- (p_mean / p_class / p_ci) +
     plot_layout(heights = c(0.9, 1, 0.72))
-  prefix <- paste0(split, "_ggplot2")
+  prefix <- paste0("figure", number, "_ggplot2")
   # Match the 6.5-inch text width from letter paper with 1-inch margins so
   # LaTeX can include the PDF at natural size without shrinking its fonts.
   ggsave(file.path(output_dir, paste0(prefix, ".pdf")), combined, width = 6.5, height = 6.5)
-  write.csv(df, file.path(output_dir, paste0(split, "_plot_data.csv")), row.names = FALSE)
+  write.csv(df, file.path(output_dir, paste0("figure", number, "_plot_data.csv")), row.names = FALSE)
 }
 
-make_result_figure("train", 6)
+make_result_figure("train", "S9")
 make_result_figure("test", 7)
-cat("Saved ggplot2 Figures 5, 6, and 7 to", normalizePath(output_dir), "\n")
+cat("Saved ggplot2 Figures 6, 7, S8, and S9 to", normalizePath(output_dir), "\n")
