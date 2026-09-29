@@ -8,3 +8,6 @@ plot/
 
 # Local experiment artifacts
 JASA_acc/
+
+# Generated R figures, coordinates, and session details
+output/

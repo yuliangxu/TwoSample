@@ -1,48 +1,69 @@
-# TwoSample Public
+# TwoSample case study
 
-This repository contains a de-identified public copy of the minimal files needed to reproduce the revision plotting workflow.
+Reproducible plotting code for the microbiome generative-model analysis in
+*Two-sample Comparison through Additive Tree Models for Density Ratios*.
+The current workflow uses ggplot2 and the round-2 figure layouts.
 
-This is the reproducible workflow for the microbiome generative-model analysis in the paper *Two-sample Comparison through Additive Tree Models for Density Ratios* (arXiv:2508.03059v3, March 11, 2026).
+## Reproduce the figures
 
-## Reproducing `plot_revision1.py`
+Install R and the plotting dependencies once:
 
-The main plotting script for the revision figures is `plot_revision1.py`.
+```r
+install.packages(c("ggplot2", "vegan", "patchwork", "scales"))
+```
 
-Required code:
+From the repository root, run these commands in order:
 
-- `plot_revision1.py`
-- `utils/DRE_baloss.py`
-- `utils/microbiome_help.py`
-- `utils/plot_ci_helpers.py`
+```sh
+Rscript scripts/recreate_figures_5_7.R
+Rscript scripts/recreate_figures_13_14.R
+```
 
-Required data files:
+Validated with ggplot2 4.0.3, vegan 2.7.5, patchwork 1.3.2, and scales 1.4.0.
 
-- `data/sample_train.csv`
-- `data/sample_test.csv`
-- `data/sample_d.csv`
-- `data/sample_dt.csv`
-- `data/sample_icfm.csv`
-- `data/sample_mbgan.csv`
-- `data/revision/train/log_w_d.csv`
-- `data/revision/train/log_w_dt.csv`
-- `data/revision/train/log_w_icfm.csv`
-- `data/revision/train/log_w_mbgan.csv`
-- `data/revision/test/log_w_d.csv`
-- `data/revision/test/log_w_dt.csv`
-- `data/revision/test/log_w_icfm.csv`
-- `data/revision/test/log_w_mbgan.csv`
+The scripts resolve inputs relative to their own location, so they also work
+when invoked by absolute path from another directory. No model fitting,
+Python installation, or new microbiome download is required.
 
+The first script computes Bray–Curtis PCoA with an additive correction and
+writes `output/figures_5_7/`:
 
-## Preprocessing
+- `figure5_train_ggplot2.pdf` and `figure5_test_ggplot2.pdf`: real/generated comparisons.
+- `train_ggplot2.pdf` (Figure 6) and `test_ggplot2.pdf` (Figure 7): posterior means,
+  interval classifications, and intervals for 20 selected generated-sample rows.
+- `pcoa_coordinates.rds`, `train_plot_data.csv`, and `test_plot_data.csv`.
 
-The upstream preprocessing entry point is `scripts/microbiome_subset.R`.
+The second script uses those coordinates and writes `output/figures_13_14/`:
 
-That script currently downloads and subsets `curatedMetagenomicData`. It is therefore preprocessing context. The real and synthetic datasets used to reproduce the plotting workflow are included under `data/`.
+- `figure13_ggplot2.pdf` and `figure14_ggplot2.pdf`: train/test grids of posterior
+  means and 2.5%/97.5% quantiles, with symmetric pseudo-log color limits of
+  [-30, 30] and [-12, 12], respectively.
+- Corresponding `figure13_plot_data.csv` and `figure14_plot_data.csv`.
 
-## Data Source
+PCoA is recomputed on each first-script run to avoid stale coordinates. This can
+take several minutes. Generated outputs are ignored by Git.
+In Figures 6–7, the 20 rows are selected by the across-method average absolute
+posterior mean. Matching row numbers across generators are display indices,
+not matched biological subjects.
 
-The microbiome preprocessing step uses the Bioconductor package `curatedMetagenomicData`.
+## Inputs and provenance
 
-Recommended citation:
+See [data/README.md](data/README.md) for the input layout and
+[data/DATA_TERMS.md](data/DATA_TERMS.md) for the data-release review.
+The bundled numerical inputs are unchanged from the preceding workflow.
+The scripts plot existing posterior summaries; they do not retrain the models.
 
-Pasolli E, Schiffer L, Manghi P, Renson A, Obenchain V, Truong DT, Beghini F, Malik F, Ramos M, Dowd JB, Huttenhower C, Morgan M, Segata N, Waldron L. *Accessible, curated metagenomic data through ExperimentHub.* Nature Methods. 2017;14(11):1023-1024. doi:10.1038/nmeth.4468.
+`scripts/microbiome_subset.R` records upstream filtering context. It downloads
+from `curatedMetagenomicData`, but does not record the historical resource
+versions, export the final matrices, or reproduce the train/test split and
+synthetic generation. It is not an end-to-end reconstruction of the bundled CSVs.
+
+`plot_revision1.py` and `utils/` are retained as the legacy Python workflow;
+the R commands above are the current case-study entry points.
+
+## Citation
+
+Pasolli E, et al. *Accessible, curated metagenomic data through ExperimentHub.*
+Nature Methods. 2017;14:1023–1024. <https://doi.org/10.1038/nmeth.4468>.
+Original contributing studies should also be cited once the historical sample
+provenance is recovered.
