@@ -1,0 +1,24 @@
+{
+  "file": "mbgan_generator.h5",
+  "sha256": "457c13dbba3afefd1c0a7979eb6854118d25806143ac5306bd1543740eaf840f",
+  "bytes": 2613920,
+  "format": "Keras HDF5 generator",
+  "saved_keras_version": "2.13.1",
+  "historical_checkpoint_name": "curated_comp_marginal_20250318T162950/models/curated_comp_marginal_500000_generator.h5",
+  "latent_dimension": 100,
+  "taxa": 123,
+  "nominal_iteration": 500000,
+  "historical_training_membership_verified": false,
+  "sampling": {
+    "seed": 256,
+    "n": 1000,
+    "batch_size": 32,
+    "output_transform": null
+  },
+  "upstream": "https://github.com/zhanxw/MB-GAN",
+  "recovered_source_hashes": {
+    "clean/model.py": "9efc755e7fdcc18310c5fe4405319134f5d6e25ea50afb0a7b776b6971968e18",
+    "clean/1_mbgan.ipynb": "0c29360ab84095c50c1f0b3ee1896d97f0c69b093fcd1d98bcc558809ffac968",
+    "4_process_generatedData.ipynb": "125a8ea0d9ea9658664a63e78883c5a7d441c103725a683525033b641acd7b2e"
+  }
+}

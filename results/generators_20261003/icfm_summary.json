@@ -1,0 +1,44 @@
+{
+  "conclusion": "Broadly comparable fit to real data; small and mixed descriptive changes; primary bootstrap interval includes zero improvement. Both synthetic sets underrepresent diversity and overrepresent dominance.",
+  "primary_test": {
+    "split": "test",
+    "metric": "sqrt_euclidean",
+    "original": {
+      "u": 0.012974205714123777,
+      "v": 0.017688492910487685,
+      "mean_cross_distance": 1.0869159923801073,
+      "mean_within_real_distance_off_diagonal": 1.053109307707354,
+      "mean_within_synthetic_distance_off_diagonal": 1.1077484713387369
+    },
+    "regenerated": {
+      "u": 0.0125515857616465,
+      "v": 0.017255498670133207,
+      "mean_cross_distance": 1.081517538465306,
+      "mean_within_real_distance_off_diagonal": 1.053109307707354,
+      "mean_within_synthetic_distance_off_diagonal": 1.0973741834616115
+    },
+    "delta_u_regenerated_minus_original": -0.0004226199524772767,
+    "percent_reduction_u": 3.2573859378321,
+    "delta_u_bootstrap_95_percentile": [
+      -0.004069705286721681,
+      0.0034156637711344525
+    ]
+  },
+  "test_mean_composition_l1": {
+    "original": 0.3174377274982716,
+    "regenerated": 0.2857591056870219
+  },
+  "test_prevalence_mae": {
+    "original": 0.0335657645617552,
+    "regenerated": 0.04017206815903777
+  },
+  "seed_check": "Four prespecified draws (2,101,102,103); no best seed selection. See icfm_energy_by_seed.csv.",
+  "training_performed": false,
+  "BATTS_refit": false,
+  "sample_counts": {
+    "original": 1000,
+    "regenerated_primary": 1000,
+    "real_train": 1166,
+    "real_test": 292
+  }
+}

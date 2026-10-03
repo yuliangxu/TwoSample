@@ -1,0 +1,59 @@
+{
+  "status": "complete",
+  "models": {
+    "d": {
+      "seed": 1,
+      "shape": [
+        1000,
+        123
+      ],
+      "sha256": "957df6b4007389c9c51ed5fc224b67e0f9dcc164354948ee16979d152f9f1f99",
+      "selected_csv_sha256": "957df6b4007389c9c51ed5fc224b67e0f9dcc164354948ee16979d152f9f1f99",
+      "exact_numeric_match": true,
+      "max_absolute_difference": 0.0,
+      "absolute_tolerance": 1e-09,
+      "passed": true
+    },
+    "dt": {
+      "seed": 1,
+      "shape": [
+        1000,
+        123
+      ],
+      "sha256": "6aab2b42f149c365305dc485ee05fd00fac1fdd16e17bd9eccd26edd68d9855b",
+      "selected_csv_sha256": "6aab2b42f149c365305dc485ee05fd00fac1fdd16e17bd9eccd26edd68d9855b",
+      "exact_numeric_match": true,
+      "max_absolute_difference": 0.0,
+      "absolute_tolerance": 1e-08,
+      "passed": true
+    },
+    "icfm": {
+      "seed": 2,
+      "shape": [
+        1000,
+        123
+      ],
+      "sha256": "24ca2b129d6073bedbe151eec23bf469fb1e79fe1c4a6ed53c2932a19436d58c",
+      "selected_csv_sha256": "24ca2b129d6073bedbe151eec23bf469fb1e79fe1c4a6ed53c2932a19436d58c",
+      "exact_numeric_match": true,
+      "max_absolute_difference": 0.0,
+      "absolute_tolerance": 1e-06,
+      "passed": true
+    },
+    "mbgan": {
+      "seed": 256,
+      "shape": [
+        1000,
+        123
+      ],
+      "sha256": "bc4b43fca1d64f9266c064df3e48e7d4979c80043945fe7242ff3c563ce19ad4",
+      "selected_csv_sha256": "bc4b43fca1d64f9266c064df3e48e7d4979c80043945fe7242ff3c563ce19ad4",
+      "exact_numeric_match": true,
+      "max_absolute_difference": 0.0,
+      "absolute_tolerance": 1e-06,
+      "passed": true
+    }
+  },
+  "real_training_sha256": "00f4afc44f36563195b12b104b87aeefecaae1dcb79037849dbf640bbf975f56",
+  "neural_mode": "Recovered checkpoint replay. This does not retrain either historical neural model."
+}

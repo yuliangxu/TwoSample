@@ -1,0 +1,68 @@
+{
+  "purpose": "Verify portable parametric fitting and sampling against selected release arrays. No test observations read.",
+  "training_rows": 1166,
+  "taxa": 123,
+  "synthetic_rows": 1000,
+  "random_state": 1,
+  "environment": {
+    "python": "3.9.25",
+    "numpy": "1.26.4",
+    "scipy": "1.13.1"
+  },
+  "source_hashes": {
+    "generators/dirichlet.py": "9b506c66b60a5f1f7346a73c38a3b92dcbfbc665dedc112864d2a2d90a96f6eb",
+    "generators/dirichlet_tree.py": "8c68150ceeb08d31d7afbb1d4bb9e56d9fe6b14a839606d2b701e318c75d4af6",
+    "generators/tree.py": "b21e5d6d53d993be2d44eeecf9d10880ff93543042d80a8fe48aa436f50dc489"
+  },
+  "models": {
+    "dirichlet": {
+      "fit_sample_equals_selected_release": true,
+      "fit_sample_equals_prior_selected_array": true,
+      "checkpoint_resampling_equals_fit_sample": true,
+      "csv_roundtrip_equals_fit_sample": true,
+      "fitted_parameters_equal_prior_selected_parameters": true,
+      "max_absolute_difference_from_selected_release": 0.0,
+      "max_equation_residual": 1.8108181620846153e-11,
+      "n_parameters": 123,
+      "parameters_shape": [
+        123
+      ],
+      "parameters_dtype": "<f8",
+      "parameters_sha256_numeric_bytes": "e48ba05c2b7cd878a864cf47bde1cdc823e36d46646dce0f1ece7041d3f35cc4",
+      "selected_release_csv_sha256": "957df6b4007389c9c51ed5fc224b67e0f9dcc164354948ee16979d152f9f1f99",
+      "training_file_sha256": "00f4afc44f36563195b12b104b87aeefecaae1dcb79037849dbf640bbf975f56",
+      "max_absolute_difference_from_original_published_array": 8.709860610522924e-11
+    },
+    "dirichlet_tree_stable": {
+      "fit_sample_equals_selected_release": true,
+      "fit_sample_equals_prior_selected_array": true,
+      "checkpoint_resampling_equals_fit_sample": true,
+      "csv_roundtrip_equals_fit_sample": true,
+      "fitted_parameters_equal_prior_selected_parameters": true,
+      "max_absolute_difference_from_selected_release": 0.0,
+      "max_equation_residual": 2.2426505097428162e-14,
+      "n_parameters": 244,
+      "parameters_shape": [
+        122,
+        2
+      ],
+      "parameters_dtype": "<f8",
+      "parameters_sha256_numeric_bytes": "9d436bdef93e4b18b94288381d235dfdd293313fb33430c754bdd095ae1a026e",
+      "selected_release_csv_sha256": "6aab2b42f149c365305dc485ee05fd00fac1fdd16e17bd9eccd26edd68d9855b",
+      "training_file_sha256": "00f4afc44f36563195b12b104b87aeefecaae1dcb79037849dbf640bbf975f56",
+      "nodes_verified": 122,
+      "all_nodes_verified": true,
+      "historical_reproduction": false
+    }
+  },
+  "npz_comparison_note": "Checkpoint numerical parameter arrays and metadata are compared; NPZ container timestamp bytes need not reproduce.",
+  "shared_tree_checks": {
+    "tree_hashes": {
+      "childNode.csv": "c92879e3a4b48db3b2342cffa30768aecebbd4b154654684ffe6a4f9708a03b4",
+      "treeTaxa.csv": "c38f1fd38293815fc7d2183deb6ea721460ef5bc8139430755411d9a600be64b",
+      "outTaxa.csv": "806157d70b850318946bd3f3de1508776521ea2e7ccb153fd4152e3a3b9c0e51"
+    },
+    "dt_forward_equals_selected_training_transform": true,
+    "icfm_float32_inverse_equals_historical_replay_array": true
+  }
+}

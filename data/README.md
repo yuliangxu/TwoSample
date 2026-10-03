@@ -11,6 +11,12 @@ All CSVs are numeric and have no header. Rows retain the ordering used for fitti
 | `sample_icfm.csv` | 1000 | 123 | ICFM generated samples |
 | `sample_mbgan.csv` | 1000 | 123 | MB-GAN generated samples |
 
+These top-level matrices are the original paper inputs. The selected updated
+synthetic data are versioned in [`regenerated_20261003/`](regenerated_20261003/),
+with checksums and [fitting/sampling commands](../generators/README.md).
+The posterior summaries below correspond to the original matrices; updated
+samples require new downstream fits.
+
 For each generator key (`d`, `dt`, `icfm`, `mbgan`),
 `revision/train/log_w_<key>.csv` and `revision/test/log_w_<key>.csv`
 contain posterior summaries. Real observations precede that generator's 1000

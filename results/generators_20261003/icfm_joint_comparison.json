@@ -1,0 +1,206 @@
+{
+  "scope": "Compare frozen original/published and regenerated ICFM cohorts; no retraining, tuning, or BATTS fitting.",
+  "versions": {
+    "python": "3.9.25",
+    "numpy": "1.26.4",
+    "scipy": "1.13.1"
+  },
+  "inputs": {
+    "original": {
+      "path": "data/sample_icfm.csv",
+      "sha256": "835fcbbb4f434c055a8b4ec7b03becbc7d9a9e4a26b02cf7417439461688f254",
+      "shape": [
+        1000,
+        123
+      ]
+    },
+    "regenerated": {
+      "path": "data/regenerated_20261003/sample_icfm.csv",
+      "sha256": "24ca2b129d6073bedbe151eec23bf469fb1e79fe1c4a6ed53c2932a19436d58c",
+      "shape": [
+        1000,
+        123
+      ]
+    },
+    "train": {
+      "path": "data/sample_train.csv",
+      "sha256": "00f4afc44f36563195b12b104b87aeefecaae1dcb79037849dbf640bbf975f56",
+      "shape": [
+        1166,
+        123
+      ]
+    },
+    "test": {
+      "path": "data/sample_test.csv",
+      "sha256": "2c33d8e4ba2ef0dea315a9a5a70aad93acf4cc9fd5beaa63ad9589c4313d012c",
+      "shape": [
+        292,
+        123
+      ]
+    }
+  },
+  "regenerated_definition": "Recovered MLP checkpoint; restored torchdyn1.0.6 dopri5; float32 CPU; atol=rtol=1e-4; seed2; 1000 samples.",
+  "primary_metric": "sqrt_euclidean",
+  "normalization": "Each abundance row divided by its row sum before any calculation.",
+  "metric_definitions": {
+    "sqrt_euclidean": "Euclidean energy after elementwise sqrt of normalized compositions. Distance is sqrt(2) times Hellinger distance; joint-sensitive.",
+    "euclidean": "Euclidean energy in normalized abundance space; joint-sensitive.",
+    "bray_curtis": "Energy with0.5*L1 distance. Equals a sum of marginal energies and cannot detect dependence-only distribution differences."
+  },
+  "energy_definition": "U=2*sum cross/(m*n)-sum real pair distances/(m*(m-1))-sum synthetic pair distances/(n*(n-1)); V retains n^2 denominators. Lower is closer; finite-sample U may be negative.",
+  "bootstrap": {
+    "replicates": 1000,
+    "seed": 20261003,
+    "interval": "95% percentile interval for U(regenerated)-U(original)",
+    "resampling": "Real rows sampled once per replicate and shared between comparisons; each synthetic cohort resampled independently with replacement.",
+    "limitations": "Conditional on frozen generators and iid rows; reflects finite-cohort sampling, not training variability, historical data leakage, or provenance uncertainty. Descriptive intervals without multiple-comparison correction."
+  },
+  "split_caveat": "Public train/test roles are preserved. Historical checkpoint fitting membership is unknown, so independent test status relative to that checkpoint is unverified.",
+  "comparisons": [
+    {
+      "split": "train",
+      "metric": "sqrt_euclidean",
+      "original": {
+        "u": 0.011865069702482689,
+        "v": 0.013876713560239118,
+        "mean_cross_distance": 1.0867777808020633,
+        "mean_within_real_distance_off_diagonal": 1.053942020562907,
+        "mean_within_synthetic_distance_off_diagonal": 1.1077484713387369
+      },
+      "regenerated": {
+        "u": 0.013109448849315974,
+        "v": 0.015110718419195202,
+        "mean_cross_distance": 1.0822128264369173,
+        "mean_within_real_distance_off_diagonal": 1.053942020562907,
+        "mean_within_synthetic_distance_off_diagonal": 1.0973741834616115
+      },
+      "delta_u_regenerated_minus_original": 0.0012443791468332854,
+      "percent_reduction_u": -10.487752520938896,
+      "delta_u_bootstrap_95_percentile": [
+        -0.0014157471963365197,
+        0.004131320724310816
+      ]
+    },
+    {
+      "split": "train",
+      "metric": "euclidean",
+      "original": {
+        "u": 0.01095365109108759,
+        "v": 0.012009450156354351,
+        "mean_cross_distance": 0.5701537790307356,
+        "mean_within_real_distance_off_diagonal": 0.5166562977500013,
+        "mean_within_synthetic_distance_off_diagonal": 0.6126976092203823
+      },
+      "regenerated": {
+        "u": 0.01120620825259655,
+        "v": 0.012256061728793233,
+        "mean_cross_distance": 0.567307263076488,
+        "mean_within_real_distance_off_diagonal": 0.5166562977500013,
+        "mean_within_synthetic_distance_off_diagonal": 0.6067520201503782
+      },
+      "delta_u_regenerated_minus_original": 0.00025255716150895946,
+      "percent_reduction_u": -2.3056893031260777,
+      "delta_u_bootstrap_95_percentile": [
+        -0.0020206335331868024,
+        0.002555296690280518
+      ]
+    },
+    {
+      "split": "train",
+      "metric": "bray_curtis",
+      "original": {
+        "u": 0.019310463039758363,
+        "v": 0.020743243728369,
+        "mean_cross_distance": 0.7785313035398307,
+        "mean_within_real_distance_off_diagonal": 0.7373296206657955,
+        "mean_within_synthetic_distance_off_diagonal": 0.8004225233741075
+      },
+      "regenerated": {
+        "u": 0.020781745024466947,
+        "v": 0.022206841993977045,
+        "mean_cross_distance": 0.7754250849818832,
+        "mean_within_real_distance_off_diagonal": 0.7373296206657955,
+        "mean_within_synthetic_distance_off_diagonal": 0.792738804273504
+      },
+      "delta_u_regenerated_minus_original": 0.0014712819847085834,
+      "percent_reduction_u": -7.619092207573464,
+      "delta_u_bootstrap_95_percentile": [
+        -0.0013954335391484051,
+        0.0046110575411937825
+      ]
+    },
+    {
+      "split": "test",
+      "metric": "sqrt_euclidean",
+      "original": {
+        "u": 0.012974205714123777,
+        "v": 0.017688492910487685,
+        "mean_cross_distance": 1.0869159923801073,
+        "mean_within_real_distance_off_diagonal": 1.053109307707354,
+        "mean_within_synthetic_distance_off_diagonal": 1.1077484713387369
+      },
+      "regenerated": {
+        "u": 0.012551585761646944,
+        "v": 0.01725549867013365,
+        "mean_cross_distance": 1.0815175384653062,
+        "mean_within_real_distance_off_diagonal": 1.053109307707354,
+        "mean_within_synthetic_distance_off_diagonal": 1.0973741834616115
+      },
+      "delta_u_regenerated_minus_original": -0.0004226199524768326,
+      "percent_reduction_u": 3.257385937828677,
+      "delta_u_bootstrap_95_percentile": [
+        -0.004069705286721681,
+        0.0034156637711344525
+      ]
+    },
+    {
+      "split": "test",
+      "metric": "euclidean",
+      "original": {
+        "u": 0.011550015287070337,
+        "v": 0.013916438276749266,
+        "mean_cross_distance": 0.5681677178006747,
+        "mean_within_real_distance_off_diagonal": 0.5120878110938967,
+        "mean_within_synthetic_distance_off_diagonal": 0.6126976092203823
+      },
+      "regenerated": {
+        "u": 0.01084391173507293,
+        "v": 0.013204389135681782,
+        "mean_cross_distance": 0.5648418714896739,
+        "mean_within_real_distance_off_diagonal": 0.5120878110938967,
+        "mean_within_synthetic_distance_off_diagonal": 0.6067520201503782
+      },
+      "delta_u_regenerated_minus_original": -0.0007061035519974057,
+      "percent_reduction_u": 6.113442575161379,
+      "delta_u_bootstrap_95_percentile": [
+        -0.0033774614533620627,
+        0.00202138582152212
+      ]
+    },
+    {
+      "split": "test",
+      "metric": "bray_curtis",
+      "original": {
+        "u": 0.019852235634441828,
+        "v": 0.02318108719542422,
+        "mean_cross_distance": 0.779288018995084,
+        "mean_within_real_distance_off_diagonal": 0.7383012789816188,
+        "mean_within_synthetic_distance_off_diagonal": 0.8004225233741075
+      },
+      "regenerated": {
+        "u": 0.020017753456390786,
+        "v": 0.02333892129827264,
+        "mean_cross_distance": 0.7755289183557568,
+        "mean_within_real_distance_off_diagonal": 0.7383012789816188,
+        "mean_within_synthetic_distance_off_diagonal": 0.792738804273504
+      },
+      "delta_u_regenerated_minus_original": 0.00016551782194895726,
+      "percent_reduction_u": -0.833749029564201,
+      "delta_u_bootstrap_95_percentile": [
+        -0.0033975799580395287,
+        0.0036882615111543766
+      ]
+    }
+  ],
+  "runtime_seconds": 2.5650459337048233
+}

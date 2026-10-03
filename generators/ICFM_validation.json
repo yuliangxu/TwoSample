@@ -1,0 +1,86 @@
+{
+  "adapter_sha256": "a769a2f6c87b283adb2be8c1627f92debfcd2059323ad965d7c8e5ebe5f8ebf1",
+  "code_sha256": "bede9c412b3248a01231bac15458383b562537adda6d25fc8115cf5e036bf9e2",
+  "date": "2026-10-03",
+  "environment": {
+    "numpy": "1.26.4",
+    "pandas": "2.2.3",
+    "python": "3.9.25",
+    "scipy": "1.13.1",
+    "torch": "2.6.0"
+  },
+  "full_new_training_performed": false,
+  "new_checkpoint_sample_roundtrip": {
+    "finite_nonnegative": true,
+    "max_row_sum_error": 4.440892098500626e-16,
+    "npy_sha256": "bc5164ce646f4ff27fb8455906eb62f4fb233039bd65192308f7405455aa3738",
+    "seed": 4,
+    "shape": [
+      17,
+      123
+    ]
+  },
+  "new_training_smoke": {
+    "all_tensors_identical_across_runs": true,
+    "batch_size": 32,
+    "device": "cpu",
+    "final_state_sha256": "84bab74b2fb5f0b297b6202ca5143cb8cc0313f9de3976d68460c006a876ca05",
+    "independent_processes": 2,
+    "initial_state_sha256": "046832d94e49997d81a854c4ba49a521085c23f868719b03ca820700188920f7",
+    "losses": [
+      60.09127426147461,
+      58.15494918823242,
+      57.687530517578125,
+      56.15605926513672,
+      55.8083610534668,
+      55.087398529052734,
+      57.59568786621094,
+      53.8858528137207
+    ],
+    "losses_identical_across_runs": true,
+    "parameters_changed_in_both": true,
+    "preprocessing": {
+      "clip_logratio": 13.815510557964274,
+      "method": "tree.forward_icfm",
+      "output_dtype": "float32",
+      "transformed_array_sha256": "b408c1b565cdf3fb98facbad008fb426a35b5c764ed3487f1b80453a5cf52ca7",
+      "zero_mass": 1e-08
+    },
+    "seed": 20261003,
+    "steps": 8,
+    "temporary_smoke_weights_shipped": false,
+    "threads": 2,
+    "training_csv_sha256": "00f4afc44f36563195b12b104b87aeefecaae1dcb79037849dbf640bbf975f56",
+    "training_shape": [
+      1166,
+      123
+    ]
+  },
+  "recovered_checkpoint_sha256": "6f8d3b318687c910b0f549c922aff4d1f346a3773f7661505b8aa8d4af4118be",
+  "recovered_replay": {
+    "atol": 0.0001,
+    "columns": 123,
+    "device": "cpu",
+    "exact_match": true,
+    "expected_npy_sha256": "c1043b018c7bb554577a1fc21cddc590c103c23bd66c8b70a351c12744e1418d",
+    "max_row_sum_error": 1.1102230246251565e-15,
+    "npy_sha256": "c1043b018c7bb554577a1fc21cddc590c103c23bd66c8b70a351c12744e1418d",
+    "rtol": 0.0001,
+    "samples": 1000,
+    "seed": 2,
+    "threads": 2
+  },
+  "status": "PASS",
+  "trained_checkpoint_tree_guard": {
+    "mismatched_tree_rejected": true,
+    "modification": "Additional newline in a copied outTaxa.csv changes its hash",
+    "sample_output_created_on_mismatch": false,
+    "unmodified_tree_control_bitwise_equal_to_prior": true,
+    "unmodified_tree_control_sha256": "bc5164ce646f4ff27fb8455906eb62f4fb233039bd65192308f7405455aa3738",
+    "unmodified_tree_control_shape": [
+      17,
+      123
+    ]
+  },
+  "tree_code_sha256": "b21e5d6d53d993be2d44eeecf9d10880ff93543042d80a8fe48aa436f50dc489"
+}

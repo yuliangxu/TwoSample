@@ -4,6 +4,15 @@ Reproducible code for the microbiome case study in *Two-sample Comparison
 through Additive Tree Models for Density Ratios*. Script names and PDF names
 follow the paper: Figures 6, 7, and S8–S12.
 
+The [generative-model release](generators/README.md) adds fitting and sampling
+code for Dirichlet, stabilized Dirichlet tree, ICFM, and MBGAN, together with
+[selected regenerated samples](data/regenerated_20261003/) and a
+[validation report](results/generators_20261003/REPORT.md). Parametric fits are
+reproducible from the public training data. Neural checkpoint replay and new
+neural training recipes are documented separately because historical neural
+training provenance is incomplete. The figure commands below continue to use
+the original data and matching BATTS results.
+
 The [updated BATTS rerun report](results/batts_909ea357/REPORT.md) contains
 new results, comparisons with the paper, and all seven regenerated PDFs for
 commit `909ea357`. The commands below distinguish redrawing the original
@@ -60,8 +69,8 @@ Rscript scripts/reproduce_case_study_batts.R 2
 ```
 
 The optional integer controls independent comparison workers on macOS/Linux;
-Windows runs sequentially. This command refits all four generators against
-each real split, reruns the held-out null experiment, exports comparison
+Windows runs sequentially. This command refits density-ratio comparisons for
+all four generators against each real split, reruns the held-out null experiment, exports comparison
 tables, and renders Figures 6, 7, and S8–S12. Outputs are under
 `output/batts_909ea357/`; the bundled paper results are preserved.
 
@@ -177,8 +186,8 @@ selection details, and duplicate-profile ambiguity.
 
 The original `scripts/microbiome_subset.R` records the upstream filtering;
 `scripts/reprocess_microbiome.R` completes reconstruction of the final real
-matrices using the recovered selection. These scripts do not regenerate the
-synthetic samples or refit the generative models.
+matrices using the recovered selection. For synthetic-sample regeneration and
+generator fitting, use the separate [generative-model workflow](generators/README.md).
 
 See [data/README.md](data/README.md) for matrix conventions,
 [data/CITATIONS.md](data/CITATIONS.md) for the package and all four contributing

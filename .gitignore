@@ -11,3 +11,7 @@ JASA_acc/
 
 # Generated R figures, coordinates, and session details
 output/
+
+# Local generator environments
+.venv-generators/
+.venv-mbgan/

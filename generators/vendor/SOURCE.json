@@ -1,0 +1,120 @@
+{
+  "package": "torchdyn",
+  "version": "1.0.6",
+  "author": "Michael Poli and torchdyn contributors",
+  "upstream": "https://github.com/DiffEqML/torchdyn",
+  "license": "Apache-2.0",
+  "license_path": "torchdyn_1_0_6/LICENSE",
+  "provenance": "Definitions extracted from the installed torchdyn 1.0.6 distribution. No claim that the original historical run recorded this package version.",
+  "files": [
+    {
+      "upstream_path": "torchdyn/numerics/solvers/templates.py",
+      "upstream_file_sha256": "3928e65df67964965749c10ef34a5ef8d72c769dcaa2f361c4f30f410c4ba535",
+      "vendored_path": "torchdyn_1_0_6/torchdyn/numerics/solvers/templates.py",
+      "vendored_sha256": "f1780bc9db2402ea60bf4b4fde896dfce9a43d46da75c0c8d5908080568d8790",
+      "definitions": [
+        {
+          "name": "DiffEqSolver",
+          "line_start": 12,
+          "line_end": 43
+        }
+      ],
+      "changes": "Imports and unrelated definitions omitted; selected definition bodies retained with trailing whitespace and extra end-of-file blank lines removed. AST is unchanged."
+    },
+    {
+      "upstream_path": "torchdyn/numerics/solvers/_constants.py",
+      "upstream_file_sha256": "583f0eb6ede31c07a7f60a87940952552738d6b5c491e5f6cb3e2c53562e944e",
+      "vendored_path": "torchdyn_1_0_6/torchdyn/numerics/solvers/_constants.py",
+      "vendored_sha256": "79dd1575fb431a35fc6508b49dd7bd53f45676ba66ca784cb415d361b70fdc9f",
+      "definitions": [
+        {
+          "name": "construct_dopri5",
+          "line_start": 31,
+          "line_end": 46
+        }
+      ],
+      "changes": "Imports and unrelated definitions omitted; selected definition bodies retained with trailing whitespace and extra end-of-file blank lines removed. AST is unchanged."
+    },
+    {
+      "upstream_path": "torchdyn/numerics/solvers/ode.py",
+      "upstream_file_sha256": "c34dbf26269651eb06a3358e3eda2d81b5f2c151b208ce1ec7e9c3b7712489b8",
+      "vendored_path": "torchdyn_1_0_6/torchdyn/numerics/solvers/ode.py",
+      "vendored_sha256": "606e7eb4359c3910a6204e835c1a67b1ca89a65229144afd96ce8dc8a70188d1",
+      "definitions": [
+        {
+          "name": "DormandPrince45",
+          "line_start": 138,
+          "line_end": 156
+        },
+        {
+          "name": "Tsitouras45",
+          "line_start": 160,
+          "line_end": 178
+        }
+      ],
+      "changes": "Imports and unrelated definitions omitted; selected definition bodies retained with trailing whitespace and extra end-of-file blank lines removed. AST is unchanged."
+    },
+    {
+      "upstream_path": "torchdyn/numerics/utils.py",
+      "upstream_file_sha256": "2672e4da5763a4eba2225b5c179d05010b68110f120a10568bf055900221f8aa",
+      "vendored_path": "torchdyn_1_0_6/torchdyn/numerics/utils.py",
+      "vendored_sha256": "e94170ae229c18b9d0700a0e72f18a19f538b50a51accfea630eeb41f1795c8a",
+      "definitions": [
+        {
+          "name": "hairer_norm",
+          "line_start": 33,
+          "line_end": 34
+        },
+        {
+          "name": "init_step",
+          "line_start": 37,
+          "line_end": 54
+        },
+        {
+          "name": "adapt_step",
+          "line_start": 57,
+          "line_end": 63
+        }
+      ],
+      "changes": "Imports and unrelated definitions omitted; selected definition bodies retained with trailing whitespace and extra end-of-file blank lines removed. AST is unchanged."
+    },
+    {
+      "upstream_path": "torchdyn/numerics/odeint.py",
+      "upstream_file_sha256": "491e584f9df4b4114fc55ffaaf7e7eb51f92b3f50dbe3e21c8e3da5174cb5c31",
+      "vendored_path": "torchdyn_1_0_6/torchdyn/numerics/odeint.py",
+      "vendored_sha256": "daa4c65fadc3324829aecd8ad2d4b09756e1361ff057e009c34b6d2a1aa68d2e",
+      "definitions": [
+        {
+          "name": "odeint",
+          "line_start": 29,
+          "line_end": 91
+        },
+        {
+          "name": "_adaptive_odeint",
+          "line_start": 326,
+          "line_end": 408
+        }
+      ],
+      "changes": "Imports and unrelated definitions omitted; selected definition bodies retained with trailing whitespace and extra end-of-file blank lines removed. AST is unchanged."
+    },
+    {
+      "upstream_path": "torchdyn/core/defunc.py",
+      "upstream_file_sha256": "bbae6636b04fe159b4664c52a02be40a65e677c0b8b88d31bb3873614b8282b3",
+      "vendored_path": "torchdyn_1_0_6/torchdyn/core/defunc.py",
+      "vendored_sha256": "2891f56e469a582be7ff89f02100696751f83a75293570a6fe5d937b72083f44",
+      "definitions": [
+        {
+          "name": "DEFuncBase",
+          "line_start": 19,
+          "line_end": 33
+        },
+        {
+          "name": "DEFunc",
+          "line_start": 36,
+          "line_end": 86
+        }
+      ],
+      "changes": "Imports and unrelated definitions omitted; selected definition bodies retained with trailing whitespace and extra end-of-file blank lines removed. AST is unchanged."
+    }
+  ]
+}

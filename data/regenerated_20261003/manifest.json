@@ -1,0 +1,87 @@
+{
+  "release": "2026-10-03",
+  "baseline_repository_commit": "53f8bfcce1aee8c9c6bf52a1951ff56d7b613733",
+  "purpose": "Selected regenerated synthetic data. Original paper data and corresponding BATTS results remain unchanged.",
+  "n_synthetic_per_model": 1000,
+  "taxa": 123,
+  "csv_format": "Headerless; samples in rows; taxonomy order data/provenance/taxa.txt; %.18e floating-point text.",
+  "real_training": {
+    "path": "../sample_train.csv",
+    "shape": [
+      1166,
+      123
+    ],
+    "sha256": "00f4afc44f36563195b12b104b87aeefecaae1dcb79037849dbf640bbf975f56"
+  },
+  "real_testing": {
+    "path": "../sample_test.csv",
+    "shape": [
+      292,
+      123
+    ],
+    "sha256": "2c33d8e4ba2ef0dea315a9a5a70aad93acf4cc9fd5beaa63ad9589c4313d012c"
+  },
+  "models": {
+    "d": {
+      "csv": "sample_d.csv",
+      "shape": [
+        1000,
+        123
+      ],
+      "seed": 1,
+      "sha256": "957df6b4007389c9c51ed5fc224b67e0f9dcc164354948ee16979d152f9f1f99",
+      "source_array_sha256": "28e6013fb5b91a3388881afae80bc687f72e2428634f44dc787b4b5949876ada",
+      "max_row_sum_error": 1.3322676295501878e-15,
+      "max_abs_difference_from_published": 8.709860610522924e-11,
+      "checkpoint": "../../generators/checkpoints/dirichlet.npz",
+      "checkpoint_sha256": "c1c534c9442f6bbd3d267e72dfb79572079934dd12677759c22a6774ace32a47",
+      "fitting_provenance": "Fitted to the1166 public training rows"
+    },
+    "dt": {
+      "csv": "sample_dt.csv",
+      "shape": [
+        1000,
+        123
+      ],
+      "seed": 1,
+      "sha256": "6aab2b42f149c365305dc485ee05fd00fac1fdd16e17bd9eccd26edd68d9855b",
+      "source_array_sha256": "52d0f46053ec5c60cde012c14bcb10c3b1e7895a301004be89bc7ffe5bcf2d46",
+      "max_row_sum_error": 8.881784197001252e-16,
+      "max_abs_difference_from_published": 0.975504275781616,
+      "checkpoint": "../../generators/checkpoints/dt_stable.npz",
+      "checkpoint_sha256": "9b4423ee7d463e2f07d8f1a2bb9a3d9aa9917b9150d18d31c641c28e84e843a1",
+      "fitting_provenance": "Fitted to the1166 public training rows"
+    },
+    "icfm": {
+      "csv": "sample_icfm.csv",
+      "shape": [
+        1000,
+        123
+      ],
+      "seed": 2,
+      "sha256": "24ca2b129d6073bedbe151eec23bf469fb1e79fe1c4a6ed53c2932a19436d58c",
+      "source_array_sha256": "c1043b018c7bb554577a1fc21cddc590c103c23bd66c8b70a351c12744e1418d",
+      "max_row_sum_error": 1.1102230246251565e-15,
+      "max_abs_difference_from_published": 0.9305832875246796,
+      "checkpoint": "../../generators/checkpoints/icfm_recovered.pt",
+      "checkpoint_sha256": "6f8d3b318687c910b0f549c922aff4d1f346a3773f7661505b8aa8d4af4118be",
+      "fitting_provenance": "Recovered historical checkpoint; fitting membership unverified"
+    },
+    "mbgan": {
+      "csv": "sample_mbgan.csv",
+      "shape": [
+        1000,
+        123
+      ],
+      "seed": 256,
+      "sha256": "bc4b43fca1d64f9266c064df3e48e7d4979c80043945fe7242ff3c563ce19ad4",
+      "source_array_sha256": "c822cbad7927e54ee2ec6c5b7ad4dd79500114e1cd5436a1b844f395b9388cae",
+      "max_row_sum_error": 2.384185791015625e-07,
+      "max_abs_difference_from_published": 1.7881393432617188e-07,
+      "checkpoint": "../../generators/checkpoints/mbgan_generator.h5",
+      "checkpoint_sha256": "457c13dbba3afefd1c0a7979eb6854118d25806143ac5306bd1543740eaf840f",
+      "fitting_provenance": "Recovered historical checkpoint; fitting membership unverified"
+    }
+  },
+  "neural_training_provenance": "ICFM and MBGAN are regenerated from recovered historical checkpoints. Their original fitting membership/settings are incompletely documented. New runnable training recipes are not claims of reconstructing the historical fit."
+}

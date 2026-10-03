@@ -1,0 +1,22 @@
+{
+  "kind": "recovered historical checkpoint; not newly trained",
+  "checkpoint_sha256": "6f8d3b318687c910b0f549c922aff4d1f346a3773f7661505b8aa8d4af4118be",
+  "architecture": {
+    "dimension": 122,
+    "hidden_width": 64,
+    "hidden_layers": 3,
+    "activation": "SELU",
+    "time_input": true
+  },
+  "historical_training_settings": "Not recovered; historical training membership, seed, optimizer settings and iteration count remain unverified.",
+  "selected_sampling": {
+    "seed": 2,
+    "n": 1000,
+    "device": "cpu",
+    "dtype": "float32",
+    "solver": "torchdyn dopri5 numerical subset from 1.0.6",
+    "atol": 0.0001,
+    "rtol": 0.0001,
+    "selected_npy_sha256": "c1043b018c7bb554577a1fc21cddc590c103c23bd66c8b70a351c12744e1418d"
+  }
+}

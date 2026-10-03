@@ -1,0 +1,73 @@
+{
+  "command": "python generators/mbgan.py smoke-test --output-dir output/mbgan_smoke",
+  "training_config": {
+    "taxa": 123,
+    "latent": 100,
+    "generator_width": 512,
+    "critic_width": 256,
+    "critic_dropout": 0.25,
+    "taxonomy_log_scale": 1000.0,
+    "optimizer": "RMSprop",
+    "learning_rate": 5e-05,
+    "rho": 0.9,
+    "optimizer_epsilon": 1e-07,
+    "gradient_penalty_weight": 10.0,
+    "batch_size": 32,
+    "n_critic": 5,
+    "n_generator": 1,
+    "iterations": 2,
+    "seed": 1,
+    "device": "cpu",
+    "threads": 2,
+    "deterministic_ops": true,
+    "training_rows": 1166,
+    "train_file": "data/sample_train.csv",
+    "train_sha256": "00f4afc44f36563195b12b104b87aeefecaae1dcb79037849dbf640bbf975f56",
+    "taxonomy_file": "data/provenance/taxa.txt",
+    "taxonomy_sha256": "323a4aaf5f93bec2574e30be5905098c4c9f1f6b35a0bd68cfdb161ceca10918",
+    "training_claim": "New train-only recipe adapted from recovered and upstream MBGAN; historical weights not retrained",
+    "test_data_used": false,
+    "gradient_penalty_epsilon": 1e-12,
+    "generator_training_during_critic_steps": false,
+    "critic_dropout_during_generator_steps": true,
+    "environment": {
+      "python": "3.9.25",
+      "tensorflow": "2.20.0",
+      "keras": "3.10.0",
+      "numpy": "2.0.2",
+      "h5py": "3.14.0"
+    }
+  },
+  "results": {
+    "status": "completed",
+    "mode": "smoke training",
+    "iterations": 2,
+    "training_rows": 1166,
+    "elapsed_seconds": 1.5272605018690228,
+    "all_step_gradients_finite": true,
+    "max_generator_parameter_change": 0.00030005350708961487,
+    "max_critic_parameter_change": 0.0011966750025749207,
+    "deterministic_save_reload_equal": true,
+    "final_losses": {
+      "critic_loss": 8977.6455078125,
+      "generator_loss": 0.1991146206855774,
+      "wasserstein_loss": -0.08333645015954971,
+      "gradient_penalty": 897.7728271484375,
+      "critic_gradient_norm": 44702.078125,
+      "generator_gradient_norm": 0.6073760986328125
+    },
+    "generator_sha256": "44a26524b6a37652fe04a7bb9c5bdbebb605e90ba4588fb7715352254989fd0e",
+    "historical_weights_reproduced": false,
+    "historical_replay": {
+      "checkpoint_sha256": "457c13dbba3afefd1c0a7979eb6854118d25806143ac5306bd1543740eaf840f",
+      "deterministic_equal": true,
+      "max_abs_error": 1.7881393432617188e-07,
+      "rmse": 3.987488790791777e-09,
+      "allclose_rtol1e5_atol1e8": true,
+      "checkpoint_keras_version": "2.13.1",
+      "load_method": "saved Sequential config plus exact HDF5 weights",
+      "verified_weight_arrays": 20
+    }
+  },
+  "scope": "Two iterations of new training and deterministic checkpoint replay; not a converged fit or recreation of historical model training."
+}

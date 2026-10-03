@@ -1,0 +1,5 @@
+# Optional TensorFlow environment used for the validated MBGAN replay.
+tensorflow==2.20.0
+keras==3.10.0
+numpy==2.0.2
+h5py==3.14.0
