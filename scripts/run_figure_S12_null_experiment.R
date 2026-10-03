@@ -8,8 +8,9 @@ project_root <- normalizePath(file.path(script_dir, ".."))
 suppressPackageStartupMessages(library(BATTS))
 
 seed <- 2026L
-train_path <- file.path(project_root, "data", "sample_train.csv")
-test_path <- file.path(project_root, "data", "sample_test.csv")
+data_dir <- Sys.getenv("TWO_SAMPLE_DATA_DIR", file.path(project_root, "data"))
+train_path <- file.path(data_dir, "sample_train.csv")
+test_path <- file.path(data_dir, "sample_test.csv")
 output_dir <- Sys.getenv("TWO_SAMPLE_NULL_OUTPUT", file.path(project_root, "output", "figure_S12_refit"))
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
@@ -39,7 +40,6 @@ fit <- batts(
   size_backfitting = 500,
   thin = 1,
   lambda_0 = 5,
-  update_lambda = FALSE,
   output_BART_ensembles = TRUE,
   quiet = FALSE
 )

@@ -9,17 +9,17 @@ workers <- if (length(args)) as.integer(args[[1]]) else 1L
 posterior_only <- "--posterior-only" %in% args
 stopifnot(length(workers) == 1L, !is.na(workers), workers >= 1L)
 suppressPackageStartupMessages(library(BATTS))
-commit <- "909ea357bdb3f97018613552ef13430d1bb60c6e"
+commit <- Sys.getenv("TWO_SAMPLE_BATTS_COMMIT", "909ea357bdb3f97018613552ef13430d1bb60c6e")
 installed_commit <- packageDescription("BATTS")$RemoteSha
 stamp <- system.file("source_commit.txt", package = "BATTS")
 if (is.null(installed_commit) && nzchar(stamp)) installed_commit <- readLines(stamp)
 if (!identical(installed_commit, commit))
   stop("Install nawaya040/BATTS@", commit, " with remotes::install_github first.")
-run_root <- file.path(project_root, "output", "batts_909ea357")
+run_root <- Sys.getenv("TWO_SAMPLE_RUN_ROOT", file.path(project_root, "output", "batts_909ea357"))
 dir.create(run_root, recursive = TRUE, showWarnings = FALSE)
 writeLines(commit, file.path(run_root, "BATTS_commit.txt"))
 writeLines(capture.output(sessionInfo()), file.path(run_root, "sessionInfo.txt"))
-data_dir <- file.path(project_root, "data")
+data_dir <- Sys.getenv("TWO_SAMPLE_DATA_DIR", file.path(project_root, "data"))
 inputs <- file.path(data_dir, paste0("sample_", c("train", "test", "d", "dt", "icfm", "mbgan"), ".csv"))
 write.csv(data.frame(file = basename(inputs), md5 = unname(tools::md5sum(inputs))),
           file.path(run_root, "input_checksums.csv"), row.names = FALSE)
@@ -68,7 +68,7 @@ fit_one <- function(job) {
   bayes <- component("batts", function() BATTS::batts(
     data = x, group_labels = labels, num_trees = settings$num_trees,
     size_burnin = settings$size_burnin, size_backfitting = settings$size_backfitting,
-    thin = settings$thin, lambda_0 = settings$lambda_0, update_lambda = FALSE,
+    thin = settings$thin, lambda_0 = settings$lambda_0,
     margin_scale = settings$margin_scale, output_BART_ensembles = FALSE, quiet = TRUE))
   if (posterior_only) return(data.frame(split = split, generator = key,
                                       estimator = "batts", seconds = bayes$elapsed_seconds))

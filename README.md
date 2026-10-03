@@ -4,6 +4,10 @@ Reproducible code for the microbiome case study in *Two-sample Comparison
 through Additive Tree Models for Density Ratios*. Script names and PDF names
 follow the paper: Figures 6, 7, and S8–S12.
 
+For the additional full-study `HMP_2019_ibdmdb` experiment, see the
+[HPC workflow](hpc/README.md): study-only preprocessing, an 80/20 split,
+fresh training of all four generators, and seven figures with current BATTS.
+
 The [generative-model release](generators/README.md) adds fitting and sampling
 code for Dirichlet, stabilized Dirichlet tree, ICFM, and MBGAN, together with
 [selected regenerated samples](data/regenerated_20261003/) and a

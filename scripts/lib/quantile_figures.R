@@ -1,5 +1,5 @@
 suppressPackageStartupMessages({ library(ggplot2); library(vegan); library(patchwork); library(scales) })
-data_dir <- file.path(project_root, "data")
+data_dir <- Sys.getenv("TWO_SAMPLE_DATA_DIR", file.path(project_root, "data"))
 ratio_root <- Sys.getenv("TWO_SAMPLE_RATIO_ROOT", file.path(project_root, "data", "revision"))
 output_dir <- Sys.getenv("TWO_SAMPLE_FIGURE_DIR", file.path(project_root, "output", "case_study"))
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
