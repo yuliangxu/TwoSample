@@ -162,7 +162,7 @@ def overview(cfg):
            'The original preprocessing, taxon order and observation split are preserved. '
            'All four generators are fitted from these training rows using released code and frozen '
            'recipes, presented in the order <b>D, DT, ICFM, MBGAN</b>. No real test rows enter '
-           'generator fitting or selection.')
+           'generator fitting or a new seed/checkpoint search.')
     p.para(f"Eight real-versus-generated comparisons and the held-out null experiment use BATTS "
            f"<b>{escape(cfg['version'])}</b>, commit <b>{cfg['commit'][:8]}</b>. "
            'Gradient and Hellinger boosting explicitly use all fitting observations '
@@ -194,13 +194,14 @@ def methods(cfg):
              ['D', 'Dirichlet Newton maximum-likelihood fit on the 1,166 training rows; seed 1.'],
              ['DT', 'Positive-parameter Beta maximum-likelihood fits at 122 tree nodes, using the 1,166 training rows; seed 1.'],
              ['ICFM', 'CPU; random initialization; MLP with three hidden layers of width 64; 20,000 Adam updates, batch 256, rate 0.001, flow noise 0.0001; training seed 20261003; final update.'],
-             ['MBGAN', 'GPU; random initialization; 500,000 generator iterations, five critic updates each, batch 32; RMSprop rate 0.00005; training seed 1; final iteration. Gradient penalty is differentiated through critic weights.']],
+             ['MBGAN', 'Historical local variant; CPU; random initialization; 500,000 generator iterations, five critic updates each, batch 32; RMSprop rate 0.00005; training seed 1; final iteration. No effective gradient penalty or weight clipping; deterministic diagnostic callbacks.']],
             [75, 441], 9)
     p.para('All four fits use only the preserved 1,166 training rows. Neural training starts from '
            'seeded random initialization; no historical weights are required. Training length and '
            'sampling settings are frozen before evaluation; the final update is used without '
            'test-based selection. Two full independent runs must agree within the recorded hardware '
-           'and software environment; equality across CPU and GPU is not assumed.', 9.5, 13)
+           'and software environment. The historical local variant was restored after review of earlier '
+           'reports; this is not a blind comparison of model variants.', 9.5, 13)
     bayes, boosting = cfg['settings']['bayes'], cfg['settings']['boosting']
     p.heading('BATTS settings')
     p.para(f"Seed {cfg['settings']['seed']} per estimator; {bayes['num_trees']} Bayesian trees; "
@@ -342,7 +343,7 @@ def build(run):
                'Real inputs: 1166 training x 123 taxa; 292 test x 123 taxa. Generators: 1000 x 123 each.',
                'Display order: D, DT, ICFM, MBGAN.',
                'All four generators are fitted from the 1166 training rows; neural models start from random initialization.',
-               'Training recipes are frozen; no real test rows enter generator training or selection.',
+               'No real test rows enter generator training or a new seed/checkpoint search; the historical MBGAN variant was restored retrospectively.',
                f"BATTS {cfg['version']} ({cfg['commit']}); boosting subsample_fraction=1.", '',
                'Real-test intervals excluding zero and mean absolute posterior-mean log ratio:']
     for key in DISPLAY_ORDER:

@@ -11,6 +11,7 @@ import json
 import os
 from pathlib import Path
 import platform
+import random
 import time
 
 import numpy as np
@@ -19,7 +20,9 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 TRAIN = ROOT / "data/sample_train.csv"
 TAXA = ROOT / "data/provenance/taxa.txt"
-SCHEMA = "mbgan_from_training_v1"
+SCHEMA = "mbgan_historical_from_training_v2"
+HISTORICAL_SOURCE = HERE / "vendor/historical_mbgan_model.py"
+HISTORICAL_SOURCE_SHA256 = "9efc755e7fdcc18310c5fe4405319134f5d6e25ea50afb0a7b776b6971968e18"
 
 
 def sha256(path):
@@ -49,8 +52,9 @@ def display_path(path):
 
 
 def configure_tf(device="cpu", threads=2, seed=1):
-    if device == "cpu":
-        os.environ["CUDA_VISIBLE_DEVICES"] = ""
+    if device != "cpu":
+        raise ValueError("This historical numerical recipe requires CPU execution")
+    os.environ["CUDA_VISIBLE_DEVICES"] = ""
     os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
     os.environ["OMP_NUM_THREADS"] = str(threads)
     os.environ["TF_NUM_INTRAOP_THREADS"] = str(threads)
@@ -58,6 +62,9 @@ def configure_tf(device="cpu", threads=2, seed=1):
     # Specify the numerical execution route, rather than inherit ambient values.
     os.environ["TF_ENABLE_ONEDNN_OPTS"] = "1"
     import tensorflow as tf
+    import keras
+    if tf.__version__ != "2.13.1" or keras.__version__ != "2.13.1":
+        raise RuntimeError("The restored historical recipe requires TensorFlow/Keras 2.13.1")
     if device == "gpu" and not tf.config.list_physical_devices("GPU"):
         raise RuntimeError("--device gpu requested, but TensorFlow has no visible GPU")
     tf.config.threading.set_intra_op_parallelism_threads(threads)
@@ -69,25 +76,30 @@ def configure_tf(device="cpu", threads=2, seed=1):
 
 def environment(tf):
     versions = {"python": platform.python_version(), "machine": platform.machine()}
-    for name in ["tensorflow", "keras", "numpy", "h5py"]:
-        versions[name] = importlib.metadata.version(name)
+    import keras
+    import h5py
+    versions.update(tensorflow=tf.__version__, keras=keras.__version__,
+                    numpy=np.__version__, h5py=h5py.__version__)
     versions["tensorflow_devices"] = [d.name for d in tf.config.list_physical_devices()]
     versions["onednn_enabled"] = True
     return versions
 
 
+def historical_module():
+    """Load the byte-preserved research source, with original upstream attribution.
+
+    The source credits keras-team/keras-contrib improved_wgan.py and was used by
+    the 2026-10-03 IBDMDB report. Its disconnected gradient-penalty layer is
+    preserved deliberately; this is the historical local variant, not WGAN-GP.
+    """
+    if sha256(HISTORICAL_SOURCE) != HISTORICAL_SOURCE_SHA256:
+        raise RuntimeError("Historical source differs from the audited original")
+    from .vendor import historical_mbgan_model
+    return historical_mbgan_model
+
+
 def build_generator(tf, taxa=123, latent=100, width=512):
-    """Recovered architecture, including initial Dense ReLU before BN."""
-    layers = [tf.keras.Input(shape=(latent,)),
-              tf.keras.layers.Dense(width, activation="relu"),
-              tf.keras.layers.BatchNormalization(momentum=0.8, epsilon=0.001),
-              tf.keras.layers.Activation("relu")]
-    for _ in range(2):
-        layers += [tf.keras.layers.Dense(width),
-                   tf.keras.layers.BatchNormalization(momentum=0.8, epsilon=0.001),
-                   tf.keras.layers.Activation("relu")]
-    layers += [tf.keras.layers.Dense(taxa), tf.keras.layers.Activation("softmax")]
-    return tf.keras.Sequential(layers, name="mbgan_generator")
+    return historical_module().build_generator((latent,), taxa, n_channels=width)
 
 
 def phylogeny_matrix(taxa):
@@ -109,88 +121,45 @@ def phylogeny_matrix(taxa):
     return matrix
 
 
-def build_critic(tf, matrix, rng, width=256, dropout=0.25, t_pow=1000.):
-    """Taxonomy-aware critic with dropout from the explicit training RNG."""
-    class StreamDropout(tf.keras.layers.Layer):
-        def call(self, inputs, training=False):
-            if not training:
-                return inputs
-            keep = rng.uniform(tf.shape(inputs), dtype=inputs.dtype) >= dropout
-            return tf.where(keep, inputs / (1. - dropout), tf.zeros_like(inputs))
-
-    inputs = tf.keras.Input(shape=(matrix.shape[0],))
-    transform = tf.constant(matrix, dtype=tf.float32)
-    x = tf.keras.layers.Lambda(lambda z: tf.math.log1p(tf.matmul(z, transform)*t_pow)
-                               / tf.math.log1p(tf.constant(t_pow, tf.float32)))(inputs)
-    for _ in range(3):
-        x = tf.keras.layers.Dense(width)(x)
-        x = tf.keras.layers.LeakyReLU(negative_slope=0.2)(x)
-        x = StreamDropout()(x)
-    return tf.keras.Model(inputs, tf.keras.layers.Dense(1)(x), name="mbgan_critic")
+def optimizer_variables(optimizer):
+    values = optimizer.variables
+    return values() if callable(values) else values
 
 
-def checked_gradients(tf, tape, loss, variables):
-    gradients = tape.gradient(loss, variables)
-    if any(g is None for g in gradients):
-        raise RuntimeError("Disconnected training gradient")
-    tf.debugging.assert_all_finite(loss, "Nonfinite training loss")
-    for gradient in gradients:
-        tf.debugging.assert_all_finite(gradient, "Nonfinite training gradient")
-    return gradients, tf.linalg.global_norm(gradients)
+def tf_random_stream_description(model, cfg):
+    """Record seeded graph streams and their deterministic replay position.
+
+    TensorFlow 2.13 stateful random kernels do not expose resumable counters as
+    checkpoint variables. The seeded graph and completed update counts describe
+    the stream position for full replay, not a checkpoint-resume guarantee.
+    """
+    functions = {}
+    for label, graph in [("critic", model.critic_graph), ("generator", model.generator_graph)]:
+        nodes = []
+        for concrete in graph.train_function._list_all_concrete_functions_for_serialization():
+            definition = concrete.graph.as_graph_def()
+            groups = [("main", definition.node)]
+            groups += [(f.signature.name, f.node_def) for f in definition.library.function]
+            for scope, members in groups:
+                for node in members:
+                    if "Random" in node.op:
+                        nodes.append(dict(scope=scope, name=node.name, op=node.op,
+                                          seeds={k: int(node.attr[k].i) for k in ("seed", "seed2")
+                                                 if k in node.attr}))
+        functions[label] = nodes
+    return dict(global_seed=cfg["seed"], graph_random_operations=functions,
+                critic_updates=cfg["iterations"] * cfg["n_critic"],
+                generator_updates=cfg["iterations"],
+                exact_checkpoint_resume_supported=False,
+                state_description="Seeded graph definition and completed call counts; replay from initialization")
 
 
-def make_training_step(tf, generator, critic, opt_g, opt_d, rng, data, cfg,
-                       compiled=True):
-    """Same differentiated objective in eager and tf.function execution."""
-    data = tf.convert_to_tensor(data, dtype=tf.float32)
-    batch, latent = cfg["batch_size"], cfg["latent"]
-
-    def critic_step():
-        indices = rng.uniform((batch,), maxval=len(data), dtype=tf.int32)
-        real = tf.gather(data, indices)
-        z = rng.normal((batch, latent), dtype=tf.float32)
-        # Generator weights and moving BN statistics stay fixed here.
-        fake = tf.stop_gradient(generator(z, training=False))
-        alpha = rng.uniform((batch, 1), dtype=tf.float32)
-        interpolated = alpha*real + (1-alpha)*fake
-        with tf.GradientTape() as critic_tape:
-            real_score = critic(real, training=True)
-            fake_score = critic(fake, training=True)
-            with tf.GradientTape() as input_tape:
-                input_tape.watch(interpolated)
-                interpolated_score = critic(interpolated, training=True)
-            input_gradient = input_tape.gradient(interpolated_score, interpolated)
-            norm = tf.sqrt(tf.reduce_sum(tf.square(input_gradient), axis=1)
-                           + cfg["gradient_penalty_epsilon"])
-            penalty = tf.reduce_mean(tf.square(norm - 1.))
-            wasserstein = tf.reduce_mean(fake_score) - tf.reduce_mean(real_score)
-            loss = wasserstein + cfg["gradient_penalty_weight"]*penalty
-        grads, grad_norm = checked_gradients(tf, critic_tape, loss, critic.trainable_variables)
-        opt_d.apply_gradients(zip(grads, critic.trainable_variables))
-        return loss, wasserstein, penalty, grad_norm
-
-    def generator_step():
-        z = rng.normal((batch, latent), dtype=tf.float32)
-        with tf.GradientTape() as generator_tape:
-            fake = generator(z, training=True)
-            loss = -tf.reduce_mean(critic(fake, training=True))
-        grads, grad_norm = checked_gradients(tf, generator_tape, loss, generator.trainable_variables)
-        opt_g.apply_gradients(zip(grads, generator.trainable_variables))
-        return loss, grad_norm
-
-    if compiled:
-        critic_step = tf.function(critic_step, autograph=False, reduce_retracing=True)
-        generator_step = tf.function(generator_step, autograph=False, reduce_retracing=True)
-
-    def iteration():
-        for _ in range(cfg["n_critic"]):
-            d_loss, wasserstein, penalty, d_norm = critic_step()
-        g_loss, g_norm = generator_step()
-        return dict(critic_loss=d_loss, generator_loss=g_loss,
-                    wasserstein_loss=wasserstein, gradient_penalty=penalty,
-                    critic_gradient_norm=d_norm, generator_gradient_norm=g_norm)
-
-    return tf.function(iteration, autograph=False) if compiled else iteration
+def rng_description(model, cfg):
+    state = np.random.get_state()
+    return dict(python_state=random.getstate(),
+                numpy_state=dict(bit_generator=state[0], keys=state[1].tolist(),
+                                 position=state[2], has_gauss=state[3], cached_gaussian=state[4]),
+                tensorflow=tf_random_stream_description(model, cfg))
 
 
 def write_new_json(path, obj):
@@ -266,85 +235,125 @@ def sample_command(args):
 
 
 def train_command(args):
-    if args.iterations < 1 or args.batch_size < 2 or args.n_critic < 1 or args.log_every < 1:
-        raise ValueError("iterations/n_critic/log_every must be positive; batch_size >= 2")
+    if (args.iterations < 1 or args.batch_size < 2 or args.n_critic < 1
+            or args.log_every < 1 or args.callback_interval < 1):
+        raise ValueError("Iteration and interval arguments must be positive; batch_size >= 2")
+    if args.eager:
+        raise ValueError("The historical recipe uses compiled Keras train_on_batch")
     if args.output_dir.exists():
         raise FileExistsError("Training requires a new output directory")
     if args.train.resolve() == (ROOT / "data/sample_test.csv").resolve():
         raise ValueError("The bundled testing split cannot be used for training")
-    x = np.loadtxt(args.train, delimiter=",").astype(np.float32)
+    # Exact historical input path: CSV float64 values, no new normalization.
+    x = np.loadtxt(args.train, delimiter=",")
     taxa = [s.strip() for s in args.taxonomy.read_text().splitlines() if s.strip()]
     if (x.ndim != 2 or x.shape[1] != len(taxa) or not np.isfinite(x).all()
-            or (x < 0).any() or (x.sum(1) <= 0).any()):
-        raise ValueError("Training requires a finite nonnegative matrix in supplied taxon order")
-    x /= x.sum(axis=1, keepdims=True)
-    cfg = dict(schema=SCHEMA, initialization="random", taxa=len(taxa), latent=100,
-               generator_width=512, critic_width=256, critic_dropout=0.25,
-               taxonomy_log_scale=1000., optimizer="RMSprop", learning_rate=5e-5,
-               rho=0.9, optimizer_epsilon=1e-7, optimizer_momentum=0.,
-               optimizer_centered=False, gradient_penalty_weight=10.,
-               gradient_penalty_epsilon=1e-12, batch_size=args.batch_size,
-               n_critic=args.n_critic, n_generator=1, iterations=args.iterations,
-               seed=args.seed, device=args.device, threads=args.threads,
-               deterministic_ops=True, execution="eager" if args.eager else "tf.function",
-               random_stream="tf.random.Generator PHILOX; explicit batch/noise/alpha/dropout draws",
-               initialization_rng="tf.keras.utils.set_random_seed(seed); GlorotUniform dense weights",
+            or (x < 0).any() or not np.allclose(x.sum(1), 1., atol=1e-6)):
+        raise ValueError("Training requires finite normalized compositions in supplied taxon order")
+    cfg = dict(schema=SCHEMA, variant="historical_local_no_penalty", initialization="random",
+               taxa=len(taxa), latent=100, generator_width=512, critic_width=256,
+               critic_dropout=0.25, taxonomy_log_scale=1000., optimizer="RMSprop",
+               learning_rate=5e-5, rho=0.9, optimizer_epsilon=1e-7,
+               optimizer_momentum=0., optimizer_centered=False,
+               gradient_penalty_weight=0., effective_gradient_penalty=False,
+               weight_clipping=False, compiled_loss_weights=[1, 1, 10],
+               batch_size=args.batch_size, n_critic=args.n_critic, n_generator=1,
+               iterations=args.iterations, seed=args.seed, device=args.device,
+               threads=args.threads, deterministic_ops=True,
+               execution="Keras 2.13.1 compiled train_on_batch",
+               random_stream="NumPy MT19937 training draws; seeded TensorFlow/Keras stateful dropout",
+               initialization_rng="tf.keras.utils.set_random_seed(seed); historical critic constructed before generator",
+               callback_rng_policy="isolated_seeded_diagnostics",
+               callback_interval=args.callback_interval,
+               callback_seed_rule="(training seed + iteration) modulo 2**32; independent RandomState",
                training_rows=len(x), train_file=display_path(args.train),
                train_sha256=sha256(args.train), normalized_train_tensor_sha256=array_hash([x]),
                taxonomy_file=display_path(args.taxonomy), taxonomy_sha256=sha256(args.taxonomy),
-               source_sha256=sha256(__file__), test_data_used=False,
+               source_sha256=sha256(__file__), historical_source_sha256=sha256(HISTORICAL_SOURCE),
+               historical_source_path=display_path(HISTORICAL_SOURCE), test_data_used=False,
                checkpoint_selection="final prescribed iteration; no validation or test selection",
                generator_training_during_critic_steps=False,
                critic_dropout_during_generator_steps=True,
-               training_preprocessing="float32; normalize each supplied training row to sum one")
+               training_preprocessing="CSV float64 values, no additional normalization; Keras casts at model input")
     tf = configure_tf(args.device, args.threads, args.seed)
-    rng = tf.random.Generator.from_seed(args.seed, alg="philox")
-    g = build_generator(tf, cfg["taxa"], cfg["latent"], cfg["generator_width"])
+    historical = historical_module()
     matrix = phylogeny_matrix(taxa)
-    d = build_critic(tf, matrix, rng, cfg["critic_width"], cfg["critic_dropout"], cfg["taxonomy_log_scale"])
-    options = dict(learning_rate=cfg["learning_rate"], rho=cfg["rho"], epsilon=cfg["optimizer_epsilon"],
-                   momentum=cfg["optimizer_momentum"], centered=cfg["optimizer_centered"])
-    opt_g, opt_d = tf.keras.optimizers.RMSprop(**options), tf.keras.optimizers.RMSprop(**options)
-    opt_g.build(g.trainable_variables)
-    opt_d.build(d.trainable_variables)
-    before_g = [v.numpy().copy() for v in g.trainable_variables]
-    before_d = [v.numpy().copy() for v in d.trainable_variables]
+    model = historical.MBGAN("curated_comp_marginal",
+        dict(ntaxa=len(taxa), latent_dim=100, generator=dict(n_channels=512),
+             critic=dict(n_channels=256, dropout_rate=.25, tf_matrix=matrix, t_pow=1000.)),
+        dict(generator=dict(optimizer=("RMSprop", {}), lr=.00005),
+             critic=dict(loss_weights=[1, 1, 10], optimizer=("RMSprop", {}), lr=.00005)))
+    if len(model.critic_graph.outputs) != 2 or model.critic_graph.losses:
+        raise RuntimeError("Historical two-output unpenalized critic graph changed")
+    g, d = model.generator, model.critic
+    opt_g, opt_d = model.generator_graph.optimizer, model.critic_graph.optimizer
+    before_g, before_d = g.get_weights(), d.get_weights()
     cfg.update(environment=environment(tf), phylogeny_tensor_sha256=array_hash([matrix]),
-               initial_generator_tensor_sha256=array_hash(g.get_weights()),
-               initial_critic_tensor_sha256=array_hash(d.get_weights()))
+               initial_generator_tensor_sha256=array_hash(before_g),
+               initial_critic_tensor_sha256=array_hash(before_d))
     args.output_dir.mkdir(parents=True)
     write_new_json(args.output_dir / "training_config.json", cfg)
     np.save(args.output_dir / "phylogeny_matrix.npy", matrix)
-    step_fn = make_training_step(tf, g, d, opt_g, opt_d, rng, x, cfg, compiled=not args.eager)
-    started = time.monotonic()
-    last = None
-    warmup = None
-    with (args.output_dir / "training_history.jsonl").open("x") as log:
+    valid, fake = -np.ones((args.batch_size, 1)), np.ones((args.batch_size, 1))
+    started, warmup, last = time.monotonic(), None, None
+    with (args.output_dir / "training_history.jsonl").open("x") as log, \
+            (args.output_dir / "callback_history.jsonl").open("x") as callback_log:
         for step in range(1, args.iterations + 1):
-            last = {key: float(value.numpy()) for key, value in step_fn().items()}
+            updates = []
+            for _ in range(args.n_critic):
+                real = x[np.random.randint(0, len(x), args.batch_size)]
+                noise = np.random.normal(0, 1, (args.batch_size, cfg["latent"]))
+                values = np.asarray(model.critic_graph.train_on_batch([real, noise], [valid, fake]), dtype=float)
+                if not np.isfinite(values).all():
+                    raise FloatingPointError(f"Nonfinite critic loss at iteration {step}")
+                updates.append(values.tolist())
+            noise = np.random.normal(0, 1, (args.batch_size, cfg["latent"]))
+            g_loss = float(model.generator_graph.train_on_batch(noise, valid))
+            if not np.isfinite(g_loss):
+                raise FloatingPointError(f"Nonfinite generator loss at iteration {step}")
             elapsed = time.monotonic() - started
+            last = dict(critic_loss=updates[-1][0], generator_loss=g_loss,
+                        critic_update_losses=updates)
             record = dict(iteration=step, elapsed_seconds=elapsed, **last)
             log.write(json.dumps(record) + "\n")
+            if step % args.callback_interval == 0:
+                # Inference diagnostics never reseed or advance the training RNG.
+                np_before, py_before = np.random.get_state(), random.getstate()
+                samples = sample_generator(g, n=1000, seed=(args.seed + step) % 2**32)
+                np.random.set_state(np_before)
+                random.setstate(py_before)
+                callback_log.write(json.dumps(dict(iteration=step, sample_tensor_sha256=array_hash([samples]),
+                                                   mean_exact_zero_fraction=float(np.mean(samples == 0)))) + "\n")
+                callback_log.flush()
             if step == min(10, args.iterations):
                 warmup = elapsed
             if step == 1 or step == args.iterations or step % args.log_every == 0:
                 log.flush()
                 rate = (elapsed - warmup) / (step - 10) if warmup is not None and step > 10 else elapsed / step
-                print(json.dumps(dict(record, estimated_remaining_seconds=rate*(args.iterations-step))), flush=True)
-    change_g = max(float(np.max(np.abs(v.numpy()-a))) for v, a in zip(g.trainable_variables, before_g))
-    change_d = max(float(np.max(np.abs(v.numpy()-a))) for v, a in zip(d.trainable_variables, before_d))
+                print(json.dumps(dict(record, estimated_remaining_seconds=rate * (args.iterations-step))), flush=True)
+    change_g = max(float(np.max(np.abs(a-b))) for a, b in zip(g.get_weights(), before_g))
+    change_d = max(float(np.max(np.abs(a-b))) for a, b in zip(d.get_weights(), before_d))
     if change_g <= 0 or change_d <= 0:
         raise RuntimeError("Training did not update both networks")
-    weights = g.get_weights()
-    final_g, final_d = array_hash(weights), array_hash(d.get_weights())
+    weights, critic_weights = g.get_weights(), d.get_weights()
+    optimizer_g = [v.numpy() for v in optimizer_variables(opt_g)]
+    optimizer_d = [v.numpy() for v in optimizer_variables(opt_d)]
+    if not all(np.isfinite(a).all() for a in weights + critic_weights + optimizer_g + optimizer_d):
+        raise FloatingPointError("Nonfinite final model or optimizer tensor")
+    final_g, final_d = array_hash(weights), array_hash(critic_weights)
     saved_cfg = dict(cfg, weight_count=len(weights), final_generator_tensor_sha256=final_g)
     np.savez_compressed(args.output_dir / "generator.npz", config=json.dumps(saved_cfg, sort_keys=True),
                         **{f"weight_{i:03d}": a for i, a in enumerate(weights)})
     np.savez_compressed(args.output_dir / "critic.npz",
-                        **{f"weight_{i:03d}": a for i, a in enumerate(d.get_weights())})
-    np.save(args.output_dir / "rng_state.npy", rng.state.numpy())
-    tf.train.Checkpoint(generator=g, critic=d, optimizer_g=opt_g, optimizer_d=opt_d,
-                        training_rng=rng).write(str(args.output_dir / "training_state"))
+                        **{f"weight_{i:03d}": a for i, a in enumerate(critic_weights)})
+    np.savez_compressed(args.output_dir / "optimizer.npz",
+                        **{f"generator_{i:03d}": a for i, a in enumerate(optimizer_g)},
+                        **{f"critic_{i:03d}": a for i, a in enumerate(optimizer_d)})
+    rng_record = rng_description(model, cfg)
+    write_new_json(args.output_dir / "rng_state.json", rng_record)
+    np.save(args.output_dir / "rng_state.npy", np.asarray(rng_record["numpy_state"]["keys"], dtype=np.uint32))
+    tf.train.Checkpoint(generator=g, critic=d, optimizer_g=opt_g, optimizer_d=opt_d).write(
+        str(args.output_dir / "training_state"))
     first = sample_generator(g, n=16, seed=256)
     restored, _ = load_generator(tf, args.output_dir / "generator.npz", require_completion=False)
     second = sample_generator(restored, n=16, seed=256)
@@ -354,16 +363,20 @@ def train_command(args):
     result = dict(status="completed", mode="from-scratch training", iterations=args.iterations,
                   training_rows=len(x), elapsed_seconds=time.monotonic()-started,
                   warmed_iteration_seconds=(elapsed-warmup)/(args.iterations-10) if args.iterations>10 else None,
-                  all_step_gradients_finite=True, max_generator_parameter_change=change_g,
-                  max_critic_parameter_change=change_d, deterministic_save_reload_equal=True,
-                  final_losses=last, generator_sha256=sha256(args.output_dir / "generator.npz"),
+                  all_step_losses_finite=True, all_checkpoint_tensors_finite=True,
+                  max_generator_parameter_change=change_g, max_critic_parameter_change=change_d,
+                  deterministic_save_reload_equal=True, final_losses=last,
+                  generator_sha256=sha256(args.output_dir / "generator.npz"),
                   final_generator_tensor_sha256=final_g, final_critic_tensor_sha256=final_d,
-                  final_optimizer_tensor_sha256=array_hash([v.numpy() for v in opt_g.variables + opt_d.variables]),
+                  final_optimizer_tensor_sha256=array_hash(optimizer_g + optimizer_d),
+                  optimizer_sha256=sha256(args.output_dir / "optimizer.npz"),
                   training_config_sha256=sha256(args.output_dir / "training_config.json"),
                   training_history_sha256=sha256(args.output_dir / "training_history.jsonl"),
+                  callback_history_sha256=sha256(args.output_dir / "callback_history.jsonl"),
+                  rng_state_sha256=sha256(args.output_dir / "rng_state.json"),
                   source_sha256=sha256(__file__), test_data_used=False,
                   checkpoint_selection=cfg["checkpoint_selection"])
-    if result["source_sha256"] != cfg["source_sha256"]:
+    if result["source_sha256"] != cfg["source_sha256"] or sha256(HISTORICAL_SOURCE) != HISTORICAL_SOURCE_SHA256:
         raise RuntimeError("Training source changed during execution")
     if sha256(args.train) != cfg["train_sha256"] or sha256(args.taxonomy) != cfg["taxonomy_sha256"]:
         raise RuntimeError("Training inputs changed during execution")
@@ -383,7 +396,8 @@ def main():
     train.add_argument("--n-critic", type=int, default=5)
     train.add_argument("--seed", type=int, default=1)
     train.add_argument("--log-every", type=int, default=1000)
-    train.add_argument("--eager", action="store_true", help="uncompiled validation path; same objective")
+    train.add_argument("--callback-interval", type=int, default=10000)
+    train.add_argument("--eager", action="store_true", help="rejected: historical recipe requires compiled Keras execution")
     sample = commands.add_parser("sample", help="sample an explicitly supplied completed training run")
     sample.add_argument("--checkpoint", type=Path, required=True)
     sample.add_argument("--output", type=Path, required=True)

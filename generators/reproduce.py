@@ -9,7 +9,6 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import re
 import shutil
 import subprocess
 import sys
@@ -20,25 +19,6 @@ from .validate import MODEL_ORDER, load, sha256, verify_bundle
 
 REPO = Path(__file__).resolve().parents[1]
 CONFIG = REPO / "generators/training_config.json"
-
-
-def replica_gpu_devices(explicit=None, visible=None):
-    def parse(value):
-        tokens = [item.strip() for item in value.split(",")]
-        if (not tokens or len(set(tokens)) != len(tokens)
-                or any(not re.fullmatch(r"(?:[0-9]+|GPU-[\w-]+|MIG-[\w/-]+)", item)
-                       for item in tokens)):
-            raise ValueError("GPU identifiers must be distinct nonnegative indices or GPU/MIG UUIDs")
-        return tokens
-    allocated = parse(visible) if visible is not None else None
-    if explicit is None:
-        return (allocated or ["0"])[:2]
-    selected = parse(explicit)
-    if len(selected) > 2:
-        raise ValueError("Specify one or two GPUs for the two independent replicas")
-    if allocated is not None and not set(selected).issubset(allocated):
-        raise ValueError("Explicit GPU identifiers must belong to CUDA_VISIBLE_DEVICES")
-    return selected
 
 
 def read(path):
@@ -64,7 +44,8 @@ def run_command(command, log, overrides=None):
     log.parent.mkdir(parents=True, exist_ok=True)
     env = os.environ.copy()
     env.update(OMP_NUM_THREADS="2", OPENBLAS_NUM_THREADS="2", MKL_NUM_THREADS="2",
-               TF_NUM_INTRAOP_THREADS="2", TF_NUM_INTEROP_THREADS="1", PYTHONHASHSEED="0")
+               TF_NUM_INTRAOP_THREADS="2", TF_NUM_INTEROP_THREADS="1", PYTHONHASHSEED="0",
+               CUDA_VISIBLE_DEVICES="")
     if overrides:
         env.update(overrides)
     with log.open("x") as f:
@@ -112,7 +93,8 @@ def single_run(out, tf_python):
                          "--taxonomy", REPO / "data/provenance/taxa.txt", "--output-dir", dest,
                          "--iterations", cfg["iterations"], "--batch-size", cfg["batch_size"],
                          "--n-critic", cfg["critic_updates"], "--seed", cfg["training_seed"],
-                         "--device", cfg["device"], "--threads", cfg["threads"]], out / "logs/mbgan_train.log")
+                         "--device", cfg["device"], "--threads", cfg["threads"],
+                         "--callback-interval", cfg["callback_interval"]], out / "logs/mbgan_train.log")
             run_command([tf_python, "-m", "generators.mbgan", "sample", "--checkpoint",
                          dest / "generator.npz", "--output", sample, "--n", 1000,
                          "--seed", cfg["sampling_seed"], "--batch-size", 32,
@@ -155,7 +137,12 @@ def native_metadata(replica, key, cfg, train_sha):
             or native["initialization"] != "random" or native["test_data_used"]
             or native["batch_size"] != cfg["batch_size"] or native["n_critic"] != cfg["critic_updates"]
             or native["learning_rate"] != cfg["learning_rate"] or native["device"] != cfg["device"]
-            or native["threads"] != cfg["threads"] or not completion["all_step_gradients_finite"]
+            or native["threads"] != cfg["threads"] or not completion["all_step_losses_finite"]
+            or not completion["all_checkpoint_tensors_finite"]
+            or native["variant"] != cfg["variant"]
+            or native["effective_gradient_penalty"]
+            or native["callback_rng_policy"] != cfg["callback_rng_policy"]
+            or native["callback_interval"] != cfg["callback_interval"]
             or completion["iterations"] != cfg["iterations"]
             or completion["max_generator_parameter_change"] <= 0
             or completion["max_critic_parameter_change"] <= 0):
@@ -193,9 +180,10 @@ def finalize(out):
     manifest = {"schema_version": 1, "mode": "from_training", "model_order": list(MODEL_ORDER),
         "training_input": {"sha256": train_sha, "shape": [1166, 123]},
         "test_input_sha256": sha256(data / "sample_test.csv"),
-        "test_used_for_training": False, "test_used_for_selection": False,
+        "test_used_for_training": False, "test_used_for_seed_or_checkpoint_selection": False,
         "models": {}, "source_hashes": sources, "validation_artifacts": {},
-        "reproduction_evidence": "evidence/reproduction.json"}
+        "reproduction_evidence": "evidence/reproduction.json",
+        "mbgan_variant_choice": config["mbgan_variant_choice"]}
     reproduction = {"status": "complete", "method": "independent_rerun", "models": {}}
     for key in MODEL_ORDER:
         paths = [replica / f"sample_{key}.csv" for replica in replicas]
@@ -209,7 +197,7 @@ def finalize(out):
         complete = {"completed": True, "completed_steps": cfg.get("steps", cfg.get("iterations"))}
         initialization = "random" if key in {"icfm", "mbgan"} else "fit_from_training"
         normalized = {"model": key, "training_input_sha256": train_sha,
-            "trained_from_scratch": True, "test_used_for_training": False, "test_used_for_selection": False,
+            "trained_from_scratch": True, "test_used_for_training": False, "test_used_for_seed_or_checkpoint_selection": False,
             "initialization": initialization, "configuration": cfg, "completion": complete,
             "trainer_metadata": metadata[0][0], "final_parameter_sha256": metadata[0][1]}
         evidence_path = f"evidence/{key}_training.json"
@@ -246,8 +234,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=REPO / "output/from_training")
     parser.add_argument("--tensorflow-python", default=sys.executable)
-    parser.add_argument("--gpu-devices", help="One or two comma-separated GPU identifiers. Defaults to "
-                        "CUDA_VISIBLE_DEVICES, or GPU 0. One GPU runs the replicas sequentially.")
+    parser.add_argument("--replica-workers", type=int, choices=(1, 2), default=2,
+                        help="Concurrent independent CPU fits (default: 2).")
     parser.add_argument("--single-run", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--finalize-existing", action="store_true",
                         help="Verify two completed training runs without repeating them")
@@ -264,25 +252,17 @@ def main():
         parser.error("Output must be a new directory")
     verify_bundle()
     config = read(CONFIG)
-    devices = []
-    if config["models"]["mbgan"]["device"] == "gpu":
-        try:
-            devices = replica_gpu_devices(args.gpu_devices, os.environ.get("CUDA_VISIBLE_DEVICES"))
-        except ValueError as error:
-            parser.error(str(error))
     out.mkdir(parents=True)
     initial_sources = source_hashes()
     write(out / "execution.json", {"configuration": config, "source_hashes": initial_sources,
           "tensorflow_python": tf_python, "generator_python": sys.executable,
-          "independent_full_runs": 2, "pretrained_model_inputs": [], "gpu_devices": devices})
+          "independent_full_runs": 2, "pretrained_model_inputs": [], "replica_workers": args.replica_workers,
+          "device": "cpu"})
     def launch(i):
         command = [sys.executable, "-m", "generators.reproduce", "--single-run", out / f"replicate_{i}",
                    "--tensorflow-python", tf_python]
-        overrides = None if not devices else {
-            "CUDA_VISIBLE_DEVICES": devices[(i - 1) % len(devices)],
-            "CUBLAS_WORKSPACE_CONFIG": ":4096:8", "TF_FORCE_GPU_ALLOW_GROWTH": "true"}
-        run_command(command, out / f"replicate_{i}.log", overrides)
-    with ThreadPoolExecutor(max_workers=1 if len(devices) == 1 else 2) as pool:
+        run_command(command, out / f"replicate_{i}.log")
+    with ThreadPoolExecutor(max_workers=args.replica_workers) as pool:
         list(pool.map(launch, (1, 2)))
     if initial_sources != source_hashes():
         raise RuntimeError("Training sources changed during execution")

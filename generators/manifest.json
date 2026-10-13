@@ -6,7 +6,7 @@
     "d",
     "mbgan"
   ],
-  "scope": "Only preserved real train/test inputs, taxon/tree metadata and numerical solver source. No pretrained model or synthetic data is required.",
+  "scope": "Only preserved real train/test inputs, taxon/tree metadata, numerical solver source and byte-preserved historical local MBGAN source. No pretrained model or synthetic data is required.",
   "files": [
     {
       "path": "data/sample_train.csv",
@@ -87,6 +87,11 @@
       "path": "data/provenance/taxa.txt",
       "bytes": 15189,
       "sha256": "323a4aaf5f93bec2574e30be5905098c4c9f1f6b35a0bd68cfdb161ceca10918"
+    },
+    {
+      "path": "generators/vendor/historical_mbgan_model.py",
+      "bytes": 16835,
+      "sha256": "9efc755e7fdcc18310c5fe4405319134f5d6e25ea50afb0a7b776b6971968e18"
     }
   ]
 }

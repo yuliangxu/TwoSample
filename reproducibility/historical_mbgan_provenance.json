@@ -1,0 +1,78 @@
+{
+  "status": "provenance_verified_restoration_pending",
+  "artifacts": {
+    "ibdmdb_report": {
+      "path": "/cwork/yx306/TwoSample/reports_20261004/ibdmdb_case_study_report.pdf",
+      "sha256": "c9e1f22747373c3ecb860824e4db94a165467653b6b1bb46088417fb62c98e38"
+    },
+    "ibdmdb_training_runner": {
+      "path": "/cwork/yx306/TwoSample/ibdmdb_20261003_f713917/historical_code/train.py",
+      "sha256": "52341307e24b7b57a1f3e9ffc11a61a882979b06ad21ca6261df6c39ffd99e40"
+    },
+    "ibdmdb_model_source": {
+      "path": "/cwork/yx306/TwoSample/ibdmdb_20261003_f713917/historical_code/source/model.py",
+      "sha256": "9efc755e7fdcc18310c5fe4405319134f5d6e25ea50afb0a7b776b6971968e18"
+    },
+    "ibdmdb_notebook_source": {
+      "path": "/cwork/yx306/TwoSample/ibdmdb_20261003_f713917/historical_code/source/1_mbgan.ipynb",
+      "sha256": "0c29360ab84095c50c1f0b3ee1896d97f0c69b093fcd1d98bcc558809ffac968"
+    },
+    "ibdmdb_training_configuration": {
+      "path": "/cwork/yx306/TwoSample/ibdmdb_20261003_historical_mbgan/generators/mbgan/training_config.json",
+      "sha256": "ea082a839f3e52e8bca9a37c06984374710778605e41fd7f7f7bafa53ae77d09"
+    },
+    "ibdmdb_training_completion": {
+      "path": "/cwork/yx306/TwoSample/ibdmdb_20261003_historical_mbgan/generators/mbgan/completion.json",
+      "sha256": "abc713f9fd48d32e4f9516b8a703233f52c6ead6853f3db3246b7720a9f9e98b"
+    },
+    "pooled_report": {
+      "path": "/cwork/yx306/TwoSample/pooled_updated_generators_20261004/updated_generators_case_study_report.pdf",
+      "sha256": "add15be8a0d60328fd11cf8678babe133cf87a98b8a7274bdeaee2c0596adbc3"
+    },
+    "pooled_input_manifest": {
+      "path": "/cwork/yx306/TwoSample/pooled_updated_generators_20261004/input_manifest.json",
+      "sha256": "1e5396be4e38c0d408e54b49eaff4bdaacb330a2686f7be791f3af7b91dd405a"
+    }
+  },
+  "ibdmdb": {
+    "training": "fresh fit from random initialization",
+    "train_shape": [
+      945,
+      77
+    ],
+    "test_shape": [
+      236,
+      77
+    ],
+    "iterations": 500000,
+    "effective_gradient_penalty": false,
+    "callback_limitation": "Every 10000 iterations predict(seed=None) reseeded NumPy from system entropy; initial seed alone was insufficient for exact reproduction."
+  },
+  "pooled_updated": {
+    "training": "checkpoint replay; no new neural fitting",
+    "train_shape": [
+      1166,
+      123
+    ],
+    "test_shape": [
+      292,
+      123
+    ],
+    "generator_checkpoint_sha256": "457c13dbba3afefd1c0a7979eb6854118d25806143ac5306bd1543740eaf840f",
+    "sample_sha256": "bc4b43fca1d64f9266c064df3e48e7d4979c80043945fe7242ff3c563ce19ad4"
+  },
+  "restoration": {
+    "variant": "historical_local_no_penalty",
+    "train_shape": [
+      1166,
+      123
+    ],
+    "iterations": 500000,
+    "training_seed": 1,
+    "sampling_seed": 256,
+    "framework": "TensorFlow CPU 2.13.1 / Keras 2.13.1",
+    "callback_rng_policy": "isolated_seeded_diagnostics",
+    "selection": "Restore the identified historical implementation at user request after inspecting previous analyses; no new search over seeds or checkpoints.",
+    "scope": "Repeatability will be checked by two complete fresh fits. It does not establish optimizer stability, fidelity, equivalence to the published MB-GAN implementation, or recovery of the earlier entropy-dependent training trajectory."
+  }
+}

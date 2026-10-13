@@ -46,8 +46,10 @@ def validate_generation(path, inputs, source_root):
             'Generator training data differ from the preserved training matrix')
     require(record['test_input_sha256'] == inputs['sample_test.csv']['sha256'],
             'Generator provenance has a different real test matrix')
-    require(record['test_used_for_training'] is False and record['test_used_for_selection'] is False,
-            'Test observations were used for generator fitting or selection')
+    require(record['test_used_for_training'] is False and record['test_used_for_seed_or_checkpoint_selection'] is False,
+            'Test observations were used for generator fitting or seed/checkpoint selection')
+    require(record['mbgan_variant_choice'] == 'retrospective_restoration_after_reviewing_prior_results',
+            'Retrospective MBGAN variant choice must be disclosed')
     require(bool(record['source_hashes']), 'Generation source hashes are required')
     for name, digest in record['source_hashes'].items():
         require(sha(relative_file(source_root, name)) == digest,
@@ -70,9 +72,11 @@ def validate_generation(path, inputs, source_root):
                      hidden_layers=3, width=64, sigma=.0001),
         'dt': dict(training_seed=None, sampling_seed=1),
         'd': dict(training_seed=None, sampling_seed=1),
-        'mbgan': dict(common, device='gpu', training_seed=1, sampling_seed=256, iterations=500000,
+        'mbgan': dict(common, device='cpu', training_seed=1, sampling_seed=256, iterations=500000,
                       batch_size=32, optimizer='RMSprop', learning_rate=.00005,
-                      critic_updates=5, gradient_penalty_connected=True),
+                      critic_updates=5, gradient_penalty_connected=False,
+                      variant='historical_local_no_penalty',
+                      callback_rng_policy='isolated_seeded_diagnostics', callback_interval=10000),
     }
     for key in MODELS:
         model = record['models'][key]
@@ -108,7 +112,7 @@ def validate_generation(path, inputs, source_root):
                       'configuration', 'completion'):
             require(metadata[field] == model[field], f'{key}: training metadata differ for {field}')
         require(metadata['test_used_for_training'] is False
-                and metadata['test_used_for_selection'] is False,
+                and metadata['test_used_for_seed_or_checkpoint_selection'] is False,
                 f'{key}: training metadata indicate generator test use')
     return record
 
@@ -161,7 +165,7 @@ def main():
                 'generation': {'manifest': 'generation/generation_manifest.json',
                                'sha256': sha(generation_path)},
                 'preprocessing': 'Original pooled 1166/292 by 123 matrices and published split; collection-wide filtering, retained-taxon normalization and float32 precision.',
-                'generator_scope': 'All four generators fitted from 1166 preserved training rows. Neural models start from seeded random initialization. Frozen recipes and final planned updates; no test use for generator fitting or selection.'}
+                'generator_scope': 'All four generators fitted from 1166 preserved training rows. Neural models start from seeded random initialization. Final planned updates and no test use for generator fitting or a new seed/checkpoint search. The historical local MBGAN implementation was restored retrospectively after inspecting earlier reports.'}
     run.mkdir(parents=True, exist_ok=True)
     target = run / 'input_manifest.json'
     if target.exists():
