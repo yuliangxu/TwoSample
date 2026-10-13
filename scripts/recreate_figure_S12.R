@@ -6,10 +6,10 @@ project_root <- normalizePath(file.path(script_dir, ".."))
 suppressPackageStartupMessages(library(ggplot2))
 
 args <- commandArgs(trailingOnly = TRUE)
-results_dir <- Sys.getenv("TWO_SAMPLE_FIGURE_DIR", file.path(project_root, "output", "case_study"))
+results_dir <- Sys.getenv("TWO_SAMPLE_FIGURE_DIR", file.path(project_root, "output", "final", "figures"))
 dir.create(results_dir, recursive = TRUE, showWarnings = FALSE)
 interval_path <- if (length(args)) normalizePath(gsub("~+~", " ", args[[1]], fixed = TRUE), mustWork = TRUE) else
-  Sys.getenv("TWO_SAMPLE_NULL_INTERVALS", file.path(project_root, "data", "figure_S12", "test_pointwise_credible_intervals.csv"))
+  Sys.getenv("TWO_SAMPLE_NULL_INTERVALS", file.path(project_root, "results", "final", "null", "test_pointwise_credible_intervals.csv"))
 if (!file.exists(interval_path)) stop("Missing interval table: ", interval_path)
 
 results <- read.csv(interval_path)
@@ -21,12 +21,12 @@ results <- results[order(results$posterior_mean), ]
 results$rank <- seq_len(nrow(results))
 results$interval_width <- results$ci_upper_975 - results$ci_lower_025
 coverage_label <- sprintf(
-  "%d of %d test observations' 95%% credible intervals include zero (%.1f%% coverage)",
+  "%d of %d test observations' 95%% credible intervals include zero (%.1f%%)",
   sum(results$covers_zero), nrow(results), 100 * mean(results$covers_zero)
 )
 
 if (all(results$covers_zero)) coverage_label <- sprintf(
-  "All %d test observations' 95%% credible intervals include zero (100.0%% coverage)", nrow(results))
+  "All %d test observations' 95%% credible intervals include zero (100.0%%)", nrow(results))
 write.csv(results, file.path(results_dir, "figureS12_plot_data.csv"), row.names = FALSE)
 
 theme_null <- theme_bw(base_size = 15) +

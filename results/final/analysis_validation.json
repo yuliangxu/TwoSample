@@ -1,0 +1,24 @@
+{
+  "BATTS_commit": "147e511d211919afefb8decac6333e66d24919db",
+  "BATTS_version": "0.3.0",
+  "model_order": ["icfm", "dt", "d", "mbgan"],
+  "real_train": 1166,
+  "real_test": 292,
+  "taxa": 123,
+  "generated_per_model": 1000,
+  "validated_comparisons": 8,
+  "validated_estimator_fits": 24,
+  "validated_figures": 7,
+  "null_intervals": 292,
+  "null_intervals_containing_zero": 292,
+  "boosting_at_search_limit": 7,
+  "figure_md5": {
+    "figure6_ggplot2.pdf": "de6df613395ed6cfe1493c2fadacd6e7",
+    "figure7_ggplot2.pdf": "c715b7218c8749aa8e3a8d35d389aff3",
+    "figureS8_ggplot2.pdf": "dd69e11054e336c426048f4d489baa4a",
+    "figureS9_ggplot2.pdf": "d2e8918896abb023a65b9a2e8c4f3a0b",
+    "figureS10_ggplot2.pdf": "bc17f1878f2f27442e4ec7a46e9292ad",
+    "figureS11_ggplot2.pdf": "f3c416681134a1b2e809624514d4a95c",
+    "figureS12_ggplot2.pdf": "e2889190c705283b47a5de566a49be34"
+  }
+}

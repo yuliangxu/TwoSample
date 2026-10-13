@@ -1,5 +1,4 @@
-# Validated parametric + ICFM environment (Python 3.9).
+# Validated parametric and ICFM environment (Python 3.9.25).
 numpy==1.26.4
 scipy==1.13.1
-pandas==2.2.3
 torch==2.6.0

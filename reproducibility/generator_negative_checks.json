@@ -1,0 +1,8 @@
+{
+  "changed_input_rejected": true,
+  "wrong_shape_rejected": true,
+  "nonfinite_rejected": true,
+  "negative_rejected": true,
+  "invalid_row_mass_rejected": true,
+  "changed_cohort_fails_replay": true
+}

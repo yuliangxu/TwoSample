@@ -1,4 +1,4 @@
-# Optional TensorFlow environment used for the validated MBGAN replay.
+# Separate TensorFlow environment for the validated MBGAN replay (Python 3.9.25).
 tensorflow==2.20.0
 keras==3.10.0
 numpy==2.0.2

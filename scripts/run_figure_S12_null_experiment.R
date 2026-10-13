@@ -5,17 +5,18 @@ script_path <- gsub("~+~", " ", sub("^--file=", "", file_arg[[1]]), fixed = TRUE
 script_dir <- dirname(normalizePath(script_path, mustWork = TRUE))
 project_root <- normalizePath(file.path(script_dir, ".."))
 
-suppressPackageStartupMessages(library(BATTS))
+source(file.path(script_dir, "lib", "case_study_config.R"))
+check_case_study_batts()
 
-seed <- 2026L
+seed <- case_study$null_seed
 data_dir <- Sys.getenv("TWO_SAMPLE_DATA_DIR", file.path(project_root, "data"))
 train_path <- file.path(data_dir, "sample_train.csv")
 test_path <- file.path(data_dir, "sample_test.csv")
-output_dir <- Sys.getenv("TWO_SAMPLE_NULL_OUTPUT", file.path(project_root, "output", "figure_S12_refit"))
+output_dir <- Sys.getenv("TWO_SAMPLE_NULL_OUTPUT", file.path(Sys.getenv("TWO_SAMPLE_RUN_ROOT", file.path(project_root, "output", "final")), "null"))
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
-train <- as.matrix(read.csv(train_path, header = FALSE, check.names = FALSE))
-test <- as.matrix(read.csv(test_path, header = FALSE, check.names = FALSE))
+train <- read_case_study_matrix(train_path, case_study$dimensions[["train"]])
+test <- read_case_study_matrix(test_path, case_study$dimensions[["test"]])
 stopifnot(ncol(train) == ncol(test), all(is.finite(train)), all(is.finite(test)))
 stopifnot(all(train >= 0 & train <= 1), all(test >= 0 & test <= 1))
 
@@ -31,24 +32,14 @@ test_fold <- make_balanced_folds(nrow(test))
 # This preserves the compositional data exactly and avoids division by zero for
 # training-constant columns such as V104.
 set.seed(seed)
-fit <- batts(
-  data = train,
-  group_labels = train_fold,
-  num_trees = 200,
-  margin_scale = -1,
-  size_burnin = 500,
-  size_backfitting = 500,
-  thin = 1,
-  lambda_0 = 5,
-  output_BART_ensembles = TRUE,
-  quiet = FALSE
-)
+fit <- do.call(BATTS::batts, c(list(data = train, group_labels = train_fold), case_study$null))
 
-evaluation <- eval_balance_weight(fit, test, is_Bayes = TRUE)
+
+evaluation <- BATTS::eval_balance_weight(fit, test, is_Bayes = TRUE)
 log_ratio_draws <- 2 * log(evaluation$balancing_weight_BART)
 stopifnot(all(is.finite(log_ratio_draws)))
 # Check the package's prediction normalization against its stored draws.
-training_evaluation <- eval_balance_weight(fit, train, is_Bayes = TRUE)
+training_evaluation <- BATTS::eval_balance_weight(fit, train, is_Bayes = TRUE)
 prediction_difference <- max(abs(2 * log(training_evaluation$balancing_weight_BART) -
                                  2 * log(fit$balance_weight_BART_data)))
 stopifnot(is.finite(prediction_difference), prediction_difference < 1e-10)
@@ -84,12 +75,16 @@ coverage <- rbind(
 write.csv(results, file.path(output_dir, "test_pointwise_credible_intervals.csv"), row.names = FALSE)
 write.csv(coverage, file.path(output_dir, "coverage_summary.csv"), row.names = FALSE)
 write.csv(results[!results$covers_zero, ], file.path(output_dir, "intervals_excluding_zero.csv"), row.names = FALSE)
+fingerprint <- list(commit = case_study$batts_commit, settings = case_study$null,
+                    seed = seed,
+                    source_hashes = case_study_sources(project_root, "run_figure_S12_null_experiment.R"),
+                    inputs = unname(tools::md5sum(c(train_path, test_path))))
 saveRDS(list(seed = seed, train_fold = train_fold, test_fold = test_fold,
-             settings = list(num_trees = 200, size_burnin = 500,
-                             size_backfitting = 500, thin = 1,
-                             lambda_0 = 5, margin_scale = -1),
+             settings = case_study$null, fingerprint = fingerprint,
              fit = fit, log_ratio_draws = log_ratio_draws),
         file.path(output_dir, "null_experiment_fit.rds"))
+writeLines(case_study$batts_commit, file.path(output_dir, "BATTS_commit.txt"))
+
 
 print(coverage, row.names = FALSE)
 cat("Intervals excluding zero:", sum(!covers_zero), "\n")

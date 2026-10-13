@@ -1,7 +1,8 @@
+source(file.path(project_root, "scripts", "lib", "case_study_config.R"))
 suppressPackageStartupMessages({ library(ggplot2); library(vegan); library(patchwork); library(scales) })
 data_dir <- Sys.getenv("TWO_SAMPLE_DATA_DIR", file.path(project_root, "data"))
-ratio_root <- Sys.getenv("TWO_SAMPLE_RATIO_ROOT", file.path(project_root, "data", "revision"))
-output_dir <- Sys.getenv("TWO_SAMPLE_FIGURE_DIR", file.path(project_root, "output", "case_study"))
+ratio_root <- Sys.getenv("TWO_SAMPLE_RATIO_ROOT", file.path(project_root, "results", "final", "revision"))
+output_dir <- Sys.getenv("TWO_SAMPLE_FIGURE_DIR", file.path(project_root, "output", "final", "figures"))
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 cache_dir <- file.path(output_dir, "cache")
 dir.create(cache_dir, showWarnings = FALSE)
@@ -10,8 +11,8 @@ dir.create(cache_dir, showWarnings = FALSE)
 axis_signs <- list(
   train = list(d = c(-1, -1), dt = c(1, -1), icfm = c(-1, -1), mbgan = c(-1, 1)),
   test = list(d = c(-1, 1), dt = c(1, 1), icfm = c(-1, 1), mbgan = c(1, 1)))
-keys <- c("d", "dt", "icfm", "mbgan")
-method_labels <- c(d = "Dirichlet", dt = "Dirichlet Tree", icfm = "ICFM", mbgan = "MB-GAN")
+keys <- case_study$keys
+method_labels <- case_study$labels
 # Matplotlib SymLogNorm(base=10, linscale=1), as in the original Python plots.
 symlog <- function(threshold) {
   a <- 1 / (1 - 10^-1)
@@ -55,8 +56,8 @@ for (number in figures) {
   df$source <- factor(df$source, levels = c("Generated", "Real"))
   # Match the fixed limits used for the manuscript's train/test grids.
   limit <- if (split == "train") 30 else 12
-  titles <- c(mean = "Posterior mean of DRE", lower = "Lower 2.5% MCMC quantile of DRE",
-              upper = "Upper 97.5% MCMC quantile of DRE")
+  titles <- c(mean = "Posterior mean of log density ratio", lower = "Lower 2.5% MCMC quantile of log density ratio",
+              upper = "Upper 97.5% MCMC quantile of log density ratio")
   plots <- lapply(names(titles), function(quantity) {
     ggplot(df, aes(PC1, PC2, color = .data[[quantity]], shape = source)) +
       geom_point(size = 0.65, alpha = 0.75, stroke = 0.3) +
@@ -67,7 +68,7 @@ for (number in figures) {
         breaks = c(-10, -1, -0.1, 0, 0.1, 1, 10),
         labels = c(expression(-10^1), expression(-10^0), expression(-10^-1), "0",
                    expression(10^-1), expression(10^0), expression(10^1))) +
-      labs(x = "PCoA 1", y = "PCoA 2", color = "log(w)", shape = NULL,
+      labs(x = "PCoA 1", y = "PCoA 2", color = "Log density ratio", shape = NULL,
            title = paste0(if (split == "train") "Train" else "Test", " vs. Generated: ", titles[[quantity]])) +
       guides(color = guide_colorbar(position = "right", barheight = grid::unit(52, "mm")),
              shape = guide_legend(position = "bottom", override.aes = list(color = "#222222", size = 2, alpha = 1))) +

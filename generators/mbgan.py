@@ -3,11 +3,7 @@
 # Adapted from zhanxw/MB-GAN and the recovered research implementation.
 # Original code credits keras-team/keras-contrib/examples/improved_wgan.py.
 # See licenses/MBGAN-NOTICE.md and the accompanying GPL/MIT license texts.
-"""Portable MBGAN checkpoint sampling and an explicit new-training recipe.
-
-Sampling replays the recovered generator; training does not claim to recreate
-its historical weights. Run ``python generators/mbgan.py --help``.
-"""
+"""Replay the fixed MBGAN checkpoint used in the finalized case study."""
 import argparse
 import hashlib
 import importlib.metadata
@@ -15,15 +11,12 @@ import json
 import os
 from pathlib import Path
 import platform
-import time
 
 import numpy as np
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 CHECKPOINT = HERE / "checkpoints/mbgan_generator.h5"
-TRAIN = ROOT / "data/sample_train.csv"
-TAXA = ROOT / "data/provenance/taxa.txt"
 BUNDLED_SHA256 = "457c13dbba3afefd1c0a7979eb6854118d25806143ac5306bd1543740eaf840f"
 
 
@@ -69,52 +62,6 @@ def environment():
         except importlib.metadata.PackageNotFoundError:
             pass
     return versions
-
-
-def build_generator(tf, taxa=123, latent=100, width=512):
-    """Original MBGAN chain, including its initial Dense ReLU before BN."""
-    layers = [tf.keras.Input(shape=(latent,)),
-              tf.keras.layers.Dense(width, activation="relu"),
-              tf.keras.layers.BatchNormalization(momentum=0.8, epsilon=0.001),
-              tf.keras.layers.Activation("relu")]
-    for _ in range(2):
-        layers += [tf.keras.layers.Dense(width),
-                   tf.keras.layers.BatchNormalization(momentum=0.8, epsilon=0.001),
-                   tf.keras.layers.Activation("relu")]
-    layers += [tf.keras.layers.Dense(taxa), tf.keras.layers.Activation("softmax")]
-    return tf.keras.Sequential(layers, name="mbgan_generator")
-
-
-def phylogeny_matrix(taxa):
-    """Leaf columns followed by taxonomy prefixes, as in recovered expand_phylo."""
-    if len(taxa) != len(set(taxa)):
-        raise ValueError("Taxon names must be unique")
-    indices = {name: i for i, name in enumerate(taxa)}
-    pairs = []
-    for i, taxon in enumerate(taxa):
-        parts = taxon.split("|")
-        for depth in range(1, len(parts) + 1):
-            name = "|".join(parts[:depth])
-            if name not in indices:
-                indices[name] = len(indices)
-            pairs.append((i, indices[name]))
-    matrix = np.zeros((len(taxa), len(indices)), dtype=np.float32)
-    for i, j in pairs:
-        matrix[i, j] = 1.
-    return matrix
-
-
-def build_critic(tf, matrix, width=256, dropout=0.25, t_pow=1000.):
-    """Taxonomy aggregation, normalized log transform, three Dense blocks."""
-    inputs = tf.keras.Input(shape=(matrix.shape[0],))
-    transform = tf.constant(matrix, dtype=tf.float32)
-    x = tf.keras.layers.Lambda(lambda z: tf.math.log1p(tf.matmul(z, transform)*t_pow)
-                               / tf.math.log1p(tf.constant(t_pow, tf.float32)))(inputs)
-    for _ in range(3):
-        x = tf.keras.layers.Dense(width)(x)
-        x = tf.keras.layers.LeakyReLU(negative_slope=0.2)(x)
-        x = tf.keras.layers.Dropout(dropout)(x)
-    return tf.keras.Model(inputs, tf.keras.layers.Dense(1)(x), name="mbgan_critic")
 
 
 def load_historical_generator(tf, path):
@@ -174,13 +121,9 @@ def load_generator(tf, path):
     path = Path(path)
     if path.resolve() == CHECKPOINT.resolve() and sha256(path) != BUNDLED_SHA256:
         raise ValueError("Bundled checkpoint hash differs from the validated checkpoint")
-    if path.suffix.lower() in {".h5", ".hdf5"}:
-        return load_historical_generator(tf, path)
-    with np.load(path, allow_pickle=False) as data:
-        config = json.loads(str(data["config"].item()))
-        model = build_generator(tf, config["taxa"], config["latent"], config["generator_width"])
-        model.set_weights([data[f"weight_{i:03d}"] for i in range(config["weight_count"])])
-    return model, dict(load_method="new-training NumPy checkpoint", training_config=config)
+    if path.suffix.lower() not in {".h5", ".hdf5"}:
+        raise ValueError("The case-study sampler requires the recovered HDF5 checkpoint")
+    return load_historical_generator(tf, path)
 
 
 def sample_generator(model, n=1000, seed=256, batch_size=32):
@@ -226,162 +169,21 @@ def sample_command(args):
     print(json.dumps(report, indent=2))
 
 
-def checked_gradients(tf, tape, loss, variables):
-    gradients = tape.gradient(loss, variables)
-    if any(g is None for g in gradients):
-        raise RuntimeError("Disconnected training gradient")
-    tf.debugging.assert_all_finite(loss, "Nonfinite training loss")
-    for g in gradients:
-        tf.debugging.assert_all_finite(g, "Nonfinite training gradient")
-    return gradients, float(tf.linalg.global_norm(gradients))
-
-
-def training_step(tf, generator, critic, opt_g, opt_d, rng, data, cfg):
-    for _ in range(cfg["n_critic"]):
-        real = tf.convert_to_tensor(data[rng.randint(len(data), size=cfg["batch_size"])])
-        z = tf.convert_to_tensor(rng.normal(size=(cfg["batch_size"], cfg["latent"])).astype(np.float32))
-        # Freeze generator weights and BN statistics during critic updates.
-        fake = tf.stop_gradient(generator(z, training=False))
-        alpha = tf.random.uniform((cfg["batch_size"], 1))
-        interpolated = alpha*real + (1-alpha)*fake
-        with tf.GradientTape() as critic_tape:
-            real_score, fake_score = critic(real, training=True), critic(fake, training=True)
-            with tf.GradientTape() as input_tape:
-                input_tape.watch(interpolated)
-                interpolated_score = critic(interpolated, training=True)
-            input_gradient = input_tape.gradient(interpolated_score, interpolated)
-            # Numerical epsilon prevents undefined sqrt derivative at zero norm.
-            norm = tf.sqrt(tf.reduce_sum(tf.square(input_gradient), axis=1) + 1e-12)
-            penalty = tf.reduce_mean(tf.square(norm-1.))
-            wasserstein = tf.reduce_mean(fake_score)-tf.reduce_mean(real_score)
-            d_loss = wasserstein + cfg["gradient_penalty_weight"]*penalty
-        d_grad, d_norm = checked_gradients(tf, critic_tape, d_loss, critic.trainable_variables)
-        opt_d.apply_gradients(zip(d_grad, critic.trainable_variables))
-    z = tf.convert_to_tensor(rng.normal(size=(cfg["batch_size"], cfg["latent"])).astype(np.float32))
-    with tf.GradientTape() as generator_tape:
-        # Original training graph keeps critic dropout active in generator steps.
-        fake = generator(z, training=True)
-        g_loss = -tf.reduce_mean(critic(fake, training=True))
-    g_grad, g_norm = checked_gradients(tf, generator_tape, g_loss, generator.trainable_variables)
-    opt_g.apply_gradients(zip(g_grad, generator.trainable_variables))
-    return dict(critic_loss=float(d_loss), generator_loss=float(g_loss),
-                wasserstein_loss=float(wasserstein), gradient_penalty=float(penalty),
-                critic_gradient_norm=d_norm, generator_gradient_norm=g_norm)
-
-
-def train_command(args, smoke=False):
-    if args.iterations < 1 or args.batch_size < 2 or args.n_critic < 1:
-        raise ValueError("iterations/n_critic must be positive and batch_size must be >=2")
-    if args.output_dir.exists():
-        raise FileExistsError("Training requires a new output directory")
-    if args.train.resolve() == (ROOT/"data/sample_test.csv").resolve():
-        raise ValueError("The bundled real testing split cannot be used for training")
-    x = np.loadtxt(args.train, delimiter=",").astype(np.float32)
-    taxa = [line.strip() for line in args.taxonomy.read_text().splitlines() if line.strip()]
-    if x.ndim != 2 or x.shape[1] != len(taxa) or not np.isfinite(x).all() or (x<0).any() or (x.sum(1)<=0).any():
-        raise ValueError("Training must be a nonnegative finite matrix in supplied taxon order")
-    x /= x.sum(axis=1, keepdims=True)
-    cfg = dict(taxa=len(taxa), latent=100, generator_width=512, critic_width=256,
-               critic_dropout=0.25, taxonomy_log_scale=1000., optimizer="RMSprop",
-               learning_rate=5e-5, rho=0.9, optimizer_epsilon=1e-7,
-               gradient_penalty_weight=10., batch_size=args.batch_size,
-               n_critic=args.n_critic, n_generator=1, iterations=args.iterations, seed=args.seed,
-               device=args.device, threads=args.threads, deterministic_ops=True,
-               training_rows=len(x), train_file=display_path(args.train), train_sha256=sha256(args.train),
-               taxonomy_file=display_path(args.taxonomy), taxonomy_sha256=sha256(args.taxonomy),
-               training_claim="New train-only recipe adapted from recovered and upstream MBGAN; historical weights not retrained",
-               test_data_used=False, gradient_penalty_epsilon=1e-12,
-               generator_training_during_critic_steps=False, critic_dropout_during_generator_steps=True)
-    tf = configure_tf(args.device, args.threads, args.seed)
-    g = build_generator(tf, cfg["taxa"], cfg["latent"], cfg["generator_width"])
-    matrix = phylogeny_matrix(taxa)
-    d = build_critic(tf, matrix, cfg["critic_width"], cfg["critic_dropout"], cfg["taxonomy_log_scale"])
-    options = dict(learning_rate=cfg["learning_rate"], rho=cfg["rho"], epsilon=cfg["optimizer_epsilon"])
-    opt_g, opt_d = tf.keras.optimizers.RMSprop(**options), tf.keras.optimizers.RMSprop(**options)
-    before_g = [v.numpy().copy() for v in g.trainable_variables]
-    before_d = [v.numpy().copy() for v in d.trainable_variables]
-    rng = np.random.RandomState(args.seed)
-    args.output_dir.mkdir(parents=True)
-    cfg["environment"] = environment()
-    write_new_json(args.output_dir/"training_config.json", cfg)
-    np.save(args.output_dir/"phylogeny_matrix.npy", matrix)
-    started = time.monotonic()
-    last = None
-    with (args.output_dir/"training_history.jsonl").open("x") as log:
-        for step in range(1, args.iterations+1):
-            last = training_step(tf, g, d, opt_g, opt_d, rng, x, cfg)
-            record = dict(iteration=step, **last)
-            log.write(json.dumps(record)+"\n")
-            if step == 1 or step == args.iterations or step % 1000 == 0:
-                log.flush()
-                print(json.dumps(record), flush=True)
-    change_g = max(float(np.max(np.abs(v.numpy()-a))) for v,a in zip(g.trainable_variables,before_g))
-    change_d = max(float(np.max(np.abs(v.numpy()-a))) for v,a in zip(d.trainable_variables,before_d))
-    if change_g <= 0 or change_d <= 0:
-        raise RuntimeError("Training did not update both generator and critic")
-    weights = g.get_weights()
-    saved_config = dict(cfg, weight_count=len(weights))
-    np.savez_compressed(args.output_dir/"generator.npz", config=json.dumps(saved_config),
-                        **{f"weight_{i:03d}": a for i,a in enumerate(weights)})
-    d.save_weights(args.output_dir/"critic.weights.h5")
-    # An optimizer checkpoint preserves training state; generator.npz is sufficient for sampling.
-    tf.train.Checkpoint(generator=g, critic=d, optimizer_g=opt_g, optimizer_d=opt_d).write(str(args.output_dir/"training_state"))
-    first = sample_generator(g, n=16, seed=256)
-    restored, _ = load_generator(tf, args.output_dir/"generator.npz")
-    second = sample_generator(restored, n=16, seed=256)
-    if not np.array_equal(first, second):
-        raise RuntimeError("Saved generator does not reproduce deterministic sampling")
-    np.save(args.output_dir/"smoke_samples.npy", first)
-    result = dict(status="completed", mode="smoke training" if smoke else "new training",
-                  iterations=args.iterations, training_rows=len(x), elapsed_seconds=time.monotonic()-started,
-                  all_step_gradients_finite=True, max_generator_parameter_change=change_g,
-                  max_critic_parameter_change=change_d, deterministic_save_reload_equal=True,
-                  final_losses=last, generator_sha256=sha256(args.output_dir/"generator.npz"),
-                  historical_weights_reproduced=False)
-    if smoke:
-        historical, metadata = load_generator(tf, CHECKPOINT)
-        a = sample_generator(historical, n=1000, seed=256)
-        b = sample_generator(historical, n=1000, seed=256)
-        ref = np.loadtxt(ROOT/"data/sample_mbgan.csv", delimiter=",")
-        error = a.astype(float)-ref
-        result["historical_replay"] = dict(checkpoint_sha256=sha256(CHECKPOINT),
-            deterministic_equal=bool(np.array_equal(a,b)),
-            max_abs_error=float(np.max(np.abs(error))), rmse=float(np.sqrt(np.mean(error**2))),
-            allclose_rtol1e5_atol1e8=bool(np.allclose(a,ref,rtol=1e-5,atol=1e-8)), **metadata)
-        if not result["historical_replay"]["deterministic_equal"] or not result["historical_replay"]["allclose_rtol1e5_atol1e8"]:
-            raise RuntimeError("Historical replay validation failed")
-    write_new_json(args.output_dir/"completion.json", result)
-    print(json.dumps(result, indent=2), flush=True)
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
-    sample = commands.add_parser("sample", help="sample a saved generator, without training")
-    sample.add_argument("--checkpoint", type=Path, default=CHECKPOINT)
-    sample.add_argument("--output", type=Path, required=True)
-    sample.add_argument("--n", type=int, default=1000)
-    sample.add_argument("--seed", type=int, default=256)
-    sample.add_argument("--batch-size", type=int, default=32)
-    for name in ["train", "smoke-test"]:
-        sub = commands.add_parser(name, help="fit a new model using only the supplied training CSV")
-        sub.add_argument("--train", type=Path, default=TRAIN)
-        sub.add_argument("--taxonomy", type=Path, default=TAXA)
-        sub.add_argument("--output-dir", type=Path, required=True)
-        sub.add_argument("--iterations", type=int, default=2 if name=="smoke-test" else 500000)
-        sub.add_argument("--batch-size", type=int, default=32)
-        sub.add_argument("--n-critic", type=int, default=5)
-        sub.add_argument("--seed", type=int, default=1)
-    for sub in commands.choices.values():
-        sub.add_argument("--threads", type=int, default=2)
-        sub.add_argument("--device", choices=["cpu","gpu","auto"], default="cpu")
+    sampling = commands.add_parser("sample", help="replay the fixed MBGAN checkpoint")
+    sampling.add_argument("--checkpoint", type=Path, default=CHECKPOINT)
+    sampling.add_argument("--output", type=Path, required=True)
+    sampling.add_argument("--n", type=int, default=1000)
+    sampling.add_argument("--seed", type=int, default=256)
+    sampling.add_argument("--batch-size", type=int, default=32)
+    sampling.add_argument("--threads", type=int, default=2)
+    sampling.add_argument("--device", choices=["cpu", "gpu", "auto"], default="cpu")
     args = parser.parse_args()
     if args.threads < 1:
         parser.error("--threads must be positive")
-    if args.command == "sample":
-        sample_command(args)
-    else:
-        train_command(args, smoke=args.command=="smoke-test")
+    sample_command(args)
 
 
 if __name__ == "__main__":

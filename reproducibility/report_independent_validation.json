@@ -1,0 +1,104 @@
+{
+  "pdf_sha256": "6851eb9ee82ace3f37d20cfad988a487b9bbe2dc2f0823e16f23a2fd527d8159",
+  "pages": 10,
+  "figures": 7,
+  "model_order": [
+    "ICFM",
+    "DT",
+    "D",
+    "MBGAN"
+  ],
+  "panel_labels": {
+    "6": [
+      "ICFM",
+      "DT",
+      "D",
+      "MBGAN"
+    ],
+    "7": [
+      "ICFM",
+      "DT",
+      "D",
+      "MBGAN",
+      "ICFM",
+      "DT",
+      "D",
+      "MBGAN",
+      "ICFM",
+      "DT",
+      "D",
+      "MBGAN"
+    ],
+    "S8": [
+      "ICFM",
+      "DT",
+      "D",
+      "MBGAN"
+    ],
+    "S9": [
+      "ICFM",
+      "DT",
+      "D",
+      "MBGAN",
+      "ICFM",
+      "DT",
+      "D",
+      "MBGAN",
+      "ICFM",
+      "DT",
+      "D",
+      "MBGAN"
+    ],
+    "S10": [
+      "ICFM",
+      "DT",
+      "D",
+      "MBGAN",
+      "ICFM",
+      "DT",
+      "D",
+      "MBGAN",
+      "ICFM",
+      "DT",
+      "D",
+      "MBGAN"
+    ],
+    "S11": [
+      "ICFM",
+      "DT",
+      "D",
+      "MBGAN",
+      "ICFM",
+      "DT",
+      "D",
+      "MBGAN",
+      "ICFM",
+      "DT",
+      "D",
+      "MBGAN"
+    ],
+    "S12": []
+  },
+  "frozen_and_executing_sources_verified": 26,
+  "bounds_errors": [],
+  "render_warnings": [],
+  "completion_hashes_verified": true,
+  "rendered_pages": [
+    1,
+    4,
+    7,
+    10
+  ],
+  "actual_run": "/cwork/yx306/TwoSample-final-case-study-20261013",
+  "visual_review": {
+    "pages": [
+      1,
+      4,
+      7,
+      10
+    ],
+    "clipped_or_overlapping_labels": false,
+    "correct_order": true,
+    "result": "Pass; legible headings, tables, panels, legends and captions."
+  }
+}

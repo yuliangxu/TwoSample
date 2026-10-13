@@ -1,44 +1,22 @@
-# Case-study input data
+# Final case-study data
 
-All CSVs are numeric and have no header. Rows retain the ordering used for fitting.
+All six CSVs have no header and contain compositions in the preserved 123-taxon order.
+The original pooled real split is 1,166 training and 292 test observations.
+The four selected synthetic matrices each have 1,000 rows, in report order
+ICFM, DT, D, MBGAN. These are the inputs used in results/final/.
 
-| File | Rows | Columns | Meaning |
-| --- | ---: | ---: | --- |
-| `sample_train.csv` | 1166 | 123 | Preprocessed real training compositions |
-| `sample_test.csv` | 292 | 123 | Preprocessed real test compositions |
-| `sample_d.csv` | 1000 | 123 | Dirichlet generated samples |
-| `sample_dt.csv` | 1000 | 123 | Dirichlet-tree generated samples |
-| `sample_icfm.csv` | 1000 | 123 | ICFM generated samples |
-| `sample_mbgan.csv` | 1000 | 123 | MB-GAN generated samples |
+ICFM uses the fixed restored torchdyn sampler; DT is the stabilized fit.
+See [generator reproduction](../generators/README.md) for seeds, checkpoints,
+reproduction commands and the historical neural-training provenance limits.
+The generator integrity manifest pins all six matrix hashes.
 
-These top-level matrices are the original paper inputs. The selected updated
-synthetic data are versioned in [`regenerated_20261003/`](regenerated_20261003/),
-with checksums and [fitting/sampling commands](../generators/README.md).
-The posterior summaries below correspond to the original matrices; updated
-samples require new downstream fits.
+[Preprocessing provenance](provenance/README.md) fixes the dated source resources,
+final sample selection, row order, taxa and float32 normalization. Run
+`Rscript scripts/reprocess_microbiome.R` to reconstruct and numerically verify
+the real matrices. Cite the package and four source studies in
+[CITATIONS.md](CITATIONS.md), retaining [DATA_TERMS.md](DATA_TERMS.md).
 
-For each generator key (`d`, `dt`, `icfm`, `mbgan`),
-`revision/train/log_w_<key>.csv` and `revision/test/log_w_<key>.csv`
-contain posterior summaries. Real observations precede that generator's 1000
-observations, giving 2166 training rows or 1292 test rows. The plotting scripts
-use columns 3, 4, and 10 (R indexing) for the posterior mean log density ratio
-and lower/upper 95% pointwise posterior interval endpoints.
-
-The real compositions originate from `curatedMetagenomicData`; the other
-sample matrices and fitted summaries were produced for this analysis.
-Run `Rscript scripts/reprocess_microbiome.R` from the repository root to
-reproduce the real training/testing matrices from the package's dated
-resources. Outputs and numerical verification are described in
-[provenance/README.md](provenance/README.md).
-
-Please cite the package and all four contributing studies listed in
-[CITATIONS.md](CITATIONS.md). See [DATA_TERMS.md](DATA_TERMS.md) for the
-study-specific release-terms assessment. The numerical matrices have no
-identifiers; their recovered sample and taxon ordering is provided separately
-in `provenance/`.
-
-## Figure S12 null experiment
-
-`figure_S12/test_pointwise_credible_intervals.csv` contains the original
-292-row null-experiment posterior summary. See [figure_S12/README.md](figure_S12/README.md)
-for provenance and the plotting/refitting commands.
+Final estimator summaries are in `results/final/revision/{train,test}/`.
+Real observations precede generated observations. Columns are gradient boosting,
+Hellinger boosting, Bayesian posterior mean, then posterior quantiles at
+0.025, 0.05, 0.1, 0.5, 0.9, 0.95, 0.975, all on the log(p_real/q_generated) scale.

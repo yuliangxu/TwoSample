@@ -1,17 +1,7 @@
-.DS_Store
-*.pyc
 __pycache__/
+*.pyc
+.DS_Store
 .ipynb_checkpoints/
-
-# Generated figures
-plot/
-
-# Local experiment artifacts
-JASA_acc/
-
-# Generated R figures, coordinates, and session details
+.venv*/
 output/
-
-# Local generator environments
-.venv-generators/
-.venv-mbgan/
+*.Rhistory

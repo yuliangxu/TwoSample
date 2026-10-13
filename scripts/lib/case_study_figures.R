@@ -1,12 +1,13 @@
+source(file.path(project_root, "scripts", "lib", "case_study_config.R"))
 suppressPackageStartupMessages({ library(ggplot2); library(vegan); library(patchwork) })
 
 data_dir <- Sys.getenv("TWO_SAMPLE_DATA_DIR", file.path(project_root, "data"))
-ratio_root <- Sys.getenv("TWO_SAMPLE_RATIO_ROOT", file.path(project_root, "data", "revision"))
-output_dir <- Sys.getenv("TWO_SAMPLE_FIGURE_DIR", file.path(project_root, "output", "case_study"))
+ratio_root <- Sys.getenv("TWO_SAMPLE_RATIO_ROOT", file.path(project_root, "results", "final", "revision"))
+output_dir <- Sys.getenv("TWO_SAMPLE_FIGURE_DIR", file.path(project_root, "output", "final", "figures"))
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
-keys <- c("d", "dt", "icfm", "mbgan")
-method_labels <- c(d = "Dirichlet", dt = "Dirichlet Tree", icfm = "ICFM", mbgan = "MB-GAN")
+keys <- case_study$keys
+method_labels <- case_study$labels
 real <- list(train = as.matrix(read.csv(file.path(data_dir, "sample_train.csv"), header = FALSE)),
              test = as.matrix(read.csv(file.path(data_dir, "sample_test.csv"), header = FALSE)))
 generated <- setNames(lapply(keys, function(k) as.matrix(read.csv(file.path(data_dir, paste0("sample_", k, ".csv")), header = FALSE))), keys)
@@ -104,6 +105,7 @@ theme_result <- theme_bw(base_size = 9.5) +
 
 make_result_figure <- function(split, number) {
   ratios <- do.call(rbind, lapply(keys, function(k) load_ratio(split, k)))
+  ratios$method <- factor(ratios$method, levels = unname(method_labels))
   panels <- lapply(keys, function(k) {
     coords <- ordination[[paste(split, k, sep = "_")]]
     z <- ratios[ratios$key == k, ]
@@ -150,6 +152,8 @@ make_result_figure <- function(split, number) {
           plot.margin = margin(t = 2, r = 4, b = 2, l = 4))
 
   gen <- ratios[ratios$source == "Generated", ]
+  # Row indices are positions in independent generator banks, not paired samples.
+  gen$row <- gen$row - nrow(real[[split]])
   score <- aggregate(abs(mean) ~ row, gen, mean)
   chosen <- head(score$row[order(score[[2]], decreasing = TRUE)], 20)
   ci_df <- gen[gen$row %in% chosen, ]

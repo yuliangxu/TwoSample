@@ -1,0 +1,7 @@
+# Keep hash-bound source, data, and result bytes identical on every platform.
+* -text
+
+# Preserve raw R provenance exports, including their formatter whitespace.
+results/final/**/sessionInfo.txt -whitespace
+results/final/sessionInfo.txt -whitespace
+results/final/settings.R -whitespace
