@@ -2,7 +2,8 @@
 
 Training and analysis workflow for the pooled microbiome case study in
 *Two-sample Comparison through Additive Tree Models for Density Ratios*.
-The model order throughout is **ICFM, DT, D, MBGAN**.
+The figure panels, legends and report use **D, DT, ICFM, MBGAN**.
+The recorded fitting sequence remains ICFM, DT, D, MBGAN.
 
 This release uses the original full pooled data and preprocessing: **1,166
 training observations, 292 test observations, and 123 taxa**, from four studies.

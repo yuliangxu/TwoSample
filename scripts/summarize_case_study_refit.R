@@ -4,6 +4,7 @@ file_arg <- grep("^--file=", commandArgs(FALSE), value = TRUE)
 script_file <- gsub("~+~", " ", sub("^--file=", "", file_arg[[1]]), fixed = TRUE)
 root <- dirname(dirname(normalizePath(script_file)))
 source(file.path(root, "scripts", "lib", "case_study_config.R"))
+source(file.path(root, "scripts", "lib", "figure_order.R"))
 run <- Sys.getenv("TWO_SAMPLE_RUN_ROOT", file.path(root, "output", "final"))
 data_dir <- Sys.getenv("TWO_SAMPLE_DATA_DIR", file.path(root, "data"))
 figure_dir <- Sys.getenv("TWO_SAMPLE_FIGURE_DIR", file.path(run, "figures"))
@@ -82,7 +83,8 @@ for (path in figures) {
 write.csv(ci, file.path(run, "interval_summary.csv"), row.names = FALSE)
 write.csv(cv, file.path(run, "boosting_cv_summary.csv"), row.names = FALSE)
 validation <- list(BATTS_commit = case_study$batts_commit, BATTS_version = case_study$batts_version,
-  model_order = case_study$keys, all_generators_trained_from_scratch = TRUE,
+  model_order = case_study$keys, display_order = figure_keys,
+  all_generators_trained_from_scratch = TRUE,
   independent_training_reproductions_verified = 4L,
   generation_manifest_sha256 = digest::digest(file = generation_manifest, algo = "sha256"),
   real_train = case_study$dimensions[["train"]],
@@ -97,14 +99,14 @@ jsonlite::write_json(validation, file.path(run, "analysis_validation.json"),
                      pretty = TRUE, auto_unbox = TRUE, digits = NA)
 lines <- c("# Final microbiome case study", "",
   sprintf("BATTS %s, source commit `%s`.", case_study$batts_version, case_study$batts_commit), "",
-  "Original pooled preprocessing and split: 1,166 training observations, 292 test observations, 123 taxa. Each generator contributes 1,000 compositions. Model order: ICFM, DT, D, MBGAN.", "",
+  "Original pooled preprocessing and split: 1,166 training observations, 292 test observations, 123 taxa. Each generator contributes 1,000 compositions. Figure and report order: D, DT, ICFM, MBGAN.", "",
   "All four generators are fitted from the original 1,166 training rows using frozen recipes. ICFM and MBGAN start from seeded random initialization and use their final planned update; no test rows enter generator training or selection. Generation provenance and reproduction evidence must pass validation before completion.", "",
   "All eight train/test comparisons are independently fitted. Test density-ratio analyses use the real test observations themselves; they are not predictions from a density-ratio estimator fitted on the training comparison.", "",
   "The previous protocol is explicit: 200 trees, 2,000 burn-in and 1,000 retained iterations, thinning 1, fixed lambda 5, seed 1. Boosting uses five-fold CV, up to 1,000 trees, depth 4, learning rate 0.01, 32 bins, and subsample_fraction = 1. See settings.json for all arguments.", "",
   "## Real-test descriptive summaries", "",
   "| Generator | Intervals excluding zero | Mean absolute posterior-mean log ratio |",
   "| --- | ---: | ---: |")
-for (key in case_study$keys) {
+for (key in figure_keys) {
   row <- ci[ci$split == "test" & ci$generator == key & ci$source == "Real", ]
   lines <- c(lines, sprintf("| %s | %d/%d | %.6f |", case_study$labels[[key]],
     row$n - row$contain_zero, row$n, row$mean_abs_log_ratio))

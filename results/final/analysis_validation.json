@@ -2,6 +2,7 @@
   "BATTS_commit": "147e511d211919afefb8decac6333e66d24919db",
   "BATTS_version": "0.3.0",
   "model_order": ["icfm", "dt", "d", "mbgan"],
+  "display_order": ["d", "dt", "icfm", "mbgan"],
   "all_generators_trained_from_scratch": true,
   "independent_training_reproductions_verified": 4,
   "generation_manifest_sha256": "e8067e8014e937f21ffbdc36d443206915696397d2c8a33f4069a0e1ac232511",
@@ -16,12 +17,12 @@
   "null_intervals_containing_zero": 292,
   "boosting_at_search_limit": 8,
   "figure_md5": {
-    "figure6_ggplot2.pdf": "f2b412d05d95671b48d65e5e62d5bf05",
-    "figure7_ggplot2.pdf": "1958a83f9f3a37c7900011f242c38420",
-    "figureS8_ggplot2.pdf": "c7d72835ad15e03508f15f46e7651d38",
-    "figureS9_ggplot2.pdf": "a8452f759c6368ec5f5f55f76adabdf0",
-    "figureS10_ggplot2.pdf": "133a6cdf9d5cfa7d1b1e1a7422378efb",
-    "figureS11_ggplot2.pdf": "60256abed72dd3cb73cb3cafadc98ac9",
-    "figureS12_ggplot2.pdf": "a2b59f9a4de5bf4201e72a2a58363d0f"
+    "figure6_ggplot2.pdf": "335e97f6fab14e8a95ee00eaa6932d4f",
+    "figure7_ggplot2.pdf": "e3f654f104ab8b2a7f4ecb41cadf57ac",
+    "figureS8_ggplot2.pdf": "cc8f2dbe1aa288e5870e854ccd120e39",
+    "figureS9_ggplot2.pdf": "af5f03e5d9846762b617dd18e6996ccb",
+    "figureS10_ggplot2.pdf": "99208791170f365c18712f005aef167d",
+    "figureS11_ggplot2.pdf": "93ad9ac7375e409529837604b97ee8d6",
+    "figureS12_ggplot2.pdf": "8f12720861039e9c12c24febd8b331c4"
   }
 }

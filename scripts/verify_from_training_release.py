@@ -45,7 +45,9 @@ def main():
         if not (results / marker).is_file():
             raise RuntimeError(f'Final analysis missing {marker}')
     validation = json.loads((results / 'analysis_validation.json').read_text())
-    verify_completed_report(results)
+    report = verify_completed_report(results)
+    if report.get('display_order') != ['d', 'dt', 'icfm', 'mbgan'] or manifest.get('display_order') != report['display_order']:
+        raise RuntimeError('Figure and report display order differs')
     if (results / 'BATTS_commit.txt').read_text().strip() != manifest['BATTS_commit']:
         raise RuntimeError('BATTS commit mismatch')
     if (manifest.get('pretrained_model_inputs') != []
@@ -59,7 +61,7 @@ def main():
             raise RuntimeError(f'Final input differs from fitted analysis: {name}')
     validate_generation(ROOT / 'data/generation_manifest.json', inputs, ROOT)
     print(f"Verified {len(manifest['files'])} source/input/result files, final completion markers and BATTS commit.")
-    print(f"Model order: {', '.join(manifest['model_order'])}")
+    print(f"Figure/report order: {', '.join(manifest['display_order'])}")
     print('Detailed numerical and PDF checks: results/final/analysis_validation.json and report_manifest.json')
 
 if __name__ == '__main__':

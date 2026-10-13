@@ -2,7 +2,7 @@
 
 BATTS 0.3.0, source commit `147e511d211919afefb8decac6333e66d24919db`.
 
-Original pooled preprocessing and split: 1,166 training observations, 292 test observations, 123 taxa. Each generator contributes 1,000 compositions. Model order: ICFM, DT, D, MBGAN.
+Original pooled preprocessing and split: 1,166 training observations, 292 test observations, 123 taxa. Each generator contributes 1,000 compositions. Figure and report order: D, DT, ICFM, MBGAN.
 
 All four generators are fitted from the original 1,166 training rows using frozen recipes. ICFM and MBGAN start from seeded random initialization and use their final planned update; no test rows enter generator training or selection. Generation provenance and reproduction evidence must pass validation before completion.
 
@@ -14,9 +14,9 @@ The previous protocol is explicit: 200 trees, 2,000 burn-in and 1,000 retained i
 
 | Generator | Intervals excluding zero | Mean absolute posterior-mean log ratio |
 | --- | ---: | ---: |
-| ICFM | 291/292 | 1.699123 |
-| DT | 174/292 | 0.604964 |
 | D | 210/292 | 1.234929 |
+| DT | 174/292 | 0.604964 |
+| ICFM | 291/292 | 1.699123 |
 | MBGAN | 292/292 | 5.676278 |
 
 These pointwise posterior intervals are descriptive. Inclusion of zero does not establish distributional equality; one null experiment does not establish a repeated-sampling coverage guarantee.

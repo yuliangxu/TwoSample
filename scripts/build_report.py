@@ -17,7 +17,7 @@ from pathlib import Path
 import fitz
 import reportlab
 
-from report_layout import FIGURES, NAMES, Page, escape, figure_page, rows, sha
+from report_layout import DISPLAY_ORDER, FIGURES, NAMES, Page, escape, figure_page, rows, sha
 from prepare_run import verify_frozen_generation
 
 
@@ -128,7 +128,8 @@ def validate(run):
                   all_generators_trained_from_scratch=True,
                   independent_training_reproductions_verified=4,
                   generation_manifest_sha256=sha(run / 'generation/generation_manifest.json'),
-                  model_order=list(NAMES), real_train=1166, real_test=292, taxa=123,
+                  model_order=list(NAMES), display_order=list(DISPLAY_ORDER),
+                  real_train=1166, real_test=292, taxa=123,
                   generated_per_model=1000, validated_comparisons=8,
                   validated_estimator_fits=24, validated_figures=7, null_intervals=292,
                   null_intervals_containing_zero=null_cover,
@@ -151,7 +152,7 @@ def validate(run):
 
 def overview(cfg):
     p = Page(cfg['label'], 1, 'Microbiome case study',
-             'Full pooled data | Original preprocessing | ICFM, DT, D, MBGAN')
+             'Full pooled data | Original preprocessing | D, DT, ICFM, MBGAN')
     p.para('<b>Two-sample Comparison through Additive Tree Models for Density Ratios</b>',
            12, 17, gap=13)
     p.metrics([('1,458', 'real observations'), ('123', 'retained taxa'),
@@ -160,7 +161,7 @@ def overview(cfg):
     p.para('The original pooled real matrices contain <b>1,166 training and 292 test observations</b>. '
            'The original preprocessing, taxon order and observation split are preserved. '
            'All four generators are fitted from these training rows using released code and frozen '
-           'recipes, in report order: <b>ICFM, DT, D, MBGAN</b>. No real test rows enter '
+           'recipes, presented in the order <b>D, DT, ICFM, MBGAN</b>. No real test rows enter '
            'generator fitting or selection.')
     p.para(f"Eight real-versus-generated comparisons and the held-out null experiment use BATTS "
            f"<b>{escape(cfg['version'])}</b>, commit <b>{cfg['commit'][:8]}</b>. "
@@ -169,7 +170,8 @@ def overview(cfg):
     p.heading('Real-test pointwise posterior summaries')
     data = [['Generator', '95% intervals<br/>excluding zero',
              'Mean absolute<br/>posterior-mean log ratio']]
-    for key, name in NAMES.items():
+    for key in DISPLAY_ORDER:
+        name = NAMES[key]
         item = cfg['stats']['test', key, 'Real']
         data.append([name, f"{item['exclude']}/{item['n']} ({100*item['exclude']/item['n']:.1f}%)",
                      f"{item['mean']:.3f}"])
@@ -189,9 +191,9 @@ def methods(cfg):
              'Preserved real inputs; all generators fitted from the training rows')
     p.heading('Generator constructions')
     p.table([['Generator', 'Construction'],
-             ['ICFM', 'CPU; random initialization; MLP with three hidden layers of width 64; 20,000 Adam updates, batch 256, rate 0.001, flow noise 0.0001; training seed 20261003; final update.'],
-             ['DT', 'Positive-parameter Beta maximum-likelihood fits at 122 tree nodes, using the 1,166 training rows; seed 1.'],
              ['D', 'Dirichlet Newton maximum-likelihood fit on the 1,166 training rows; seed 1.'],
+             ['DT', 'Positive-parameter Beta maximum-likelihood fits at 122 tree nodes, using the 1,166 training rows; seed 1.'],
+             ['ICFM', 'CPU; random initialization; MLP with three hidden layers of width 64; 20,000 Adam updates, batch 256, rate 0.001, flow noise 0.0001; training seed 20261003; final update.'],
              ['MBGAN', 'GPU; random initialization; 500,000 generator iterations, five critic updates each, batch 32; RMSprop rate 0.00005; training seed 1; final iteration. Gradient penalty is differentiated through critic weights.']],
             [75, 441], 9)
     p.para('All four fits use only the preserved 1,166 training rows. Neural training starts from '
@@ -210,7 +212,8 @@ def methods(cfg):
            9.5, 13)
     p.heading('Training comparison: intervals excluding zero')
     data = [['Generator', 'Real training rows', 'Generated rows']]
-    for key, name in NAMES.items():
+    for key in DISPLAY_ORDER:
+        name = NAMES[key]
         real, generated = [cfg['stats']['train', key, source] for source in ('Real', 'Generated')]
         data.append([name, f"{real['exclude']}/{real['n']}", f"{generated['exclude']}/{generated['n']}"])
     p.table(data, [172, 172, 172], 9)
@@ -293,7 +296,7 @@ def build(run):
     document.set_toc(contents)
     document.set_metadata(dict(title='Microbiome case study: full pooled data',
                               author='TwoSample case-study report',
-                              subject='Original preprocessing; ICFM, DT, D, MBGAN; Figures 6, 7 and S8-S12',
+                              subject='Original preprocessing; D, DT, ICFM, MBGAN; Figures 6, 7 and S8-S12',
                               creator='build_report.py; ReportLab and PyMuPDF'))
     output = run / 'case_study_report.pdf'
     partial = run / 'case_study_report.partial.pdf'
@@ -320,6 +323,7 @@ def build(run):
     record = dict(created_utc=datetime.now(timezone.utc).isoformat(), pdf=output.name,
                   sha256=sha(output), pages=10, figures=figures,
                   BATTS_commit=cfg['commit'], BATTS_version=cfg['version'], model_order=list(NAMES),
+                  display_order=list(DISPLAY_ORDER),
                   input_manifest_sha256=sha(run / 'input_manifest.json'),
                   generation_manifest_sha256=sha(run / 'generation/generation_manifest.json'),
                   all_generators_trained_from_scratch=True,
@@ -336,12 +340,13 @@ def build(run):
     (run / 'report_manifest.json').write_text(json.dumps(record, indent=2) + '\n')
     summary = ['Final case study: full pooled data and original preprocessing', '',
                'Real inputs: 1166 training x 123 taxa; 292 test x 123 taxa. Generators: 1000 x 123 each.',
-               'Model order: ICFM, DT, D, MBGAN.',
+               'Display order: D, DT, ICFM, MBGAN.',
                'All four generators are fitted from the 1166 training rows; neural models start from random initialization.',
                'Training recipes are frozen; no real test rows enter generator training or selection.',
                f"BATTS {cfg['version']} ({cfg['commit']}); boosting subsample_fraction=1.", '',
                'Real-test intervals excluding zero and mean absolute posterior-mean log ratio:']
-    for key, name in NAMES.items():
+    for key in DISPLAY_ORDER:
+        name = NAMES[key]
         item = cfg['stats']['test', key, 'Real']
         summary.append(f"{name}: {item['exclude']}/{item['n']}; {item['mean']:.6f}")
     summary += ['', f"Null intervals containing zero: {cfg['null_cover']}/292.",

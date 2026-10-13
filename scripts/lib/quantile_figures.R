@@ -1,4 +1,5 @@
 source(file.path(project_root, "scripts", "lib", "case_study_config.R"))
+source(file.path(project_root, "scripts", "lib", "figure_order.R"))
 suppressPackageStartupMessages({ library(ggplot2); library(vegan); library(patchwork); library(scales) })
 data_dir <- Sys.getenv("TWO_SAMPLE_DATA_DIR", file.path(project_root, "data"))
 ratio_root <- Sys.getenv("TWO_SAMPLE_RATIO_ROOT", file.path(project_root, "results", "final", "revision"))
@@ -11,8 +12,8 @@ dir.create(cache_dir, showWarnings = FALSE)
 axis_signs <- list(
   train = list(d = c(-1, -1), dt = c(1, -1), icfm = c(-1, -1), mbgan = c(-1, 1)),
   test = list(d = c(-1, 1), dt = c(1, 1), icfm = c(-1, 1), mbgan = c(1, 1)))
-keys <- case_study$keys
-method_labels <- case_study$labels
+keys <- figure_keys
+method_labels <- figure_labels
 # Matplotlib SymLogNorm(base=10, linscale=1), as in the original Python plots.
 symlog <- function(threshold) {
   a <- 1 / (1 - 10^-1)

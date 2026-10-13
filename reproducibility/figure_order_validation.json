@@ -1,0 +1,427 @@
+{
+  "schema": "twosample-figure-order-audit-v1",
+  "created_utc": "2026-10-13T18:15:37.313946+00:00",
+  "requested_display_order": [
+    "d",
+    "dt",
+    "icfm",
+    "mbgan"
+  ],
+  "unchanged_fitting_order": [
+    "icfm",
+    "dt",
+    "d",
+    "mbgan"
+  ],
+  "report_sha256": "9f3cab585b7094a7052669da4897d364e049f344e55baad1f5ba4d58a657996f",
+  "prior_report_sha256": "695f23537644a263629c6db00e609f73d9b40f9d3424923d83cd1691ed11083b",
+  "report_pages": 10,
+  "report_bookmarks": 10,
+  "figures": {
+    "6": {
+      "rows": 5168,
+      "columns": [
+        "PC1",
+        "PC2",
+        "sample",
+        "split",
+        "method",
+        "key",
+        "pct1",
+        "pct2"
+      ],
+      "all_plot_data_identical_by_model": true,
+      "model_rows": {
+        "d": 1292,
+        "dt": 1292,
+        "icfm": 1292,
+        "mbgan": 1292
+      },
+      "model_label_rows": [
+        {
+          "y": 10.1,
+          "labels": [
+            "D",
+            "DT",
+            "ICFM",
+            "MBGAN"
+          ]
+        }
+      ],
+      "pdf_sha256": "60a78ee5cad4a82f88ad1863baccde42f817073876a31246aacc01f008982ca0"
+    },
+    "7": {
+      "rows": 5168,
+      "columns": [
+        "row",
+        "source",
+        "mean",
+        "lower",
+        "upper",
+        "key",
+        "method",
+        "split",
+        "PC1",
+        "PC2",
+        "ci_class"
+      ],
+      "all_plot_data_identical_by_model": true,
+      "model_rows": {
+        "d": 1292,
+        "dt": 1292,
+        "icfm": 1292,
+        "mbgan": 1292
+      },
+      "selected_generated_rows": [
+        479,
+        500,
+        747,
+        662,
+        605,
+        911,
+        510,
+        642,
+        102,
+        306,
+        947,
+        452,
+        421,
+        916,
+        395,
+        222,
+        554,
+        263,
+        900,
+        766
+      ],
+      "selected_generated_rows_unchanged": true,
+      "model_label_rows": [
+        {
+          "y": 17.4,
+          "labels": [
+            "D",
+            "DT",
+            "ICFM",
+            "MBGAN"
+          ]
+        },
+        {
+          "y": 161.8,
+          "labels": [
+            "D",
+            "DT",
+            "ICFM",
+            "MBGAN"
+          ]
+        },
+        {
+          "y": 447.0,
+          "labels": [
+            "D",
+            "DT",
+            "ICFM",
+            "MBGAN"
+          ]
+        }
+      ],
+      "interval_panel_vector_validation": {
+        "validated_selected_row_groups": 20,
+        "actual_vector_marker_order": [
+          "D",
+          "DT",
+          "ICFM",
+          "MBGAN"
+        ],
+        "actual_vector_legend_order": [
+          "D",
+          "DT",
+          "ICFM",
+          "MBGAN"
+        ],
+        "generator_colors_preserved": true
+      },
+      "pdf_sha256": "dd76957a98e9ce3bfb34f2cf844ada2c09f1f47bdd53cad782d7619229df22cd"
+    },
+    "S8": {
+      "rows": 8664,
+      "columns": [
+        "PC1",
+        "PC2",
+        "sample",
+        "split",
+        "method",
+        "key",
+        "pct1",
+        "pct2"
+      ],
+      "all_plot_data_identical_by_model": true,
+      "model_rows": {
+        "d": 2166,
+        "dt": 2166,
+        "icfm": 2166,
+        "mbgan": 2166
+      },
+      "model_label_rows": [
+        {
+          "y": 10.1,
+          "labels": [
+            "D",
+            "DT",
+            "ICFM",
+            "MBGAN"
+          ]
+        }
+      ],
+      "pdf_sha256": "d60757f7a852beac2f4def728422950e27a08745f917d3dd933391bdb4671a61"
+    },
+    "S9": {
+      "rows": 8664,
+      "columns": [
+        "row",
+        "source",
+        "mean",
+        "lower",
+        "upper",
+        "key",
+        "method",
+        "split",
+        "PC1",
+        "PC2",
+        "ci_class"
+      ],
+      "all_plot_data_identical_by_model": true,
+      "model_rows": {
+        "d": 2166,
+        "dt": 2166,
+        "icfm": 2166,
+        "mbgan": 2166
+      },
+      "selected_generated_rows": [
+        479,
+        994,
+        884,
+        95,
+        188,
+        332,
+        248,
+        13,
+        510,
+        169,
+        56,
+        97,
+        920,
+        397,
+        741,
+        900,
+        214,
+        265,
+        158,
+        517
+      ],
+      "selected_generated_rows_unchanged": true,
+      "model_label_rows": [
+        {
+          "y": 17.4,
+          "labels": [
+            "D",
+            "DT",
+            "ICFM",
+            "MBGAN"
+          ]
+        },
+        {
+          "y": 161.8,
+          "labels": [
+            "D",
+            "DT",
+            "ICFM",
+            "MBGAN"
+          ]
+        },
+        {
+          "y": 447.0,
+          "labels": [
+            "D",
+            "DT",
+            "ICFM",
+            "MBGAN"
+          ]
+        }
+      ],
+      "interval_panel_vector_validation": {
+        "validated_selected_row_groups": 20,
+        "actual_vector_marker_order": [
+          "D",
+          "DT",
+          "ICFM",
+          "MBGAN"
+        ],
+        "actual_vector_legend_order": [
+          "D",
+          "DT",
+          "ICFM",
+          "MBGAN"
+        ],
+        "generator_colors_preserved": true
+      },
+      "pdf_sha256": "9b59a7c77b4107e243703211bb62f24907a2f37eca45306548aa1bd4f4987086"
+    },
+    "S10": {
+      "rows": 8664,
+      "columns": [
+        "PC1",
+        "PC2",
+        "source",
+        "method",
+        "key",
+        "mean",
+        "lower",
+        "upper"
+      ],
+      "all_plot_data_identical_by_model": true,
+      "model_rows": {
+        "d": 2166,
+        "dt": 2166,
+        "icfm": 2166,
+        "mbgan": 2166
+      },
+      "model_label_rows": [
+        {
+          "y": 30.8,
+          "labels": [
+            "D",
+            "DT",
+            "ICFM",
+            "MBGAN"
+          ]
+        },
+        {
+          "y": 267.2,
+          "labels": [
+            "D",
+            "DT",
+            "ICFM",
+            "MBGAN"
+          ]
+        },
+        {
+          "y": 503.5,
+          "labels": [
+            "D",
+            "DT",
+            "ICFM",
+            "MBGAN"
+          ]
+        }
+      ],
+      "pdf_sha256": "f1f7d36c46b4b195c1ee10802a196c3274e7412fb358b39d4e8b2574751ac151"
+    },
+    "S11": {
+      "rows": 5168,
+      "columns": [
+        "PC1",
+        "PC2",
+        "source",
+        "method",
+        "key",
+        "mean",
+        "lower",
+        "upper"
+      ],
+      "all_plot_data_identical_by_model": true,
+      "model_rows": {
+        "d": 1292,
+        "dt": 1292,
+        "icfm": 1292,
+        "mbgan": 1292
+      },
+      "model_label_rows": [
+        {
+          "y": 30.8,
+          "labels": [
+            "D",
+            "DT",
+            "ICFM",
+            "MBGAN"
+          ]
+        },
+        {
+          "y": 267.2,
+          "labels": [
+            "D",
+            "DT",
+            "ICFM",
+            "MBGAN"
+          ]
+        },
+        {
+          "y": 503.5,
+          "labels": [
+            "D",
+            "DT",
+            "ICFM",
+            "MBGAN"
+          ]
+        }
+      ],
+      "pdf_sha256": "363cc82d6e6236e9c1ddbd83b1b7a7f8f0775872dddc58dcf2fd95d26e6945aa"
+    },
+    "S12": {
+      "rows": 292,
+      "columns": [
+        "test_row",
+        "test_fold",
+        "posterior_mean",
+        "ci_lower_025",
+        "ci_upper_975",
+        "covers_zero",
+        "interval_class",
+        "rank",
+        "interval_width"
+      ],
+      "all_plot_data_identical_by_model": true,
+      "model_label_rows": [],
+      "pdf_sha256": "270db8cbdf6ea52d0491cbd3d252037ddd1ac584855494d09112952aecb62ab1"
+    }
+  },
+  "unchanged_scientific_inputs_and_estimates": {
+    "inputs/sample_d.csv": "957df6b4007389c9c51ed5fc224b67e0f9dcc164354948ee16979d152f9f1f99",
+    "inputs/sample_dt.csv": "6aab2b42f149c365305dc485ee05fd00fac1fdd16e17bd9eccd26edd68d9855b",
+    "inputs/sample_icfm.csv": "fd0fcc702fd96f6a40a7ecd4a020a86cc95eac05e32a81f1764c6fc568ed89f4",
+    "inputs/sample_mbgan.csv": "f7bf7c71a93cb82bd4286f8ff73c6d2a7a6bffd5e7743de8f2e10f9432821520",
+    "inputs/sample_test.csv": "2c33d8e4ba2ef0dea315a9a5a70aad93acf4cc9fd5beaa63ad9589c4313d012c",
+    "inputs/sample_train.csv": "00f4afc44f36563195b12b104b87aeefecaae1dcb79037849dbf640bbf975f56",
+    "revision/test/log_w_d.csv": "2bfec3d3ea66603267964d6fea74e7ae5f0f4c6c140b4e3d8c0c0548e5f071eb",
+    "revision/test/log_w_dt.csv": "a81285a396a6c01d3fc35d2707dbff3f85b415b83d39f21452e38be142a65c74",
+    "revision/test/log_w_icfm.csv": "99deaeed7c48f12e35a068772a7f38759ead1d9a20a4ca1c154cfafb15df344a",
+    "revision/test/log_w_mbgan.csv": "5a5a9c4ce6b93a862a56235905b7bd1fc427173761d8f01051abcdb4a41fbc7f",
+    "revision/train/log_w_d.csv": "e3228068dfe92463874522fe390ccd5813e68e0e73c05d9fd0c8479186d34185",
+    "revision/train/log_w_dt.csv": "d258be026c4e37ad51ec5869bae34d1ec2017a7e77e2761a0cb4e19b4e7af22f",
+    "revision/train/log_w_icfm.csv": "d49768ab7c41e355a05d55d07d850a40d7ca24ce1750214702c102cfed978067",
+    "revision/train/log_w_mbgan.csv": "508f75519c8a0511e239000893fb1f3b9731304ce26a74c111108787d0483e9d",
+    "null/coverage_summary.csv": "aa999bff3288004bf39ffca1886dfa04607800f1f5099622279798ed805c5106",
+    "null/intervals_excluding_zero.csv": "97c91988089648b95c1bce82ab8cf0247dbcc28a9d7e382c9dfc65fb5af605d8",
+    "null/test_pointwise_credible_intervals.csv": "af071aa4a49f0c46ac7a34c90775067967296ff5065df71ab48482a73cc38e0f",
+    "settings.json": "3b2503c8814347a7eb47b9e8019e6e5da2ae054c35362b6c2908760eda0d13a0",
+    "settings.R": "d6ed8af23cd0a0fcddaa1766d3be174ef102a3c71686d35c1a350a0843534a71",
+    "generation/generation_manifest.json": "e8067e8014e937f21ffbdc36d443206915696397d2c8a33f4069a0e1ac232511"
+  },
+  "all_plotting_values_identical_by_model": true,
+  "report_text_outside_pages": [],
+  "pdf_decoding_warnings": [],
+  "visual_inspection_pending": false,
+  "visual_inspection": {
+    "passed": true,
+    "all_seven_source_figures_reviewed": true,
+    "all_ten_report_pages_reviewed": true,
+    "contact_sheets": [
+      "figures_contact_sheet.png",
+      "report_contact_sheet.png"
+    ],
+    "observations": [
+      "All generator panels and report tables follow D, DT, ICFM, MBGAN.",
+      "Figures 7 and S9 retain generator colors, with both legend entries and interval markers ordered D, DT, ICFM, MBGAN.",
+      "All source figures are embedded and visible; no cropped content or layout overlaps were observed."
+    ]
+  }
+}

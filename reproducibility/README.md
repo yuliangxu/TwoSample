@@ -11,10 +11,13 @@ and GPU MBGAN in each replica. The earlier CPU MBGAN run is retained separately.
 The GPU pair reproduced exactly within its recorded hardware and software
 environment; equality between CPU and GPU trajectories is not assumed.
 
-The [independent report audit](report_independent_validation.json) recomputes the
+The [original numerical and report audit](report_independent_validation.json) recomputes the
 summary tables, checks all figure data and model ordering, and records visual
 review of all seven figures and ten report pages. It also lists the numerical
-changes that must be reflected in the manuscript.
+changes that must be reflected in the manuscript. The subsequent
+[figure-order audit](figure_order_validation.json) verifies the current
+D, DT, ICFM, MBGAN presentation, including panel/legend order, preserved colors,
+unchanged plotting values, and the regenerated ten-page report.
 
 The completed workflow retains the following evidence:
 

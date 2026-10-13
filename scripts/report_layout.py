@@ -22,6 +22,8 @@ FIGURES = [('6', 'Test-data ordination'), ('7', 'Test-data density ratios'),
            ('S10', 'Training posterior mean and quantiles'),
            ('S11', 'Test posterior mean and quantiles'), ('S12', 'Held-out null diagnostic')]
 NAMES = {'icfm': 'ICFM', 'dt': 'DT', 'd': 'D', 'mbgan': 'MBGAN'}
+# Presentation order is independent of the frozen generator-fitting protocol.
+DISPLAY_ORDER = ('d', 'dt', 'icfm', 'mbgan')
 
 
 def sha(path):
@@ -151,7 +153,7 @@ def figure_page(cfg, num, title, page_number):
                    'not the same observation evaluated under four generators.')
     elif num in ('S10', 'S11'):
         caption = (f'<b>Posterior summaries across the {split} compositions.</b> Columns correspond to '
-                   'ICFM, DT, D and MBGAN, in that order. Rows show the posterior mean, lower '
+                   'D, DT, ICFM and MBGAN, in that order. Rows show the posterior mean, lower '
                    '2.5% quantile and upper 97.5% quantile of the log density ratio. Real samples are dots; '
                    'generated samples are crosses. These grids use classical Bray-Curtis PCoA without '
                    'an additive correction, following the legacy workflow, and a symmetric-log color scale. '

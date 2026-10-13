@@ -5,7 +5,7 @@ The original full pooled real split contains 1,166 training observations and
 292 test observations. These two real matrices remain unchanged.
 
 The four validated 1,000-row synthetic matrices are in report order
-**ICFM, DT, D, MBGAN** and were generated using only the training matrix.
+**D, DT, ICFM, MBGAN** and were generated using only the training matrix.
 Two complete independent fitting sequences produced identical parameters and
 synthetic CSVs. [generation_manifest.json](generation_manifest.json) binds the
 inputs, settings, source and outputs; [reproduction evidence](evidence/reproduction.json)

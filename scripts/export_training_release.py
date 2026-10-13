@@ -48,7 +48,7 @@ def main():
         if sha(local) != digest:
             raise RuntimeError(f'Release analysis source differs from executed source: {local}')
     checks = json.loads((analysis / 'analysis_validation.json').read_text())
-    verify_completed_report(analysis)
+    report = verify_completed_report(analysis)
     if (checks['validated_comparisons'] != 8 or checks['validated_estimator_fits'] != 24
             or checks['validated_figures'] != 7 or not checks['all_generators_trained_from_scratch']
             or checks['independent_training_reproductions_verified'] != 4):
@@ -68,6 +68,8 @@ def main():
            'report_manifest.json', 'timing.csv']
     for name in top:
         copy_verified(analysis / name, final / name)
+    if (analysis / 'presentation_revision.json').is_file():
+        copy_verified(analysis / 'presentation_revision.json', final / 'presentation_revision.json')
     for pattern in ('figures/*.pdf', 'figures/*_plot_data.csv', 'figures/sessionInfo.txt',
                     'revision/*/*.csv', 'null/*.csv', 'null/*.txt'):
         for source in sorted(analysis.glob(pattern)):
@@ -76,6 +78,7 @@ def main():
                'run_root': str(run), 'generation_manifest_sha256': sha(ROOT / 'data/generation_manifest.json'),
                'report_sha256': sha(final / 'case_study_report.pdf'),
                'model_order': generation['model_order'], 'independent_full_runs': 2,
+               'display_order': report['display_order'],
                'training_source_files': len(generation['source_hashes']),
                'analysis': checks}
     target = ROOT / 'reproducibility/from_training_validation.json'
@@ -96,6 +99,7 @@ def main():
             continue
         files[rel.as_posix()] = sha(path)
     release = {'schema': 'twosample-from-training-release-v1', 'model_order': generation['model_order'],
+               'display_order': report['display_order'],
                'BATTS_commit': inputs['BATTS_commit'], 'files': files,
                'generation_manifest_sha256': sha(ROOT / 'data/generation_manifest.json'),
                'pretrained_model_inputs': [], 'independent_full_training_runs': 2}

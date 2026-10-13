@@ -1,14 +1,14 @@
 {
-  "created_utc": "2026-10-13T17:02:14.092677+00:00",
+  "created_utc": "2026-10-13T18:13:23.819741+00:00",
   "pdf": "case_study_report.pdf",
-  "sha256": "695f23537644a263629c6db00e609f73d9b40f9d3424923d83cd1691ed11083b",
+  "sha256": "9f3cab585b7094a7052669da4897d364e049f344e55baad1f5ba4d58a657996f",
   "pages": 10,
   "figures": [
     {
       "figure": "6",
       "report_page": 3,
       "source": "figures/figure6_ggplot2.pdf",
-      "sha256": "0c6f0c725e1aad1e97702c11f4d4f2bd3b48fd16aa39faacbc47772a99146d30",
+      "sha256": "60a78ee5cad4a82f88ad1863baccde42f817073876a31246aacc01f008982ca0",
       "source_points": [
         1008.0,
         374.0
@@ -24,7 +24,7 @@
       "figure": "7",
       "report_page": 4,
       "source": "figures/figure7_ggplot2.pdf",
-      "sha256": "3d782cc51f0f614b1daf4c0e4b7865d3aa0674930547c5bb0fc3b24895e6f3cc",
+      "sha256": "dd76957a98e9ce3bfb34f2cf844ada2c09f1f47bdd53cad782d7619229df22cd",
       "source_points": [
         468.0,
         468.0
@@ -40,7 +40,7 @@
       "figure": "S8",
       "report_page": 5,
       "source": "figures/figureS8_ggplot2.pdf",
-      "sha256": "5547c88ebf0b01f6106a82a9acd92a1b37d8131e035ccc37f074022ceeb65c89",
+      "sha256": "d60757f7a852beac2f4def728422950e27a08745f917d3dd933391bdb4671a61",
       "source_points": [
         1008.0,
         374.0
@@ -56,7 +56,7 @@
       "figure": "S9",
       "report_page": 6,
       "source": "figures/figureS9_ggplot2.pdf",
-      "sha256": "5b8c6833335ab2f3e7dee956f62bdd6bf4686db71e1a90fcef42b5f296fb89c5",
+      "sha256": "9b59a7c77b4107e243703211bb62f24907a2f37eca45306548aa1bd4f4987086",
       "source_points": [
         468.0,
         468.0
@@ -72,7 +72,7 @@
       "figure": "S10",
       "report_page": 7,
       "source": "figures/figureS10_ggplot2.pdf",
-      "sha256": "2dc7e1f3332a4006fad1909febca4259f65b048b2b1c5c8a2b3116d36ee07274",
+      "sha256": "f1f7d36c46b4b195c1ee10802a196c3274e7412fb358b39d4e8b2574751ac151",
       "source_points": [
         864.0,
         720.0
@@ -88,7 +88,7 @@
       "figure": "S11",
       "report_page": 8,
       "source": "figures/figureS11_ggplot2.pdf",
-      "sha256": "6e40886a85690a40eef027d6511d4c00df4a8c6465c3e55c60d2a67a48153280",
+      "sha256": "363cc82d6e6236e9c1ddbd83b1b7a7f8f0775872dddc58dcf2fd95d26e6945aa",
       "source_points": [
         864.0,
         720.0
@@ -104,7 +104,7 @@
       "figure": "S12",
       "report_page": 9,
       "source": "figures/figureS12_ggplot2.pdf",
-      "sha256": "e1c400f8eaa6214687123d863d9d21a032fd649bcf0a0016af8cc792fea02b9e",
+      "sha256": "270db8cbdf6ea52d0491cbd3d252037ddd1ac584855494d09112952aecb62ab1",
       "source_points": [
         720.0,
         374.0
@@ -125,13 +125,19 @@
     "d",
     "mbgan"
   ],
-  "input_manifest_sha256": "db7ee6411411e4ffebadd72743b1340bd8acfd5d9381039f3c6d73d1018a7be4",
+  "display_order": [
+    "d",
+    "dt",
+    "icfm",
+    "mbgan"
+  ],
+  "input_manifest_sha256": "3017b9b6dd2b694699276ac6f5805f7565ae6628073f2bdda37c59e46edd2c6c",
   "generation_manifest_sha256": "e8067e8014e937f21ffbdc36d443206915696397d2c8a33f4069a0e1ac232511",
   "all_generators_trained_from_scratch": true,
   "independent_training_reproductions_verified": 4,
   "settings_sha256": "3b2503c8814347a7eb47b9e8019e6e5da2ae054c35362b6c2908760eda0d13a0",
-  "analysis_validation_sha256": "896c700fde988f409f2dfa29a5bf9a68953104b87322618bacd6761fdea6b698",
-  "analysis_complete_sha256": "f0d32cddd07c8727a84f2c1e8fd15f7949c0919f9291643b828a393420816b34",
+  "analysis_validation_sha256": "62c21822d4e618cd640bc58f1e1deb59e2b17464df1c2369cf4dc93c0e09377a",
+  "analysis_complete_sha256": "c00dd04d5e8e3ea01dbc7526e79361a7e405ab8241702486cee4c8db2f8b3aa0",
   "eight_estimator_tables_validated": true,
   "estimator_tables": {
     "revision/train/log_w_icfm.csv": "d49768ab7c41e355a05d55d07d850a40d7ca24ce1750214702c102cfed978067",
@@ -151,6 +157,6 @@
   "boosting_at_search_limit": 8,
   "reportlab_version": "5.0.1",
   "pymupdf_version": "1.26.5",
-  "builder_sha256": "9d4f8e734aaeb2e34b0bdcd587513598443957641d9aad76d6c829c2439438a6",
-  "layout_sha256": "e464263dd2596ce9e5806dd0f82de80d57d0583694ed2b7f13f06ae62f6bb81c"
+  "builder_sha256": "0e8691fbceca0a5edbf9406ebc8de24bab8a678dd9f3b70dfb43e91a636823ea",
+  "layout_sha256": "7dfe05b55abf367c4d9dffb98dbf5f0d1256c5861bfe4328670c6cbfb872895c"
 }

@@ -1,4 +1,5 @@
 source(file.path(project_root, "scripts", "lib", "case_study_config.R"))
+source(file.path(project_root, "scripts", "lib", "figure_order.R"))
 suppressPackageStartupMessages({ library(ggplot2); library(vegan); library(patchwork) })
 
 data_dir <- Sys.getenv("TWO_SAMPLE_DATA_DIR", file.path(project_root, "data"))
@@ -6,8 +7,8 @@ ratio_root <- Sys.getenv("TWO_SAMPLE_RATIO_ROOT", file.path(project_root, "resul
 output_dir <- Sys.getenv("TWO_SAMPLE_FIGURE_DIR", file.path(project_root, "output", "final", "figures"))
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
-keys <- case_study$keys
-method_labels <- case_study$labels
+keys <- figure_keys
+method_labels <- figure_labels
 real <- list(train = as.matrix(read.csv(file.path(data_dir, "sample_train.csv"), header = FALSE)),
              test = as.matrix(read.csv(file.path(data_dir, "sample_test.csv"), header = FALSE)))
 generated <- setNames(lapply(keys, function(k) as.matrix(read.csv(file.path(data_dir, paste0("sample_", k, ".csv")), header = FALSE))), keys)
@@ -159,6 +160,9 @@ make_result_figure <- function(split, number) {
   ci_df <- gen[gen$row %in% chosen, ]
   ci_df$display_row <- factor(ci_df$row, levels = rev(chosen))
   p_ci <- ggplot(ci_df, aes(display_row, mean, color = method)) +
+    scale_color_manual(values = c(ICFM = "#F8766D", DT = "#7CAE00",
+                                  D = "#00BFC4", MBGAN = "#C77CFF"),
+                       breaks = unname(method_labels)) +
     geom_hline(yintercept = 0, color = "grey40") +
     geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2,
       position = position_dodge(width = 0.7)) +
