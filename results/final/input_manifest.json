@@ -23,7 +23,7 @@
       ]
     },
     "sample_icfm.csv": {
-      "sha256": "24ca2b129d6073bedbe151eec23bf469fb1e79fe1c4a6ed53c2932a19436d58c",
+      "sha256": "fd0fcc702fd96f6a40a7ecd4a020a86cc95eac05e32a81f1764c6fc568ed89f4",
       "shape": [
         1000,
         123
@@ -44,7 +44,7 @@
       ]
     },
     "sample_mbgan.csv": {
-      "sha256": "bc4b43fca1d64f9266c064df3e48e7d4979c80043945fe7242ff3c563ce19ad4",
+      "sha256": "f7bf7c71a93cb82bd4286f8ff73c6d2a7a6bffd5e7743de8f2e10f9432821520",
       "shape": [
         1000,
         123
@@ -52,7 +52,8 @@
     }
   },
   "source_scripts": {
-    "source/scripts/build_report.py": "af4aea941be548d5ebc9110aae40639a6347a5fdf63dad2ee6fe1f4c5b32485b",
+    "source/scripts/build_report.py": "9d4f8e734aaeb2e34b0bdcd587513598443957641d9aad76d6c829c2439438a6",
+    "source/scripts/export_training_release.py": "4e897da7cceca60fb18396c16947b58416b7b8344ecde67c9a456de8939b0d77",
     "source/scripts/install_dependencies.R": "2aff05f988c5bb713bfd4b84144ccd47fbd123c4421b7febce53c42b24eeb022",
     "source/scripts/install_preprocessing.R": "9fce074f4870512442dd01265e33d96b09135f5aed9cef33238da95b50950736",
     "source/scripts/lib/case_study_config.R": "f1f221ba32dabbdbcee90d621c2c80268ce427a2f7a3a3f7f70a4249744999d6",
@@ -60,7 +61,7 @@
     "source/scripts/lib/quantile_figures.R": "99a10340aead34641717cdae8c651df25763743691f470afc095fdac8b0cc36e",
     "source/scripts/microbiome_subset.R": "89d68206773e9e68a65dc22f07b61491190e7fa90fac3a17ecce6f7c1be35c7f",
     "source/scripts/precompute_pcoa.R": "94e14ea93bc22197ca81bfd6d2b8b55c338962201e718c0aac6a5dc1db7321f3",
-    "source/scripts/prepare_run.py": "d9c07cbe519ab71189c6c5eb40a38593d075d9cb374848596c51b58bc3fc6504",
+    "source/scripts/prepare_run.py": "252a8c46e4b657dbc6a3182284a041e66ad12ca280661fd87b344a89516f763a",
     "source/scripts/recreate_all_case_study_figures.R": "045493fe1f341830f318b635b88383aa775743dd0160de01365175a6136951d8",
     "source/scripts/recreate_figure_6.R": "b19747d71060505ff3c176f4ecf0e793e326a0ddaf0fe6b382a91f8ccbf7f7db",
     "source/scripts/recreate_figure_7.R": "01ad60c1bb527ed1a8a4092f8b8324a43af25db01fb66b388d85c6cc477858dd",
@@ -72,13 +73,19 @@
     "source/scripts/recreate_figures_6_7.R": "b43b2ef9acd38e69d5530e435cdb223a69193698663e0a6d54984d2516c2c3aa",
     "source/scripts/recreate_figures_S10_S11.R": "3b72645f190a6eff8ed47c8f24ea6b67ab8f4a1859ed1bb25756f630acde4fc9",
     "source/scripts/refit_case_study.R": "7535965c32fb1206d4b65823dc0b8ae5f28d14eee2822d086c004660045b7193",
-    "source/scripts/report_layout.py": "a6e82e6aa4d11ee654b1bcdfeea1ea60dc467bb0cc995dbdaaf5d4d95cb4a686",
+    "source/scripts/report_layout.py": "e464263dd2596ce9e5806dd0f82de80d57d0583694ed2b7f13f06ae62f6bb81c",
     "source/scripts/reprocess_microbiome.R": "697bbd8808e2c998708af24d048e711e7ae9a15b99275b5c14399415ce35aa31",
     "source/scripts/reproduce_case_study_batts.R": "a393923a34b734317f3972450293a4b546c3320b72b3875bb982efcdf4ec862c",
     "source/scripts/run_figure_S12_null_experiment.R": "ad0e169e6002876a963a276f7716322ae3a5e9dbf55347a169fa6b14eb59157b",
-    "source/scripts/summarize_case_study_refit.R": "1162d383026e3fafa7404dd2a619c41f56147fabdc4e315be5c3b68947bd0a90",
+    "source/scripts/summarize_case_study_refit.R": "2a9c231ff53c4c1c33356181ead8cc378a6a385db712d34f522a9eb75562e8d3",
+    "source/scripts/training_run_status.py": "35567e3c44abb8d1d8e623828e080af08acafe83aea0b665b65df5cf74216973",
+    "source/scripts/verify_from_training_release.py": "3156c2ae3cec1b1c297f8479f4b65c262a9a9ea1ed718832528baf8f588a925d",
     "source/scripts/verify_release.py": "691ea122e5a012c264590dc6a31ebe117d95463603881dd1141a3300e2c5cb04"
   },
-  "preprocessing": "Original pooled 1166/292 by 123 matrices and published split; retained-taxon normalization and float32 precision.",
-  "generator_scope": "D and DT fit original training rows. Fixed ICFM and MBGAN checkpoint replay; historical neural fitting membership unknown."
+  "generation": {
+    "manifest": "generation/generation_manifest.json",
+    "sha256": "e8067e8014e937f21ffbdc36d443206915696397d2c8a33f4069a0e1ac232511"
+  },
+  "preprocessing": "Original pooled 1166/292 by 123 matrices and published split; collection-wide filtering, retained-taxon normalization and float32 precision.",
+  "generator_scope": "All four generators fitted from 1166 preserved training rows. Neural models start from seeded random initialization. Frozen recipes and final planned updates; no test use for generator fitting or selection."
 }

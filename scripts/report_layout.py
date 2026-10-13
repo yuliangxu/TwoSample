@@ -146,9 +146,9 @@ def figure_page(cfg, num, title, page_number):
                    '(b) Classification of central 95% intervals as above zero, covering zero, or below zero. '
                    '(c) Posterior means and intervals at 20 generated-row indices selected by the '
                    'average absolute posterior mean across the four generator comparisons. These are '
-                   'selected extremes. Row labels refer to the stacked real/generated matrices. '
-                   'Equal display indices across generators represent independent generated samples, '
-                   'not matched biological observations.')
+                   'selected extremes. Display labels are row positions within the generated sample banks. '
+                   'The same index across generators labels different generated compositions, '
+                   'not the same observation evaluated under four generators.')
     elif num in ('S10', 'S11'):
         caption = (f'<b>Posterior summaries across the {split} compositions.</b> Columns correspond to '
                    'ICFM, DT, D and MBGAN, in that order. Rows show the posterior mean, lower '

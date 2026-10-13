@@ -1,4 +1,4 @@
-"""Replay the fixed ICFM checkpoint used in the finalized case study."""
+"""Fit independent CFM from the training CSV, then sample its verified fit."""
 from __future__ import annotations
 
 import argparse
@@ -21,7 +21,7 @@ from .vendor.torchdyn_numerics import integrate
 
 PACKAGE = Path(__file__).resolve().parent
 DEFAULT_TREE = PACKAGE / "assets" / "tree"
-RECOVERED = PACKAGE / "checkpoints" / "icfm_recovered.pt"
+FORMAT = "twosample.icfm.from_training.v2"
 
 
 class MLP(nn.Module):
@@ -74,17 +74,23 @@ def environment():
             **{name: importlib.metadata.version(name) for name in ["torch", "numpy", "scipy"]}}
 
 
+def source_metadata():
+    """Bind fitting, transformation and integration to the executable source."""
+    files = [Path(__file__), PACKAGE / "tree.py", PACKAGE / "__init__.py"]
+    files.extend((PACKAGE / "vendor").rglob("*.py"))
+    return {str(p.relative_to(PACKAGE)): sha256(p) for p in sorted(files)}
+
+
 def seed_everything(seed: int, device: str, threads: int):
     if threads < 1:
         raise ValueError("threads must be positive")
-    if device.startswith("cuda") and not torch.cuda.is_available():
-        raise RuntimeError("CUDA was requested but is unavailable")
+    if device != "cpu":
+        raise ValueError("The declared reproduction protocol uses CPU float32")
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(seed)
     torch.set_num_threads(threads)
+    torch.set_num_interop_threads(1)
     torch.use_deterministic_algorithms(True)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
@@ -100,20 +106,50 @@ def save_json(path: Path, value):
 
 
 def output_guard(path: Path):
-    if path.resolve() == RECOVERED.resolve():
-        raise ValueError("The bundled recovered checkpoint cannot be overwritten")
     if path.exists() or path.with_suffix(path.suffix + ".metadata.json").exists():
         raise FileExistsError(f"Output exists: {path}; choose a new path")
     path.parent.mkdir(parents=True, exist_ok=True)
 
 
-def load_model(checkpoint: Path, device: str):
+def load_model(checkpoint: Path, device: str, train_path: Path, tree: Path):
+    """Require a completed fit whose hashes match its inputs and this source.
+
+    These checks establish file integrity and provenance consistency, not a
+    cryptographic signature or independent proof of having run the training.
+    The independent rerun supplies the empirical reproducibility check.
+    """
     payload = torch.load(checkpoint, map_location="cpu", weights_only=True)
-    if isinstance(payload, dict) and "state_dict" in payload:
-        state, metadata = payload["state_dict"], payload.get("metadata", {})
-    else:
-        state, metadata = payload, {"kind": "recovered state dictionary; historical training provenance unverified"}
+    if not isinstance(payload, dict) or payload.get("format") != FORMAT:
+        raise ValueError("Expected a completed from-training ICFM fit; recovered checkpoints are unsupported")
+    state, metadata = payload["state_dict"], payload["metadata"]
+    sidecar = json.loads(checkpoint.with_suffix(checkpoint.suffix + ".metadata.json").read_text())
+    if sidecar.pop("checkpoint_sha256", None) != sha256(checkpoint) or sidecar != metadata:
+        raise ValueError("Checkpoint bytes or embedded training metadata fail sidecar integrity checks")
+    expected = {
+        "operation": "train", "status": "complete", "initialization": "seeded random initialization; no input checkpoint",
+        "training_csv_sha256": sha256(train_path), "tree_csv_sha256": tree_metadata(tree),
+        "executable_source_sha256": source_metadata(), "environment": environment(),
+        "final_state_sha256": state_sha256(state),
+        "initial_state_sha256": state_sha256(payload["initial_state_dict"]),
+        "checkpoint_rule": "final update, no validation or model selection",
+        "device": "cpu", "dtype": "float32", "deterministic_algorithms": True,
+    }
+    for key, value in expected.items():
+        if metadata.get(key) != value:
+            raise ValueError(f"Training provenance mismatch: {key}")
+    if metadata["initial_state_sha256"] == metadata["final_state_sha256"]:
+        raise ValueError("Checkpoint parameters did not change from initialization")
+    if metadata["steps"] < 1 or len(metadata["losses"]) != metadata["steps"]:
+        raise ValueError("Checkpoint is missing its complete training history")
     dim, width = state["net.6.weight"].shape
+    if metadata["architecture"] != {"dimension": dim, "hidden_width": 64,
+                                  "hidden_layers": 3, "activation": "SELU", "time_input": True} or width != 64:
+        raise ValueError("Checkpoint does not match the declared MLP architecture")
+    with torch.random.fork_rng(devices=[]):
+        torch.manual_seed(metadata["seed"])
+        initialized = MLP(dim=dim, width=width)
+    if state_sha256(initialized.state_dict()) != metadata["initial_state_sha256"]:
+        raise ValueError("Initial parameters do not match fresh initialization with the recorded seed")
     model = MLP(dim=dim, width=width).to(device)
     model.load_state_dict(state)
     model.eval()
@@ -127,11 +163,11 @@ def sample(args):
         raise ValueError("Sample output must end in .npy or .csv")
     output_guard(args.output)
     seed_everything(args.seed, args.device, args.threads)
-    model, training_metadata, dim = load_model(args.checkpoint, args.device)
+    model, training_metadata, dim = load_model(args.checkpoint, args.device, args.train, args.tree)
     current_tree_hashes = tree_metadata(args.tree)
     expected_tree_hashes = training_metadata.get("tree_csv_sha256")
     if expected_tree_hashes is not None and current_tree_hashes != expected_tree_hashes:
-        raise ValueError("Tree metadata hashes differ from those recorded in the checkpoint")
+        raise ValueError("Tree metadata hashes differ from those recorded in the trained checkpoint")
     tree = TreeTransform.from_directory(args.tree)
     # Reseed after model construction, exactly as the historical sampling code.
     torch.manual_seed(args.seed)
@@ -158,25 +194,126 @@ def sample(args):
         "max_row_sum_error": float(np.abs(samples.sum(1)-1).max()),
         "output_sha256": sha256(args.output), "environment": environment(),
         "source_sha256": sha256(Path(__file__)), "deterministic_algorithms": True,
+        "executable_source_sha256": source_metadata(),
         "replay_limit": "Bitwise reproducibility can depend on device, library versions, and floating-point implementation."}
     save_json(args.output.with_suffix(args.output.suffix + ".metadata.json"), metadata)
     print(json.dumps({"output": str(args.output), "sha256": metadata["output_sha256"], "shape": list(samples.shape)}))
 
 
+def train(args):
+    if args.steps < 1 or args.batch_size < 1 or args.lr <= 0 or args.sigma < 0:
+        raise ValueError("steps, batch-size, and lr must be positive; sigma must be nonnegative")
+    if args.zero_mass <= 0 or args.clip_logratio <= 0:
+        raise ValueError("zero-mass and clip-logratio must be positive")
+    output_guard(args.output)
+    seed_everything(args.seed, args.device, args.threads)
+    source_hashes = source_metadata()
+    training_hash = sha256(args.train)
+    tree_hashes = tree_metadata(args.tree)
+    raw = np.loadtxt(args.train, delimiter=",")
+    if raw.ndim != 2 or len(raw) < 2:
+        raise ValueError("Training CSV must contain a sample-by-taxon matrix")
+    tree = TreeTransform.from_directory(args.tree)
+    logtree = tree.forward_icfm(raw, zero_mass=args.zero_mass, clip_logratio=args.clip_logratio)
+    if not np.isfinite(logtree).all():
+        raise ValueError("Training transformation contains non-finite values")
+    target_bank = torch.as_tensor(logtree, dtype=torch.float32, device=args.device)
+    model = MLP(dim=target_bank.shape[1]).to(args.device)
+    initial_state = {name: value.detach().cpu().clone() for name, value in model.state_dict().items()}
+    initial_hash = state_sha256(initial_state)
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=0.0,
+                                 betas=(0.9, 0.999), eps=1e-8, amsgrad=False,
+                                 foreach=False, fused=False)
+    losses = []
+    start = time.monotonic()
+    model.train()
+    for step in range(args.steps):
+        index = torch.randint(len(target_bank), (args.batch_size,), device=args.device)
+        z1 = target_bank[index]
+        z0 = torch.randn_like(z1)
+        t = torch.rand(args.batch_size, 1, device=args.device)
+        epsilon = torch.randn_like(z1)
+        zt = (1-t)*z0 + t*z1 + args.sigma*epsilon
+        velocity = z1-z0
+        predicted = model(torch.cat([zt,t], dim=1))
+        loss = torch.mean((predicted-velocity)**2)
+        if not torch.isfinite(loss):
+            raise RuntimeError(f"Non-finite loss at update {step+1}")
+        optimizer.zero_grad(set_to_none=True)
+        loss.backward()
+        optimizer.step()
+        losses.append(float(loss.detach().cpu()))
+        if (step+1) % 1000 == 0 or step+1 == args.steps:
+            elapsed = time.monotonic()-start
+            print(json.dumps({"operation": "train_progress", "step": step+1,
+                              "steps": args.steps, "loss": losses[-1], "seconds": elapsed,
+                              "estimated_remaining_seconds": elapsed*(args.steps-step-1)/(step+1)}), flush=True)
+    state = {name:value.detach().cpu() for name,value in model.state_dict().items()}
+    final_hash = state_sha256(state)
+    if not all(torch.isfinite(value).all().item() for value in state.values()) or initial_hash == final_hash:
+        raise RuntimeError("Training did not produce finite updated parameters")
+    if source_metadata() != source_hashes or sha256(args.train) != training_hash or tree_metadata(args.tree) != tree_hashes:
+        raise RuntimeError("Training input, tree or executable source changed during training")
+    metadata = {"operation": "train", "status": "complete",
+        "kind": "new independent-CFM training recipe; not recovered historical settings",
+        "initialization": "seeded random initialization; no input checkpoint",
+        "training_csv_name": args.train.name, "training_csv_sha256": training_hash,
+        "training_shape": list(raw.shape), "training_inputs": "Only the supplied training CSV; no validation/test loading",
+        "tree_csv_sha256": tree_hashes,
+        "preprocessing": {"method": "tree.forward_icfm", "zero_mass": args.zero_mass,
+                          "clip_logratio": args.clip_logratio, "output_dtype": "float32",
+                          "transformed_array_sha256": hashlib.sha256(target_bank.cpu().numpy().tobytes()).hexdigest()},
+        "architecture": {"dimension": int(target_bank.shape[1]), "hidden_width": 64,
+                         "hidden_layers": 3, "activation": "SELU", "time_input": True},
+        "objective": "mean((v_theta((1-t)z0+t*z1+sigma*epsilon,t)-(z1-z0))**2)",
+        "coupling": "independent standard-normal z0 and uniformly sampled training z1",
+        "seed": args.seed, "steps": args.steps, "batch_size": args.batch_size,
+        "minibatch_sampling": "with replacement; no epoch-based shuffle",
+        "equivalent_training_passes": args.steps*args.batch_size/len(raw),
+        "sigma": args.sigma, "optimizer": "Adam", "lr": args.lr, "weight_decay": 0.0,
+        "optimizer_defaults": {"betas": [0.9,0.999], "eps": 1e-8, "amsgrad": False,
+                               "foreach": False, "fused": False},
+        "checkpoint_rule": "final update, no validation or model selection",
+        "device": args.device, "dtype": "float32", "threads": args.threads, "interop_threads": 1,
+        "deterministic_algorithms": True,
+        "initial_state_sha256": initial_hash, "final_state_sha256": final_hash,
+        "parameters_changed": initial_hash != final_hash,
+        "first_loss": losses[0], "final_loss": losses[-1], "losses": losses,
+        "seconds": time.monotonic()-start, "environment": environment(), "source_sha256": sha256(Path(__file__)),
+        "executable_source_sha256": source_hashes}
+    torch.save({"format": FORMAT, "state_dict": state, "initial_state_dict": initial_state,
+                "metadata": metadata}, args.output)
+    metadata["checkpoint_sha256"] = sha256(args.output)
+    save_json(args.output.with_suffix(args.output.suffix + ".metadata.json"), metadata)
+    print(json.dumps({"output": str(args.output), "parameters_changed": metadata["parameters_changed"],
+                      "final_state_sha256": final_hash, "first_loss": losses[0], "final_loss": losses[-1]}))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
-    sampling = commands.add_parser("sample", help="replay the fixed ICFM checkpoint")
-    sampling.add_argument("--output", type=Path, required=True)
-    sampling.add_argument("--tree", type=Path, default=DEFAULT_TREE)
-    sampling.add_argument("--seed", type=int, default=2)
-    sampling.add_argument("--device", default="cpu")
-    sampling.add_argument("--threads", type=int, default=2)
-    sampling.add_argument("--checkpoint", type=Path, default=RECOVERED)
+    for name in ["train", "sample"]:
+        command = commands.add_parser(name)
+        command.add_argument("--output", type=Path, required=True)
+        command.add_argument("--tree", type=Path, default=DEFAULT_TREE)
+        command.add_argument("--train", type=Path, default=PACKAGE.parent/"data/sample_train.csv")
+        command.add_argument("--seed", type=int, default=2 if name == "sample" else 20261003)
+        command.add_argument("--device", choices=["cpu"], default="cpu")
+        command.add_argument("--threads", type=int, default=2)
+    sampling = commands.choices["sample"]
+    sampling.add_argument("--checkpoint", type=Path, required=True)
     sampling.add_argument("--n", type=int, default=1000)
     sampling.add_argument("--atol", type=float, default=1e-4)
     sampling.add_argument("--rtol", type=float, default=1e-4)
-    sample(parser.parse_args())
+    training = commands.choices["train"]
+    training.add_argument("--steps", type=int, default=20000)
+    training.add_argument("--batch-size", type=int, default=256)
+    training.add_argument("--lr", type=float, default=1e-3)
+    training.add_argument("--sigma", type=float, default=1e-4)
+    training.add_argument("--zero-mass", type=float, default=1e-8)
+    training.add_argument("--clip-logratio", type=float, default=float(np.log(1e6)))
+    args = parser.parse_args()
+    (train if args.command == "train" else sample)(args)
 
 
 if __name__ == "__main__":

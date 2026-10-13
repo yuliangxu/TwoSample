@@ -1,0 +1,46 @@
+{
+  "scope": "All four generators trained from preserved observations; no pretrained model inputs.",
+  "run_root": "/cwork/yx306/TwoSample-from-training-gpu-20261013",
+  "generation_manifest_sha256": "e8067e8014e937f21ffbdc36d443206915696397d2c8a33f4069a0e1ac232511",
+  "report_sha256": "695f23537644a263629c6db00e609f73d9b40f9d3424923d83cd1691ed11083b",
+  "model_order": [
+    "icfm",
+    "dt",
+    "d",
+    "mbgan"
+  ],
+  "independent_full_runs": 2,
+  "training_source_files": 28,
+  "analysis": {
+    "BATTS_commit": "147e511d211919afefb8decac6333e66d24919db",
+    "BATTS_version": "0.3.0",
+    "model_order": [
+      "icfm",
+      "dt",
+      "d",
+      "mbgan"
+    ],
+    "all_generators_trained_from_scratch": true,
+    "independent_training_reproductions_verified": 4,
+    "generation_manifest_sha256": "e8067e8014e937f21ffbdc36d443206915696397d2c8a33f4069a0e1ac232511",
+    "real_train": 1166,
+    "real_test": 292,
+    "taxa": 123,
+    "generated_per_model": 1000,
+    "validated_comparisons": 8,
+    "validated_estimator_fits": 24,
+    "validated_figures": 7,
+    "null_intervals": 292,
+    "null_intervals_containing_zero": 292,
+    "boosting_at_search_limit": 8,
+    "figure_md5": {
+      "figure6_ggplot2.pdf": "f2b412d05d95671b48d65e5e62d5bf05",
+      "figure7_ggplot2.pdf": "1958a83f9f3a37c7900011f242c38420",
+      "figureS8_ggplot2.pdf": "c7d72835ad15e03508f15f46e7651d38",
+      "figureS9_ggplot2.pdf": "a8452f759c6368ec5f5f55f76adabdf0",
+      "figureS10_ggplot2.pdf": "133a6cdf9d5cfa7d1b1e1a7422378efb",
+      "figureS11_ggplot2.pdf": "60256abed72dd3cb73cb3cafadc98ac9",
+      "figureS12_ggplot2.pdf": "a2b59f9a4de5bf4201e72a2a58363d0f"
+    }
+  }
+}

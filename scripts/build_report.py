@@ -18,6 +18,7 @@ import fitz
 import reportlab
 
 from report_layout import FIGURES, NAMES, Page, escape, figure_page, rows, sha
+from prepare_run import verify_frozen_generation
 
 
 def require(condition, message):
@@ -59,11 +60,13 @@ def validate(run):
     require(bool(manifest['source_scripts']), 'Source manifest is empty')
     for name, digest in manifest['source_scripts'].items():
         require(sha(run / name) == digest, f'Source hash changed: {name}')
-    for name in ('build_report.py', 'report_layout.py'):
+    for name in ('build_report.py', 'report_layout.py', 'prepare_run.py'):
         snapshot = f'source/scripts/{name}'
         require(snapshot in manifest['source_scripts'], f'Report source not snapshotted: {name}')
         require(sha(Path(__file__).with_name(name)) == manifest['source_scripts'][snapshot],
                 f'Report source differs from the staged analysis workflow: {name}')
+
+    generation = verify_frozen_generation(run, manifest)
 
     stats = {}
     for row in rows(run / 'interval_summary.csv'):
@@ -122,6 +125,9 @@ def validate(run):
                 'Inconsistent boosting search-limit flag')
     analysis_validation = json.loads((run / 'analysis_validation.json').read_text())
     checks = dict(BATTS_commit=commit, BATTS_version=settings['batts_version'],
+                  all_generators_trained_from_scratch=True,
+                  independent_training_reproductions_verified=4,
+                  generation_manifest_sha256=sha(run / 'generation/generation_manifest.json'),
                   model_order=list(NAMES), real_train=1166, real_test=292, taxa=123,
                   generated_per_model=1000, validated_comparisons=8,
                   validated_estimator_fits=24, validated_figures=7, null_intervals=292,
@@ -140,7 +146,7 @@ def validate(run):
                 cap=sum(row['selected_at_search_limit'] == 'TRUE' for row in cv),
                 expected={f'figures/figure{num}_ggplot2.pdf': sha(run / f'figures/figure{num}_ggplot2.pdf')
                           for num, _ in FIGURES}, table_hashes=table_hashes,
-                analysis_validation=analysis_validation)
+                analysis_validation=analysis_validation, generation=generation)
 
 
 def overview(cfg):
@@ -153,8 +159,9 @@ def overview(cfg):
     p.heading('Final analysis')
     p.para('The original pooled real matrices contain <b>1,166 training and 292 test observations</b>. '
            'The original preprocessing, taxon order and observation split are preserved. '
-           'All four selected generator datasets are reproducible from the released generation code '
-           'and fixed fitted artifacts, in report order: <b>ICFM, DT, D, MBGAN</b>.')
+           'All four generators are fitted from these training rows using released code and frozen '
+           'recipes, in report order: <b>ICFM, DT, D, MBGAN</b>. No real test rows enter '
+           'generator fitting or selection.')
     p.para(f"Eight real-versus-generated comparisons and the held-out null experiment use BATTS "
            f"<b>{escape(cfg['version'])}</b>, commit <b>{cfg['commit'][:8]}</b>. "
            'Gradient and Hellinger boosting explicitly use all fitting observations '
@@ -179,19 +186,19 @@ def overview(cfg):
 
 def methods(cfg):
     p = Page(cfg['label'], 2, 'Methods and generator provenance',
-             'Frozen original real inputs and reproducible selected generator samples')
+             'Preserved real inputs; all generators fitted from the training rows')
     p.heading('Generator constructions')
     p.table([['Generator', 'Construction'],
-             ['ICFM', 'Recovered MLP checkpoint; fixed torchdyn 1.0.6 numerical sampler; CPU seed 2.'],
+             ['ICFM', 'CPU; random initialization; MLP with three hidden layers of width 64; 20,000 Adam updates, batch 256, rate 0.001, flow noise 0.0001; training seed 20261003; final update.'],
              ['DT', 'Positive-parameter Beta maximum-likelihood fits at 122 tree nodes, using the 1,166 training rows; seed 1.'],
              ['D', 'Dirichlet Newton maximum-likelihood fit on the 1,166 training rows; seed 1.'],
-             ['MBGAN', 'Recovered HDF5 generator weights, replayed with the equivalent TensorFlow/Keras layer chain; seed 256.']],
+             ['MBGAN', 'GPU; random initialization; 500,000 generator iterations, five critic updates each, batch 32; RMSprop rate 0.00005; training seed 1; final iteration. Gradient penalty is differentiated through critic weights.']],
             [75, 441], 9)
-    p.para('<b>ICFM and MBGAN are fixed-checkpoint replays.</b> Their historical training membership '
-           'and complete fitting settings remain unverified. Independence of the real test rows from '
-           'those historical neural fits cannot be certified. Reproducibility here covers the selected '
-           'generator outputs and downstream analysis; it does not establish historical neural '
-           'training reproducibility.', 9.5, 13)
+    p.para('All four fits use only the preserved 1,166 training rows. Neural training starts from '
+           'seeded random initialization; no historical weights are required. Training length and '
+           'sampling settings are frozen before evaluation; the final update is used without '
+           'test-based selection. Two full independent runs must agree within the recorded hardware '
+           'and software environment; equality across CPU and GPU is not assumed.', 9.5, 13)
     bayes, boosting = cfg['settings']['bayes'], cfg['settings']['boosting']
     p.heading('BATTS settings')
     p.para(f"Seed {cfg['settings']['seed']} per estimator; {bayes['num_trees']} Bayesian trees; "
@@ -211,7 +218,7 @@ def methods(cfg):
     p.para('The test comparisons fit density ratios using the real test rows themselves; they are '
            'not predictions from training-comparison estimators. Different reference sizes limit '
            'train/test comparisons. Filtering precedes the observation-level split; repeated '
-           'observations from one participant can occur in both splits.', 9.5, 13)
+           'observations may share participants across splits; participant-level separation is not established.', 9.5, 13)
     p.para(f"{cfg['cap']}/16 boosting fits selected the {boosting['num_trees_max']:,}-tree search limit. "
            'This follows the supplied single-chain workflow; no new multi-chain convergence '
            'assessment is claimed.', 9.5, 13)
@@ -228,13 +235,14 @@ def provenance(cfg):
     p.para('The original curatedMetagenomicData selection is normalized over 123 retained taxa '
            'and stored at float32 precision. Counts refer to observations, not unique participants. '
            'The recovered sample-selection manifest, taxon order and preprocessing code accompany the release. '
-           'The real input files are verified against the input-manifest hashes.', 9.5, 13)
+           'Filtering is collection-wide, before the observation split. Real input hashes are verified.', 9.5, 13)
     p.heading('Execution and verification')
     p.para('All six input matrices are checked for dimensions, finite nonnegative values and '
            'row sums. All eight estimator tables are checked for dimensions, finite values, '
            'ordered posterior quantiles and agreement with numerical summaries. Seven source '
            'figures are embedded as PDF content. Every report page is rendered and checked for '
-           'decoding warnings and text outside page bounds before COMPLETE is written.', 9.5, 13)
+           'decoding warnings and text outside page bounds before COMPLETE is written. Generator '
+           'training, sample hashes and reproduction evidence must also pass the provenance gate.', 9.5, 13)
     null = cfg['settings']['null']
     p.para(f"The separate null fit has <b>{cfg['null_cover']}/292</b> pointwise 95% intervals "
            f"containing zero. Balanced random real-training labels use seed {cfg['settings']['null_seed']}; "
@@ -243,7 +251,8 @@ def provenance(cfg):
            f"margin {null['margin_scale']:g}, evaluated on the real test matrix. One null experiment "
            'does not establish a repeated-sampling coverage guarantee.', 9.5, 13)
     p.heading('Portable run artifacts')
-    p.para('Input and source hashes: input_manifest.json. Fitting settings: settings.json and settings.R. '
+    p.para('Input and source hashes: input_manifest.json. Generator evidence: generation/. '
+           'Fitting settings: settings.json and settings.R. '
            'Numerical results: interval_summary.csv and boosting_cv_summary.csv. Estimator tables: '
            'revision/. Figures: figures/. Verification: analysis_validation.json and report_manifest.json.',
            9, 13)
@@ -312,6 +321,9 @@ def build(run):
                   sha256=sha(output), pages=10, figures=figures,
                   BATTS_commit=cfg['commit'], BATTS_version=cfg['version'], model_order=list(NAMES),
                   input_manifest_sha256=sha(run / 'input_manifest.json'),
+                  generation_manifest_sha256=sha(run / 'generation/generation_manifest.json'),
+                  all_generators_trained_from_scratch=True,
+                  independent_training_reproductions_verified=4,
                   settings_sha256=sha(run / 'settings.json'),
                   analysis_validation_sha256=sha(run / 'analysis_validation.json'),
                   analysis_complete_sha256=sha(run / 'ANALYSIS_COMPLETE'),
@@ -325,7 +337,8 @@ def build(run):
     summary = ['Final case study: full pooled data and original preprocessing', '',
                'Real inputs: 1166 training x 123 taxa; 292 test x 123 taxa. Generators: 1000 x 123 each.',
                'Model order: ICFM, DT, D, MBGAN.',
-               'ICFM and MBGAN replay fixed checkpoints; historical neural training membership is unverified.',
+               'All four generators are fitted from the 1166 training rows; neural models start from random initialization.',
+               'Training recipes are frozen; no real test rows enter generator training or selection.',
                f"BATTS {cfg['version']} ({cfg['commit']}); boosting subsample_fraction=1.", '',
                'Real-test intervals excluding zero and mean absolute posterior-mean log ratio:']
     for key, name in NAMES.items():

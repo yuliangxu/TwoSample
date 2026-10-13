@@ -8,6 +8,12 @@ run <- Sys.getenv("TWO_SAMPLE_RUN_ROOT", file.path(root, "output", "final"))
 data_dir <- Sys.getenv("TWO_SAMPLE_DATA_DIR", file.path(root, "data"))
 figure_dir <- Sys.getenv("TWO_SAMPLE_FIGURE_DIR", file.path(run, "figures"))
 stopifnot(identical(readLines(file.path(run, "BATTS_commit.txt")), case_study$batts_commit))
+# Numerical completion also requires hash-bound training and independent-rerun evidence.
+python <- Sys.getenv("TWO_SAMPLE_PYTHON", "python3")
+status <- system2(python, c(shQuote(file.path(root, "scripts", "prepare_run.py")),
+                           "--run-root", shQuote(run), "--verify-generation-only"))
+if (status != 0) stop("From-training generator provenance validation failed.")
+generation_manifest <- file.path(run, "generation", "generation_manifest.json")
 intervals <- diagnostics <- list()
 validated_fits <- 0L
 for (split in c("train", "test")) for (key in case_study$keys) {
@@ -76,7 +82,10 @@ for (path in figures) {
 write.csv(ci, file.path(run, "interval_summary.csv"), row.names = FALSE)
 write.csv(cv, file.path(run, "boosting_cv_summary.csv"), row.names = FALSE)
 validation <- list(BATTS_commit = case_study$batts_commit, BATTS_version = case_study$batts_version,
-  model_order = case_study$keys, real_train = case_study$dimensions[["train"]],
+  model_order = case_study$keys, all_generators_trained_from_scratch = TRUE,
+  independent_training_reproductions_verified = 4L,
+  generation_manifest_sha256 = digest::digest(file = generation_manifest, algo = "sha256"),
+  real_train = case_study$dimensions[["train"]],
   real_test = case_study$dimensions[["test"]], taxa = case_study$dimensions[["taxa"]],
   generated_per_model = case_study$dimensions[["generated"]],
   validated_comparisons = 8L, validated_estimator_fits = validated_fits,
@@ -89,7 +98,7 @@ jsonlite::write_json(validation, file.path(run, "analysis_validation.json"),
 lines <- c("# Final microbiome case study", "",
   sprintf("BATTS %s, source commit `%s`.", case_study$batts_version, case_study$batts_commit), "",
   "Original pooled preprocessing and split: 1,166 training observations, 292 test observations, 123 taxa. Each generator contributes 1,000 compositions. Model order: ICFM, DT, D, MBGAN.", "",
-  "D and stabilized DT are fitted on the original training rows. ICFM and MBGAN replay recovered checkpoints; historical neural fitting membership and complete training settings remain unverified.", "",
+  "All four generators are fitted from the original 1,166 training rows using frozen recipes. ICFM and MBGAN start from seeded random initialization and use their final planned update; no test rows enter generator training or selection. Generation provenance and reproduction evidence must pass validation before completion.", "",
   "All eight train/test comparisons are independently fitted. Test density-ratio analyses use the real test observations themselves; they are not predictions from a density-ratio estimator fitted on the training comparison.", "",
   "The previous protocol is explicit: 200 trees, 2,000 burn-in and 1,000 retained iterations, thinning 1, fixed lambda 5, seed 1. Boosting uses five-fold CV, up to 1,000 trees, depth 4, learning rate 0.01, 32 bins, and subsample_fraction = 1. See settings.json for all arguments.", "",
   "## Real-test descriptive summaries", "",
@@ -104,7 +113,7 @@ lines <- c(lines, "",
   "These pointwise posterior intervals are descriptive. Inclusion of zero does not establish distributional equality; one null experiment does not establish a repeated-sampling coverage guarantee.", "",
   sprintf("Null intervals containing zero: %d/%d. Boosting fits at the 1,000-tree cap: %d/16.",
     validation$null_intervals_containing_zero, nrow(null), validation$boosting_at_search_limit), "",
-  "The original split is by observation and does not establish participant-level separation. Figures 6, 7, S8 and S9 use corrected Bray-Curtis PCoA; S10/S11 retain classical uncorrected PCoA. Posterior intervals are pointwise.", "",
+  "Preprocessing is collection-wide. The original split is by observation and does not establish participant-level separation. Figures 6, 7, S8 and S9 use corrected Bray-Curtis PCoA; S10/S11 retain classical uncorrected PCoA. Posterior intervals are pointwise.", "",
   "All eight comparison tables, 24 estimator fingerprints, the null diagnostic, and seven PDF signatures passed validation. analysis_validation.json records the checks.")
 writeLines(lines, file.path(run, "REPORT.md"))
 writeLines(format(Sys.time(), tz = "UTC", usetz = TRUE), file.path(run, "ANALYSIS_COMPLETE"))

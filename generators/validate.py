@@ -1,12 +1,9 @@
-"""Check final case-study inputs, generator assets, and reproduced samples.
-
-This integrity check does not fit BATTS or compare with superseded synthetic
-cohorts. The pinned file list is generators/manifest.json.
-"""
+"""Check real inputs, code-only fitting assets, and verified training outputs."""
 import argparse
 import hashlib
 import json
 from pathlib import Path
+import sys
 
 import numpy as np
 
@@ -24,7 +21,7 @@ def sha256(path):
 
 
 def verify_bundle():
-    """Require every fixed data, checkpoint, tree and vendor file to match."""
+    """Verify preserved real inputs and taxonomy/solver assets; no fitted weights."""
     manifest = json.loads((REPO / "generators/manifest.json").read_text())
     verified = {}
     for entry in manifest["files"]:
@@ -40,9 +37,9 @@ def load(path, rows):
     values = np.loadtxt(path, delimiter=",")
     if values.shape != (rows, 123):
         raise ValueError(f"Unexpected matrix shape: {path}: {values.shape}")
-    if not np.isfinite(values).all() or (values < 0).any():
+    if not np.isfinite(values).all() or (values < 0).any() or (values > 1).any():
         raise ValueError(f"Invalid nonnegative compositions: {path}")
-    if np.max(np.abs(values.sum(axis=1) - 1)) > 1e-5:
+    if np.max(np.abs(values.sum(axis=1) - 1)) > 1e-6:
         raise ValueError(f"Rows do not sum to one: {path}")
     return values
 
@@ -79,17 +76,22 @@ def main():
         path = REPO / "data" / f"sample_{split}.csv"
         values = load(path, rows)
         real_data[split] = {"shape": list(values.shape), "sha256": sha256(path)}
-    models = {key: compare_sample(args.data_dir / f"sample_{key}.csv", key)
-              for key in MODEL_ORDER}
-    if not all(model["passed"] for model in models.values()):
-        raise ValueError("A synthetic matrix exceeds its fixed-cohort replay tolerance")
+    inputs = {}
+    for key in ("train", "test", *MODEL_ORDER):
+        path = args.data_dir / f"sample_{key}.csv"
+        rows = {"train": 1166, "test": 292}.get(key, 1000)
+        values = load(path, rows)
+        inputs[path.name] = {"shape": list(values.shape), "sha256": sha256(path)}
+    sys.path.insert(0, str(REPO / "scripts"))
+    from prepare_run import validate_generation
+    manifest = validate_generation(args.data_dir / "generation_manifest.json", inputs, REPO)
     report = {
         "status": "complete",
         "model_order": list(MODEL_ORDER),
         "bundle_files_verified": len(verified),
         "real_data": real_data,
-        "models": models,
-        "scope": "Fixed input integrity and numerical replay; not a model-quality or historical-training claim.",
+        "models": manifest["models"],
+        "scope": "Full training and generation independently repeated twice with identical outputs.",
     }
     args.output.mkdir(parents=True, exist_ok=True)
     with (args.output / "validation.json").open("x") as handle:

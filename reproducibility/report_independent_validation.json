@@ -1,104 +1,170 @@
 {
-  "pdf_sha256": "6851eb9ee82ace3f37d20cfad988a487b9bbe2dc2f0823e16f23a2fd527d8159",
-  "pages": 10,
-  "figures": 7,
+  "schema": "twosample-independent-report-audit-v1",
+  "status": "passed",
+  "report_sha256": "695f23537644a263629c6db00e609f73d9b40f9d3424923d83cd1691ed11083b",
   "model_order": [
-    "ICFM",
-    "DT",
-    "D",
-    "MBGAN"
+    "icfm",
+    "dt",
+    "d",
+    "mbgan"
   ],
-  "panel_labels": {
-    "6": [
-      "ICFM",
-      "DT",
-      "D",
-      "MBGAN"
-    ],
-    "7": [
-      "ICFM",
-      "DT",
-      "D",
-      "MBGAN",
-      "ICFM",
-      "DT",
-      "D",
-      "MBGAN",
-      "ICFM",
-      "DT",
-      "D",
-      "MBGAN"
-    ],
-    "S8": [
-      "ICFM",
-      "DT",
-      "D",
-      "MBGAN"
-    ],
-    "S9": [
-      "ICFM",
-      "DT",
-      "D",
-      "MBGAN",
-      "ICFM",
-      "DT",
-      "D",
-      "MBGAN",
-      "ICFM",
-      "DT",
-      "D",
-      "MBGAN"
-    ],
-    "S10": [
-      "ICFM",
-      "DT",
-      "D",
-      "MBGAN",
-      "ICFM",
-      "DT",
-      "D",
-      "MBGAN",
-      "ICFM",
-      "DT",
-      "D",
-      "MBGAN"
-    ],
-    "S11": [
-      "ICFM",
-      "DT",
-      "D",
-      "MBGAN",
-      "ICFM",
-      "DT",
-      "D",
-      "MBGAN",
-      "ICFM",
-      "DT",
-      "D",
-      "MBGAN"
-    ],
-    "S12": []
+  "completed_from_training_report": true,
+  "training_scope": "Two complete independent fits of all four generators; CPU ICFM and GPU MBGAN. No pretrained input checkpoints. The analysis/report are bound to the verified generation manifest.",
+  "independent_checks": {
+    "source_and_input_hashes": true,
+    "completion_report_hashes": true,
+    "comparison_tables": 8,
+    "recomputed_interval_summary_rows": 16,
+    "plotting_csv_checks": 6,
+    "rendered_source_figures": 7,
+    "rendered_report_pages": 10,
+    "visual_source_figures": 7,
+    "visual_report_pages": 10,
+    "pdf_warnings": [],
+    "text_outside_page_bounds": [],
+    "model_order_verified": true
   },
-  "frozen_and_executing_sources_verified": 26,
-  "bounds_errors": [],
-  "render_warnings": [],
-  "completion_hashes_verified": true,
-  "rendered_pages": [
-    1,
-    4,
-    7,
-    10
+  "parametric_end_to_end_control": [
+    {
+      "split": "train",
+      "generator": "dt",
+      "scalar_values": 21660,
+      "numerical_arrays_identical": true,
+      "max_absolute_difference": 0.0,
+      "table_byte_identical": true
+    },
+    {
+      "split": "train",
+      "generator": "d",
+      "scalar_values": 21660,
+      "numerical_arrays_identical": true,
+      "max_absolute_difference": 0.0,
+      "table_byte_identical": true
+    },
+    {
+      "split": "test",
+      "generator": "dt",
+      "scalar_values": 12920,
+      "numerical_arrays_identical": true,
+      "max_absolute_difference": 0.0,
+      "table_byte_identical": true
+    },
+    {
+      "split": "test",
+      "generator": "d",
+      "scalar_values": 12920,
+      "numerical_arrays_identical": true,
+      "max_absolute_difference": 0.0,
+      "table_byte_identical": true
+    }
   ],
-  "actual_run": "/cwork/yx306/TwoSample-final-case-study-20261013",
+  "null_intervals_containing_zero": 292,
+  "real_test_summaries": [
+    {
+      "split": "test",
+      "generator": "icfm",
+      "source": "Real",
+      "n": "292",
+      "contain_zero": "1",
+      "exclude_zero": "291",
+      "mean_abs_log_ratio": "1.6991228336002184",
+      "mean_interval_width": "1.160758340206547",
+      "old_contain_zero": "2",
+      "old_mean_abs_log_ratio": "3.0519477239446",
+      "old_mean_interval_width": "1.1957012936423",
+      "table_byte_identical_to_old": "False"
+    },
+    {
+      "split": "test",
+      "generator": "dt",
+      "source": "Real",
+      "n": "292",
+      "contain_zero": "118",
+      "exclude_zero": "174",
+      "mean_abs_log_ratio": "0.6049644324981239",
+      "mean_interval_width": "1.0714005385555752",
+      "old_contain_zero": "118",
+      "old_mean_abs_log_ratio": "0.604964432498124",
+      "old_mean_interval_width": "1.07140053855558",
+      "table_byte_identical_to_old": "True"
+    },
+    {
+      "split": "test",
+      "generator": "d",
+      "source": "Real",
+      "n": "292",
+      "contain_zero": "82",
+      "exclude_zero": "210",
+      "mean_abs_log_ratio": "1.2349287664875144",
+      "mean_interval_width": "1.3090703251643756",
+      "old_contain_zero": "82",
+      "old_mean_abs_log_ratio": "1.23492876648751",
+      "old_mean_interval_width": "1.30907032516438",
+      "table_byte_identical_to_old": "True"
+    },
+    {
+      "split": "test",
+      "generator": "mbgan",
+      "source": "Real",
+      "n": "292",
+      "contain_zero": "0",
+      "exclude_zero": "292",
+      "mean_abs_log_ratio": "5.67627765682582",
+      "mean_interval_width": "1.6618907036176969",
+      "old_contain_zero": "292",
+      "old_mean_abs_log_ratio": "0.0349537238720174",
+      "old_mean_interval_width": "0.734137076092777",
+      "table_byte_identical_to_old": "False"
+    }
+  ],
+  "quantile_grid_saturation": [
+    {
+      "figure": "S10",
+      "split": "train",
+      "generator": "mbgan",
+      "source": "Generated",
+      "quantity": "mean",
+      "n": 1000,
+      "limit": 30,
+      "below_limit": 1,
+      "above_limit": 0,
+      "saturated_fraction": 0.001,
+      "minimum": -30.0267682818313,
+      "maximum": -2.70045563139072
+    },
+    {
+      "figure": "S10",
+      "split": "train",
+      "generator": "mbgan",
+      "source": "Generated",
+      "quantity": "lower",
+      "n": 1000,
+      "limit": 30,
+      "below_limit": 2,
+      "above_limit": 0,
+      "saturated_fraction": 0.002,
+      "minimum": -31.641312448876,
+      "maximum": -3.61217174873419
+    }
+  ],
+  "saturation_interpretation": "S10 clips the color only for 1/1000 MBGAN generated posterior means below -30 and 2/1000 lower quantiles below -30. No other S10 cells or S11 cells saturate. All numerical exports retain their exact values.",
   "visual_review": {
-    "pages": [
-      1,
-      4,
-      7,
-      10
-    ],
-    "clipped_or_overlapping_labels": false,
-    "correct_order": true,
-    "result": "Pass; legible headings, tables, panels, legends and captions."
-  }
+    "report_pages_reviewed": 10,
+    "source_figures_reviewed": 7,
+    "model_order": "ICFM, DT, D, MBGAN",
+    "overlap_or_cropping_problems": [],
+    "figure_caption_mismatches": [],
+    "method_and_scope_mismatches": [],
+    "review_method": "All seven source figures inspected at readable resolution; report methods/results/provenance pages inspected individually and seven embedded figure pages inspected in contact sheets."
+  },
+  "material_manuscript_changes": [
+    "MBGAN now has 0/292 real-test and 5/1000 generated-test intervals containing zero, compared with 292/292 and 1000/1000 in the prior checkpoint run. The previous near-zero narrative must be replaced.",
+    "ICFM real-test mean absolute posterior-mean log ratio is 1.699123, compared with 3.051948 previously. Its real-test intervals containing zero number 1/292.",
+    "D and DT comparison tables are unchanged cell for cell and byte for byte across all four train/test comparisons.",
+    "Mean training intervals remain wider than test intervals for every generator, both at real and generated observations. Do not retain the manuscript narrower-training-interval claim.",
+    "The fixed-recipe MBGAN comparison now shows larger absolute posterior-mean log ratios than the other models at evaluated test observations. This is a descriptive finding for these selected recipes, not an optimality claim.",
+    "Null coverage remains 292/292 for this single randomized-label experiment, with the existing pointwise and participant-level limitations."
+  ],
+  "audit_script_sha256": "73f69eff0ba630e718e5411a11cff00eedc7b2b99aedae5c0e4bacc836a1efbf",
+  "previous_release_commit": "b2f560dbe93806e9374acd7b4421c63eda03c7c5"
 }

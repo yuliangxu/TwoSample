@@ -1,0 +1,1523 @@
+{
+  "model": "dt",
+  "training_input_sha256": "00f4afc44f36563195b12b104b87aeefecaae1dcb79037849dbf640bbf975f56",
+  "trained_from_scratch": true,
+  "test_used_for_training": false,
+  "test_used_for_selection": false,
+  "initialization": "fit_from_training",
+  "configuration": {
+    "training_seed": null,
+    "sampling_seed": 1,
+    "fitter": "independent Beta maximum likelihood in positive log parameters",
+    "nodes": 122,
+    "smoothing": 1e-07,
+    "checkpoint_rule": "converged maximum likelihood fit"
+  },
+  "completion": {
+    "completed": true,
+    "completed_steps": null
+  },
+  "trainer_metadata": {
+    "format": "twosample-dirichlet-tree-v1",
+    "training_shape": [
+      1166,
+      123
+    ],
+    "model": "Independent Beta splits on the fixed binary tree",
+    "preprocessing": "float32 row normalization; child mass 0->1e-7,1->1-1e-7; log ratio; sigmoid; split clipping[1e-10,1-1e-10]",
+    "solver": "least_squares in log shape parameters; bounds[-30,30]; moments start; analytic Jacobian; xtol=ftol=gtol=1e-12; max_nfev=1000; interior and residual<1e-8 required",
+    "tree_hashes": {
+      "childNode.csv": "c92879e3a4b48db3b2342cffa30768aecebbd4b154654684ffe6a4f9708a03b4",
+      "treeTaxa.csv": "c38f1fd38293815fc7d2183deb6ea721460ef5bc8139430755411d9a600be64b",
+      "outTaxa.csv": "806157d70b850318946bd3f3de1508776521ea2e7ccb153fd4152e3a3b9c0e51"
+    },
+    "nodes": [
+      {
+        "node": 0,
+        "success": true,
+        "max_equation_residual": 2.8102520310824275e-16,
+        "interior": true,
+        "function_evaluations": 37,
+        "parameters": [
+          0.09782874594674802,
+          73.75296235719723
+        ],
+        "log_likelihood_per_row": 11.529568737024052
+      },
+      {
+        "node": 1,
+        "success": true,
+        "max_equation_residual": 4.440892098500626e-16,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.7830902438355801,
+          1.2032142510421833
+        ],
+        "log_likelihood_per_row": 0.07750902391321877
+      },
+      {
+        "node": 2,
+        "success": true,
+        "max_equation_residual": 8.881784197001252e-16,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          0.2131888261676822,
+          3.9559603867323516
+        ],
+        "log_likelihood_per_row": 3.569474900559338
+      },
+      {
+        "node": 3,
+        "success": true,
+        "max_equation_residual": 1.1102230246251565e-16,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.11679238348623479,
+          0.7720500817386295
+        ],
+        "log_likelihood_per_row": 5.091970371190698
+      },
+      {
+        "node": 4,
+        "success": true,
+        "max_equation_residual": 2.220446049250313e-16,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.9777989657070779,
+          0.12219692563918018
+        ],
+        "log_likelihood_per_row": 5.053918147051327
+      },
+      {
+        "node": 5,
+        "success": true,
+        "max_equation_residual": 7.993605777301127e-15,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.13989568547498002,
+          0.5862752900730914
+        ],
+        "log_likelihood_per_row": 3.5697742104607695
+      },
+      {
+        "node": 6,
+        "success": true,
+        "max_equation_residual": 6.661338147750939e-16,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.23989501934529903,
+          0.32446806272484696
+        ],
+        "log_likelihood_per_row": 1.231238897965008
+      },
+      {
+        "node": 7,
+        "success": true,
+        "max_equation_residual": 1.3322676295501878e-15,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.24180539643987614,
+          0.2002819037943206
+        ],
+        "log_likelihood_per_row": 1.8347058500165034
+      },
+      {
+        "node": 8,
+        "success": true,
+        "max_equation_residual": 2.220446049250313e-16,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          0.5636360608924343,
+          0.29273834818970146
+        ],
+        "log_likelihood_per_row": 0.83451370050347
+      },
+      {
+        "node": 9,
+        "success": true,
+        "max_equation_residual": 4.440892098500626e-16,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.3241562304272884,
+          0.6835925307639587
+        ],
+        "log_likelihood_per_row": 0.7215541744358611
+      },
+      {
+        "node": 10,
+        "success": true,
+        "max_equation_residual": 3.885780586188048e-16,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.8020399889113838,
+          0.14592742265279765
+        ],
+        "log_likelihood_per_row": 3.674684184965246
+      },
+      {
+        "node": 11,
+        "success": true,
+        "max_equation_residual": 1.9984014443252818e-15,
+        "interior": true,
+        "function_evaluations": 9,
+        "parameters": [
+          2.70058372553595,
+          2.100999942654183
+        ],
+        "log_likelihood_per_row": 0.19917690548605504
+      },
+      {
+        "node": 12,
+        "success": true,
+        "max_equation_residual": 8.881784197001252e-16,
+        "interior": true,
+        "function_evaluations": 9,
+        "parameters": [
+          0.19904458993541194,
+          6.457194367315712
+        ],
+        "log_likelihood_per_row": 4.363709409882501
+      },
+      {
+        "node": 13,
+        "success": true,
+        "max_equation_residual": 8.881784197001252e-16,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.13543632604975311,
+          0.2698763069633406
+        ],
+        "log_likelihood_per_row": 3.1782605731617473
+      },
+      {
+        "node": 14,
+        "success": true,
+        "max_equation_residual": 1.7763568394002505e-15,
+        "interior": true,
+        "function_evaluations": 10,
+        "parameters": [
+          2.835876411283795,
+          0.13444893708264102
+        ],
+        "log_likelihood_per_row": 5.6257873902899105
+      },
+      {
+        "node": 15,
+        "success": true,
+        "max_equation_residual": 8.881784197001252e-16,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          0.29483552970007476,
+          3.7045058306789045
+        ],
+        "log_likelihood_per_row": 2.40803177297645
+      },
+      {
+        "node": 16,
+        "success": true,
+        "max_equation_residual": 1.7763568394002505e-15,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.13532291721766107,
+          0.12297991282062778
+        ],
+        "log_likelihood_per_row": 4.347032949335168
+      },
+      {
+        "node": 17,
+        "success": true,
+        "max_equation_residual": 1.3322676295501878e-15,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.22730214874067878,
+          0.22381642117741699
+        ],
+        "log_likelihood_per_row": 1.6972677188370562
+      },
+      {
+        "node": 18,
+        "success": true,
+        "max_equation_residual": 4.440892098500626e-16,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          0.4072065214384001,
+          0.2017209878880429
+        ],
+        "log_likelihood_per_row": 1.6668343085389077
+      },
+      {
+        "node": 19,
+        "success": true,
+        "max_equation_residual": 2.2426505097428162e-14,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.3898136678233607,
+          0.8176815511344164
+        ],
+        "log_likelihood_per_row": 0.510259294033863
+      },
+      {
+        "node": 20,
+        "success": true,
+        "max_equation_residual": 1.7763568394002505e-14,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.5418744215289104,
+          0.41232954350353923
+        ],
+        "log_likelihood_per_row": 0.3481549473187937
+      },
+      {
+        "node": 21,
+        "success": true,
+        "max_equation_residual": 4.440892098500626e-16,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          0.16503192892655172,
+          0.43639193106810437
+        ],
+        "log_likelihood_per_row": 2.457419767062947
+      },
+      {
+        "node": 22,
+        "success": true,
+        "max_equation_residual": 8.881784197001252e-16,
+        "interior": true,
+        "function_evaluations": 9,
+        "parameters": [
+          0.16576783507998522,
+          0.2860378068384749
+        ],
+        "log_likelihood_per_row": 2.302045765227408
+      },
+      {
+        "node": 23,
+        "success": true,
+        "max_equation_residual": 3.1051550219984847e-16,
+        "interior": true,
+        "function_evaluations": 21,
+        "parameters": [
+          0.0901499848494975,
+          17.623524707366027
+        ],
+        "log_likelihood_per_row": 10.888799742425785
+      },
+      {
+        "node": 24,
+        "success": true,
+        "max_equation_residual": 2.220446049250313e-16,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          1.2917857970869497,
+          1.4258037676886453
+        ],
+        "log_likelihood_per_row": 0.03201553180426564
+      },
+      {
+        "node": 25,
+        "success": true,
+        "max_equation_residual": 5.551115123125783e-17,
+        "interior": true,
+        "function_evaluations": 5,
+        "parameters": [
+          0.46805865562166227,
+          1.605800960717336
+        ],
+        "log_likelihood_per_row": 0.6849994885733948
+      },
+      {
+        "node": 26,
+        "success": true,
+        "max_equation_residual": 8.881784197001252e-16,
+        "interior": true,
+        "function_evaluations": 5,
+        "parameters": [
+          0.1847156592818529,
+          0.8077180811938471
+        ],
+        "log_likelihood_per_row": 2.504889003946609
+      },
+      {
+        "node": 27,
+        "success": true,
+        "max_equation_residual": 4.440892098500626e-16,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.16539274813955307,
+          0.19088294286832674
+        ],
+        "log_likelihood_per_row": 2.634948995712641
+      },
+      {
+        "node": 28,
+        "success": true,
+        "max_equation_residual": 8.881784197001252e-16,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          0.1524283314802205,
+          0.8035960178797139
+        ],
+        "log_likelihood_per_row": 3.4327875440818922
+      },
+      {
+        "node": 29,
+        "success": true,
+        "max_equation_residual": 4.440892098500626e-16,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.3188276205318972,
+          0.2891484957259963
+        ],
+        "log_likelihood_per_row": 0.9397672010134568
+      },
+      {
+        "node": 30,
+        "success": true,
+        "max_equation_residual": 4.440892098500626e-16,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.3472359265148755,
+          0.21869963939617593
+        ],
+        "log_likelihood_per_row": 1.4210160424733496
+      },
+      {
+        "node": 31,
+        "success": true,
+        "max_equation_residual": 2.7755575615628914e-17,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.12288428364057774,
+          1.012041106180696
+        ],
+        "log_likelihood_per_row": 5.05583195551989
+      },
+      {
+        "node": 32,
+        "success": true,
+        "max_equation_residual": 5.551115123125783e-15,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          0.19362295252251852,
+          0.3241365449008365
+        ],
+        "log_likelihood_per_row": 1.7664575218903984
+      },
+      {
+        "node": 33,
+        "success": true,
+        "max_equation_residual": 6.661338147750939e-16,
+        "interior": true,
+        "function_evaluations": 9,
+        "parameters": [
+          0.4824985928578536,
+          0.4664921950096605
+        ],
+        "log_likelihood_per_row": 0.288156466913591
+      },
+      {
+        "node": 34,
+        "success": true,
+        "max_equation_residual": 8.881784197001252e-16,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          1.2366251867696854,
+          0.18641254306900443
+        ],
+        "log_likelihood_per_row": 2.91005283825357
+      },
+      {
+        "node": 35,
+        "success": true,
+        "max_equation_residual": 1.1046719095020308e-14,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.14551344539841254,
+          1.0596238798698727
+        ],
+        "log_likelihood_per_row": 4.011707675930892
+      },
+      {
+        "node": 36,
+        "success": true,
+        "max_equation_residual": 1.7763568394002505e-15,
+        "interior": true,
+        "function_evaluations": 9,
+        "parameters": [
+          2.4441892197760797,
+          0.13297772240868966
+        ],
+        "log_likelihood_per_row": 5.535160240797074
+      },
+      {
+        "node": 37,
+        "success": true,
+        "max_equation_residual": 0.0,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.17307308677501124,
+          0.19981867580683596
+        ],
+        "log_likelihood_per_row": 2.4393650178789086
+      },
+      {
+        "node": 38,
+        "success": true,
+        "max_equation_residual": 2.9698465908722937e-15,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.32683658147233163,
+          4.205182783863477
+        ],
+        "log_likelihood_per_row": 2.2611224726341255
+      },
+      {
+        "node": 39,
+        "success": true,
+        "max_equation_residual": 1.7763568394002505e-15,
+        "interior": true,
+        "function_evaluations": 9,
+        "parameters": [
+          0.13628141988364428,
+          5.5768383482268575
+        ],
+        "log_likelihood_per_row": 6.2612079507451766
+      },
+      {
+        "node": 40,
+        "success": true,
+        "max_equation_residual": 8.881784197001252e-16,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          0.37373983229335067,
+          0.2518371854366376
+        ],
+        "log_likelihood_per_row": 1.089743310787128
+      },
+      {
+        "node": 41,
+        "success": true,
+        "max_equation_residual": 1.1102230246251565e-16,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.5756507466161375,
+          0.9519481024969598
+        ],
+        "log_likelihood_per_row": 0.1676356650758073
+      },
+      {
+        "node": 42,
+        "success": true,
+        "max_equation_residual": 1.1102230246251565e-16,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.781803530693945,
+          0.935571973489464
+        ],
+        "log_likelihood_per_row": 0.024239161066732184
+      },
+      {
+        "node": 43,
+        "success": true,
+        "max_equation_residual": 4.440892098500626e-16,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.326163576852179,
+          0.4136448235114373
+        ],
+        "log_likelihood_per_row": 0.6481625301608431
+      },
+      {
+        "node": 44,
+        "success": true,
+        "max_equation_residual": 2.6645352591003757e-15,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          0.13688406993782995,
+          1.396382752208329
+        ],
+        "log_likelihood_per_row": 4.708414090297476
+      },
+      {
+        "node": 45,
+        "success": true,
+        "max_equation_residual": 4.440892098500626e-16,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.2332108195592424,
+          0.19962859966452384
+        ],
+        "log_likelihood_per_row": 1.882799601984587
+      },
+      {
+        "node": 46,
+        "success": true,
+        "max_equation_residual": 2.7755575615628914e-16,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          0.2748284253381687,
+          0.88493451080096
+        ],
+        "log_likelihood_per_row": 1.2470795345140404
+      },
+      {
+        "node": 47,
+        "success": true,
+        "max_equation_residual": 4.440892098500626e-16,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.26107478753526053,
+          0.41142729718219023
+        ],
+        "log_likelihood_per_row": 1.0075055663245103
+      },
+      {
+        "node": 48,
+        "success": true,
+        "max_equation_residual": 4.440892098500626e-16,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.28371392729969364,
+          0.2963629681110928
+        ],
+        "log_likelihood_per_row": 1.0286088431021685
+      },
+      {
+        "node": 49,
+        "success": true,
+        "max_equation_residual": 1.7763568394002505e-15,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.17888507415275667,
+          0.12913915954432945
+        ],
+        "log_likelihood_per_row": 3.6035635039540694
+      },
+      {
+        "node": 50,
+        "success": true,
+        "max_equation_residual": 1.0436096431476471e-14,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.3443082442773025,
+          0.1817882044778269
+        ],
+        "log_likelihood_per_row": 1.9734425469506474
+      },
+      {
+        "node": 51,
+        "success": true,
+        "max_equation_residual": 1.149080830487037e-14,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.19444332017800495,
+          1.4633815528732546
+        ],
+        "log_likelihood_per_row": 2.9056535630766644
+      },
+      {
+        "node": 52,
+        "success": true,
+        "max_equation_residual": 8.881784197001252e-16,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.19070116398638362,
+          0.40164355622332976
+        ],
+        "log_likelihood_per_row": 1.8477883274191487
+      },
+      {
+        "node": 53,
+        "success": true,
+        "max_equation_residual": 4.440892098500626e-16,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.29899485139220655,
+          0.7616094543077249
+        ],
+        "log_likelihood_per_row": 0.9411155823418327
+      },
+      {
+        "node": 54,
+        "success": true,
+        "max_equation_residual": 3.552713678800501e-15,
+        "interior": true,
+        "function_evaluations": 5,
+        "parameters": [
+          0.11184745426667074,
+          0.8395768198028468
+        ],
+        "log_likelihood_per_row": 5.5293095147175535
+      },
+      {
+        "node": 55,
+        "success": true,
+        "max_equation_residual": 3.3306690738754696e-16,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.9268733034518292,
+          0.670566475836196
+        ],
+        "log_likelihood_per_row": 0.07400110163317919
+      },
+      {
+        "node": 56,
+        "success": true,
+        "max_equation_residual": 8.881784197001252e-16,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.2053439050452113,
+          0.20082381571374708
+        ],
+        "log_likelihood_per_row": 2.057121910188368
+      },
+      {
+        "node": 57,
+        "success": true,
+        "max_equation_residual": 8.881784197001252e-16,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.17719052703557345,
+          0.1750064372450984
+        ],
+        "log_likelihood_per_row": 2.63296367712537
+      },
+      {
+        "node": 58,
+        "success": true,
+        "max_equation_residual": 1.3322676295501878e-15,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.23905668109485784,
+          0.525325337009102
+        ],
+        "log_likelihood_per_row": 1.2725668076580314
+      },
+      {
+        "node": 59,
+        "success": true,
+        "max_equation_residual": 7.549516567451064e-15,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.20965553295954353,
+          0.22187603740059011
+        ],
+        "log_likelihood_per_row": 1.8491457267589082
+      },
+      {
+        "node": 60,
+        "success": true,
+        "max_equation_residual": 1.7763568394002505e-15,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.20855103744892445,
+          0.661718409345399
+        ],
+        "log_likelihood_per_row": 1.8474247887216702
+      },
+      {
+        "node": 61,
+        "success": true,
+        "max_equation_residual": 6.661338147750939e-16,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.1770085009583948,
+          0.2740154657973198
+        ],
+        "log_likelihood_per_row": 2.0857116348808575
+      },
+      {
+        "node": 62,
+        "success": true,
+        "max_equation_residual": 8.881784197001252e-16,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.16050926688488062,
+          0.8956462117231152
+        ],
+        "log_likelihood_per_row": 3.278444327137663
+      },
+      {
+        "node": 63,
+        "success": true,
+        "max_equation_residual": 3.6637359812630166e-15,
+        "interior": true,
+        "function_evaluations": 9,
+        "parameters": [
+          10.511922586727806,
+          11.1066807448377
+        ],
+        "log_likelihood_per_row": 0.8356277145410935
+      },
+      {
+        "node": 64,
+        "success": true,
+        "max_equation_residual": 4.551914400963142e-15,
+        "interior": true,
+        "function_evaluations": 9,
+        "parameters": [
+          11.106680744838267,
+          10.511922586728362
+        ],
+        "log_likelihood_per_row": 0.8356277145411148
+      },
+      {
+        "node": 65,
+        "success": true,
+        "max_equation_residual": 0.0,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.20490568745977267,
+          0.3462455788469057
+        ],
+        "log_likelihood_per_row": 1.5960895490848164
+      },
+      {
+        "node": 66,
+        "success": true,
+        "max_equation_residual": 4.440892098500626e-16,
+        "interior": true,
+        "function_evaluations": 10,
+        "parameters": [
+          0.4707393159760884,
+          0.29987503631939927
+        ],
+        "log_likelihood_per_row": 0.7542647666218365
+      },
+      {
+        "node": 67,
+        "success": true,
+        "max_equation_residual": 3.3306690738754696e-16,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          0.3622411309211763,
+          0.5955086864956441
+        ],
+        "log_likelihood_per_row": 0.5001498688370718
+      },
+      {
+        "node": 68,
+        "success": true,
+        "max_equation_residual": 5.551115123125783e-17,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          0.8325979212250509,
+          0.18635482723304564
+        ],
+        "log_likelihood_per_row": 2.4974983665464663
+      },
+      {
+        "node": 69,
+        "success": true,
+        "max_equation_residual": 8.881784197001252e-16,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.19608993595061616,
+          0.7702365547425153
+        ],
+        "log_likelihood_per_row": 2.212227322164635
+      },
+      {
+        "node": 70,
+        "success": true,
+        "max_equation_residual": 1.1102230246251565e-16,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          1.8265525803931164,
+          1.981894930872905
+        ],
+        "log_likelihood_per_row": 0.11189202617439231
+      },
+      {
+        "node": 71,
+        "success": true,
+        "max_equation_residual": 1.5543122344752192e-15,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.3581146378217543,
+          0.6284067827416292
+        ],
+        "log_likelihood_per_row": 0.5290410640732612
+      },
+      {
+        "node": 72,
+        "success": true,
+        "max_equation_residual": 4.440892098500626e-16,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.7517346997189484,
+          0.33384213792344763
+        ],
+        "log_likelihood_per_row": 0.7160865892197064
+      },
+      {
+        "node": 73,
+        "success": true,
+        "max_equation_residual": 2.220446049250313e-16,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          1.8611193181471,
+          1.4920458005107924
+        ],
+        "log_likelihood_per_row": 0.08814242552333273
+      },
+      {
+        "node": 74,
+        "success": true,
+        "max_equation_residual": 4.440892098500626e-16,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.29071173490998503,
+          0.3750885080355578
+        ],
+        "log_likelihood_per_row": 0.8381633959980186
+      },
+      {
+        "node": 75,
+        "success": true,
+        "max_equation_residual": 4.440892098500626e-16,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.2902213675687018,
+          0.91218241813451
+        ],
+        "log_likelihood_per_row": 1.1357644853450815
+      },
+      {
+        "node": 76,
+        "success": true,
+        "max_equation_residual": 3.3306690738754696e-16,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          12.824165353024242,
+          13.395892698703115
+        ],
+        "log_likelihood_per_row": 0.92753972366949
+      },
+      {
+        "node": 77,
+        "success": true,
+        "max_equation_residual": 1.6653345369377348e-16,
+        "interior": true,
+        "function_evaluations": 9,
+        "parameters": [
+          0.7201522529886336,
+          0.14733635546883475
+        ],
+        "log_likelihood_per_row": 3.49886291608804
+      },
+      {
+        "node": 78,
+        "success": true,
+        "max_equation_residual": 1.7763568394002505e-15,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          0.08889168921241931,
+          1.0004205930085408
+        ],
+        "log_likelihood_per_row": 7.82986611289064
+      },
+      {
+        "node": 79,
+        "success": true,
+        "max_equation_residual": 1.249000902703301e-16,
+        "interior": true,
+        "function_evaluations": 11,
+        "parameters": [
+          0.15377691989686837,
+          5.626514699034818
+        ],
+        "log_likelihood_per_row": 5.523747632479017
+      },
+      {
+        "node": 80,
+        "success": true,
+        "max_equation_residual": 1.3877787807814457e-16,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          0.27094889354813323,
+          2.6351805007250984
+        ],
+        "log_likelihood_per_row": 2.3124514148015787
+      },
+      {
+        "node": 81,
+        "success": true,
+        "max_equation_residual": 3.3306690738754696e-16,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.10631225903347924,
+          0.6759778796246183
+        ],
+        "log_likelihood_per_row": 5.658998292488642
+      },
+      {
+        "node": 82,
+        "success": true,
+        "max_equation_residual": 8.881784197001252e-16,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.2662656747896597,
+          0.2629576930666114
+        ],
+        "log_likelihood_per_row": 1.2427056872895927
+      },
+      {
+        "node": 83,
+        "success": true,
+        "max_equation_residual": 8.881784197001252e-16,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.21659923498752784,
+          0.32792639018307124
+        ],
+        "log_likelihood_per_row": 1.456113762069963
+      },
+      {
+        "node": 84,
+        "success": true,
+        "max_equation_residual": 8.881784197001252e-16,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.3099973214791408,
+          2.737165556105476
+        ],
+        "log_likelihood_per_row": 1.9729264973021015
+      },
+      {
+        "node": 85,
+        "success": true,
+        "max_equation_residual": 6.661338147750939e-16,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          0.1811865414265433,
+          0.32398323550437974
+        ],
+        "log_likelihood_per_row": 1.979675351965803
+      },
+      {
+        "node": 86,
+        "success": true,
+        "max_equation_residual": 1.8041124150158794e-16,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.1131520266427208,
+          3.0188014334061966
+        ],
+        "log_likelihood_per_row": 6.956707301333504
+      },
+      {
+        "node": 87,
+        "success": true,
+        "max_equation_residual": 2.220446049250313e-16,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          0.184375906017501,
+          0.6209905252669041
+        ],
+        "log_likelihood_per_row": 2.2635263935647645
+      },
+      {
+        "node": 88,
+        "success": true,
+        "max_equation_residual": 1.7763568394002505e-15,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.652256790242929,
+          0.09097640889305382
+        ],
+        "log_likelihood_per_row": 7.0135320494331435
+      },
+      {
+        "node": 89,
+        "success": true,
+        "max_equation_residual": 2.220446049250313e-16,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.6243981398867392,
+          0.9281221707922483
+        ],
+        "log_likelihood_per_row": 0.10948053680558223
+      },
+      {
+        "node": 90,
+        "success": true,
+        "max_equation_residual": 2.1371793224034263e-15,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          1.301612382326064,
+          0.09083036538373293
+        ],
+        "log_likelihood_per_row": 7.950812334531157
+      },
+      {
+        "node": 91,
+        "success": true,
+        "max_equation_residual": 3.552713678800501e-15,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.10179678805926021,
+          0.9906138509988706
+        ],
+        "log_likelihood_per_row": 6.526596128835099
+      },
+      {
+        "node": 92,
+        "success": true,
+        "max_equation_residual": 8.881784197001252e-16,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.09454667416444937,
+          0.20440034132283383
+        ],
+        "log_likelihood_per_row": 5.392819747748421
+      },
+      {
+        "node": 93,
+        "success": true,
+        "max_equation_residual": 6.661338147750939e-16,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          0.5780980250072492,
+          0.5183965240438436
+        ],
+        "log_likelihood_per_row": 0.18215066677825043
+      },
+      {
+        "node": 94,
+        "success": true,
+        "max_equation_residual": 4.440892098500626e-16,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.5416332123960731,
+          0.4952433334142167
+        ],
+        "log_likelihood_per_row": 0.21938216093581797
+      },
+      {
+        "node": 95,
+        "success": true,
+        "max_equation_residual": 3.885780586188048e-16,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.13495350170782,
+          0.569315088223072
+        ],
+        "log_likelihood_per_row": 3.752034800979654
+      },
+      {
+        "node": 96,
+        "success": true,
+        "max_equation_residual": 8.881784197001252e-16,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          0.15114950840657249,
+          0.4005255958348643
+        ],
+        "log_likelihood_per_row": 2.806574917085397
+      },
+      {
+        "node": 97,
+        "success": true,
+        "max_equation_residual": 1.7763568394002505e-15,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          0.10770442014189768,
+          1.2963292681505008
+        ],
+        "log_likelihood_per_row": 6.379908971082276
+      },
+      {
+        "node": 98,
+        "success": true,
+        "max_equation_residual": 2.7755575615628914e-16,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.17038009996089326,
+          0.720467241061759
+        ],
+        "log_likelihood_per_row": 2.752321492540272
+      },
+      {
+        "node": 99,
+        "success": true,
+        "max_equation_residual": 5.773159728050814e-15,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.27012991088288485,
+          0.39702224901150057
+        ],
+        "log_likelihood_per_row": 0.9450501652319419
+      },
+      {
+        "node": 100,
+        "success": true,
+        "max_equation_residual": 1.7763568394002505e-15,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.11098621388002075,
+          0.20315598442620292
+        ],
+        "log_likelihood_per_row": 4.293529780724647
+      },
+      {
+        "node": 101,
+        "success": true,
+        "max_equation_residual": 4.440892098500626e-16,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.2815225037613129,
+          0.20289058039583951
+        ],
+        "log_likelihood_per_row": 1.6814927230586938
+      },
+      {
+        "node": 102,
+        "success": true,
+        "max_equation_residual": 1.7763568394002505e-15,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.1259633547824543,
+          0.7147141076758273
+        ],
+        "log_likelihood_per_row": 4.459257294228188
+      },
+      {
+        "node": 103,
+        "success": true,
+        "max_equation_residual": 1.5543122344752192e-15,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          0.2989956013549256,
+          0.1784334877547973
+        ],
+        "log_likelihood_per_row": 2.0364300490427385
+      },
+      {
+        "node": 104,
+        "success": true,
+        "max_equation_residual": 1.7763568394002505e-15,
+        "interior": true,
+        "function_evaluations": 9,
+        "parameters": [
+          0.17274057352252725,
+          0.4235750161370029
+        ],
+        "log_likelihood_per_row": 2.2449434222259335
+      },
+      {
+        "node": 105,
+        "success": true,
+        "max_equation_residual": 1.7763568394002505e-15,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          0.24629827313884178,
+          0.1262821641928818
+        ],
+        "log_likelihood_per_row": 3.5345690439106026
+      },
+      {
+        "node": 106,
+        "success": true,
+        "max_equation_residual": 1.3322676295501878e-15,
+        "interior": true,
+        "function_evaluations": 9,
+        "parameters": [
+          0.21200980658994245,
+          0.29773840504530974
+        ],
+        "log_likelihood_per_row": 1.5436181956583344
+      },
+      {
+        "node": 107,
+        "success": true,
+        "max_equation_residual": 1.1102230246251565e-15,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          0.24062681221633125,
+          0.695471978003674
+        ],
+        "log_likelihood_per_row": 1.426599411708213
+      },
+      {
+        "node": 108,
+        "success": true,
+        "max_equation_residual": 1.1657341758564144e-14,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.6139969921178448,
+          0.2787270058760478
+        ],
+        "log_likelihood_per_row": 0.9729780430816104
+      },
+      {
+        "node": 109,
+        "success": true,
+        "max_equation_residual": 1.1102230246251565e-16,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          0.6617021155298232,
+          0.262901366658214
+        ],
+        "log_likelihood_per_row": 1.1529704233065174
+      },
+      {
+        "node": 110,
+        "success": true,
+        "max_equation_residual": 2.220446049250313e-16,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.9732865835993865,
+          1.0615401495176806
+        ],
+        "log_likelihood_per_row": 0.0031561211284122405
+      },
+      {
+        "node": 111,
+        "success": true,
+        "max_equation_residual": 0.0,
+        "interior": true,
+        "function_evaluations": 11,
+        "parameters": [
+          2.2553291601566308,
+          1.7656901135729166
+        ],
+        "log_likelihood_per_row": 0.14113084843381962
+      },
+      {
+        "node": 112,
+        "success": true,
+        "max_equation_residual": 4.440892098500626e-16,
+        "interior": true,
+        "function_evaluations": 5,
+        "parameters": [
+          0.15404016852747168,
+          0.1727696281112517
+        ],
+        "log_likelihood_per_row": 3.017943291038098
+      },
+      {
+        "node": 113,
+        "success": true,
+        "max_equation_residual": 1.1102230246251565e-16,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.16204359229051268,
+          0.7788983510112327
+        ],
+        "log_likelihood_per_row": 3.077735570590976
+      },
+      {
+        "node": 114,
+        "success": true,
+        "max_equation_residual": 1.1102230246251565e-16,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.9193570942821466,
+          0.46628320975453086
+        ],
+        "log_likelihood_per_row": 0.3410961744007448
+      },
+      {
+        "node": 115,
+        "success": true,
+        "max_equation_residual": 6.661338147750939e-15,
+        "interior": true,
+        "function_evaluations": 6,
+        "parameters": [
+          0.18330936101978726,
+          0.26086111255429595
+        ],
+        "log_likelihood_per_row": 2.0024123448508773
+      },
+      {
+        "node": 116,
+        "success": true,
+        "max_equation_residual": 8.881784197001252e-16,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.18684627646265575,
+          0.7550775664681562
+        ],
+        "log_likelihood_per_row": 2.389721125447794
+      },
+      {
+        "node": 117,
+        "success": true,
+        "max_equation_residual": 1.7763568394002505e-15,
+        "interior": true,
+        "function_evaluations": 7,
+        "parameters": [
+          0.53254375090342,
+          0.1987267044501716
+        ],
+        "log_likelihood_per_row": 1.854624259429572
+      },
+      {
+        "node": 118,
+        "success": true,
+        "max_equation_residual": 2.220446049250313e-16,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          0.8193078162858972,
+          1.2323075533316912
+        ],
+        "log_likelihood_per_row": 0.06805106956587746
+      },
+      {
+        "node": 119,
+        "success": true,
+        "max_equation_residual": 4.440892098500626e-16,
+        "interior": true,
+        "function_evaluations": 9,
+        "parameters": [
+          1.394206659198647,
+          0.8792417450803321
+        ],
+        "log_likelihood_per_row": 0.08463214067468128
+      },
+      {
+        "node": 120,
+        "success": true,
+        "max_equation_residual": 1.1102230246251565e-16,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          0.9095110589887961,
+          1.2928391475825054
+        ],
+        "log_likelihood_per_row": 0.050207223848764124
+      },
+      {
+        "node": 121,
+        "success": true,
+        "max_equation_residual": 1.1102230246251565e-16,
+        "interior": true,
+        "function_evaluations": 8,
+        "parameters": [
+          3.0749629347055683,
+          3.5530390187250367
+        ],
+        "log_likelihood_per_row": 0.31101627110012586
+      }
+    ],
+    "max_equation_residual": 2.2426505097428162e-14,
+    "all_nodes_verified": true,
+    "historical_reproduction": false,
+    "versions": {
+      "python": "3.9.25",
+      "numpy": "1.26.4",
+      "scipy": "1.13.1"
+    },
+    "training_file_name": "sample_train.csv",
+    "training_file_sha256": "00f4afc44f36563195b12b104b87aeefecaae1dcb79037849dbf640bbf975f56",
+    "sampling": {
+      "seed": 1,
+      "shape": [
+        1000,
+        123
+      ],
+      "inverse": "dt_float64",
+      "rng": "NumPy legacy RandomState MT19937, nodewise beta draws",
+      "output_file_name": "sample_dt.csv",
+      "output_file_sha256": "6aab2b42f149c365305dc485ee05fd00fac1fdd16e17bd9eccd26edd68d9855b"
+    }
+  },
+  "final_parameter_sha256": "9d436bdef93e4b18b94288381d235dfdd293313fb33430c754bdd095ae1a026e"
+}

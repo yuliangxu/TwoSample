@@ -1,12 +1,12 @@
 {
-  "schema": "twosample-generator-assets-v1",
+  "schema": "twosample-training-input-assets-v1",
   "model_order": [
     "icfm",
     "dt",
     "d",
     "mbgan"
   ],
-  "scope": "Final fixed case-study inputs, model checkpoints, tree metadata and vendored numerical source. Paths are repository-relative.",
+  "scope": "Only preserved real train/test inputs, taxon/tree metadata and numerical solver source. No pretrained model or synthetic data is required.",
   "files": [
     {
       "path": "data/sample_train.csv",
@@ -17,56 +17,6 @@
       "path": "data/sample_test.csv",
       "bytes": 897900,
       "sha256": "2c33d8e4ba2ef0dea315a9a5a70aad93acf4cc9fd5beaa63ad9589c4313d012c"
-    },
-    {
-      "path": "data/sample_icfm.csv",
-      "bytes": 3075000,
-      "sha256": "24ca2b129d6073bedbe151eec23bf469fb1e79fe1c4a6ed53c2932a19436d58c"
-    },
-    {
-      "path": "data/sample_dt.csv",
-      "bytes": 3075000,
-      "sha256": "6aab2b42f149c365305dc485ee05fd00fac1fdd16e17bd9eccd26edd68d9855b"
-    },
-    {
-      "path": "data/sample_d.csv",
-      "bytes": 3075001,
-      "sha256": "957df6b4007389c9c51ed5fc224b67e0f9dcc164354948ee16979d152f9f1f99"
-    },
-    {
-      "path": "data/sample_mbgan.csv",
-      "bytes": 3075000,
-      "sha256": "bc4b43fca1d64f9266c064df3e48e7d4979c80043945fe7242ff3c563ce19ad4"
-    },
-    {
-      "path": "generators/checkpoints/dirichlet.npz",
-      "bytes": 4662,
-      "sha256": "c1c534c9442f6bbd3d267e72dfb79572079934dd12677759c22a6774ace32a47"
-    },
-    {
-      "path": "generators/checkpoints/dt_stable.npz",
-      "bytes": 117018,
-      "sha256": "9b4423ee7d463e2f07d8f1a2bb9a3d9aa9917b9150d18d31c641c28e84e843a1"
-    },
-    {
-      "path": "generators/checkpoints/icfm_recovered.json",
-      "bytes": 750,
-      "sha256": "2e2e27c3435edfc6fae739c203a31dcd68bfcfe3c66619427d4ea05dedf6f539"
-    },
-    {
-      "path": "generators/checkpoints/icfm_recovered.pt",
-      "bytes": 99584,
-      "sha256": "6f8d3b318687c910b0f549c922aff4d1f346a3773f7661505b8aa8d4af4118be"
-    },
-    {
-      "path": "generators/checkpoints/mbgan_generator.h5",
-      "bytes": 2613920,
-      "sha256": "457c13dbba3afefd1c0a7979eb6854118d25806143ac5306bd1543740eaf840f"
-    },
-    {
-      "path": "generators/checkpoints/mbgan_generator.json",
-      "bytes": 932,
-      "sha256": "08ab2fb00cca3c3aff1256f731a0e27fb907cf0dc3354e2a6405b7d54d2e1400"
     },
     {
       "path": "generators/assets/tree/childNode.csv",
@@ -132,6 +82,11 @@
       "path": "generators/vendor/torchdyn_numerics.py",
       "bytes": 2487,
       "sha256": "a769a2f6c87b283adb2be8c1627f92debfcd2059323ad965d7c8e5ebe5f8ebf1"
+    },
+    {
+      "path": "data/provenance/taxa.txt",
+      "bytes": 15189,
+      "sha256": "323a4aaf5f93bec2574e30be5905098c4c9f1f6b35a0bd68cfdb161ceca10918"
     }
   ]
 }

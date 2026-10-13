@@ -1,14 +1,14 @@
 {
-  "created_utc": "2026-10-13T12:47:06.946117+00:00",
+  "created_utc": "2026-10-13T17:02:14.092677+00:00",
   "pdf": "case_study_report.pdf",
-  "sha256": "6851eb9ee82ace3f37d20cfad988a487b9bbe2dc2f0823e16f23a2fd527d8159",
+  "sha256": "695f23537644a263629c6db00e609f73d9b40f9d3424923d83cd1691ed11083b",
   "pages": 10,
   "figures": [
     {
       "figure": "6",
       "report_page": 3,
       "source": "figures/figure6_ggplot2.pdf",
-      "sha256": "d23e2ecc2639ad3ebb1b31aa8e80f7a725a4640116a786690e935156545cbb1e",
+      "sha256": "0c6f0c725e1aad1e97702c11f4d4f2bd3b48fd16aa39faacbc47772a99146d30",
       "source_points": [
         1008.0,
         374.0
@@ -24,7 +24,7 @@
       "figure": "7",
       "report_page": 4,
       "source": "figures/figure7_ggplot2.pdf",
-      "sha256": "2c7cb92abe900384af959b94fa21db769b46dc42244d2a4edd9f6771f2634f90",
+      "sha256": "3d782cc51f0f614b1daf4c0e4b7865d3aa0674930547c5bb0fc3b24895e6f3cc",
       "source_points": [
         468.0,
         468.0
@@ -40,7 +40,7 @@
       "figure": "S8",
       "report_page": 5,
       "source": "figures/figureS8_ggplot2.pdf",
-      "sha256": "2be40be6407736b3f53307dd38bdc8a825a9856b5558bff55be4c2b3a567042f",
+      "sha256": "5547c88ebf0b01f6106a82a9acd92a1b37d8131e035ccc37f074022ceeb65c89",
       "source_points": [
         1008.0,
         374.0
@@ -56,7 +56,7 @@
       "figure": "S9",
       "report_page": 6,
       "source": "figures/figureS9_ggplot2.pdf",
-      "sha256": "755bd79f77438766e89b0822137dfd224ed1b0160a33f0c0fbcb1ae5acfb948f",
+      "sha256": "5b8c6833335ab2f3e7dee956f62bdd6bf4686db71e1a90fcef42b5f296fb89c5",
       "source_points": [
         468.0,
         468.0
@@ -72,7 +72,7 @@
       "figure": "S10",
       "report_page": 7,
       "source": "figures/figureS10_ggplot2.pdf",
-      "sha256": "a8b58481dfa774ba19f540d5e8b00f180ecc7c2c00a325b0992516b384a9f9ec",
+      "sha256": "2dc7e1f3332a4006fad1909febca4259f65b048b2b1c5c8a2b3116d36ee07274",
       "source_points": [
         864.0,
         720.0
@@ -88,7 +88,7 @@
       "figure": "S11",
       "report_page": 8,
       "source": "figures/figureS11_ggplot2.pdf",
-      "sha256": "0784c4f998542d6257a2e752c4b07ec1af55372a40276aa97d90bf2a5f7387e2",
+      "sha256": "6e40886a85690a40eef027d6511d4c00df4a8c6465c3e55c60d2a67a48153280",
       "source_points": [
         864.0,
         720.0
@@ -104,7 +104,7 @@
       "figure": "S12",
       "report_page": 9,
       "source": "figures/figureS12_ggplot2.pdf",
-      "sha256": "05dbcf66fc8e19ef82a380720aeec8692b4977314be7e0568a425bc3e64c6e5b",
+      "sha256": "e1c400f8eaa6214687123d863d9d21a032fd649bcf0a0016af8cc792fea02b9e",
       "source_points": [
         720.0,
         374.0
@@ -125,29 +125,32 @@
     "d",
     "mbgan"
   ],
-  "input_manifest_sha256": "5f7e39d236db6cf5544e190b2654139187f34c46ad00c25d7768037580922683",
+  "input_manifest_sha256": "db7ee6411411e4ffebadd72743b1340bd8acfd5d9381039f3c6d73d1018a7be4",
+  "generation_manifest_sha256": "e8067e8014e937f21ffbdc36d443206915696397d2c8a33f4069a0e1ac232511",
+  "all_generators_trained_from_scratch": true,
+  "independent_training_reproductions_verified": 4,
   "settings_sha256": "3b2503c8814347a7eb47b9e8019e6e5da2ae054c35362b6c2908760eda0d13a0",
-  "analysis_validation_sha256": "92f0a2df1aa1f5fbb080f61fb8f0521be23663d349c20882c9d0933174dfdc09",
-  "analysis_complete_sha256": "09717313d7af088bc80a886635cb3eb5e350fe4d1ae7d75c890643e4dd0a2d83",
+  "analysis_validation_sha256": "896c700fde988f409f2dfa29a5bf9a68953104b87322618bacd6761fdea6b698",
+  "analysis_complete_sha256": "f0d32cddd07c8727a84f2c1e8fd15f7949c0919f9291643b828a393420816b34",
   "eight_estimator_tables_validated": true,
   "estimator_tables": {
-    "revision/train/log_w_icfm.csv": "3caa03113638a7587ac175e1f905c76cb3036f3753bb8b3f358eead2b99ddd83",
+    "revision/train/log_w_icfm.csv": "d49768ab7c41e355a05d55d07d850a40d7ca24ce1750214702c102cfed978067",
     "revision/train/log_w_dt.csv": "d258be026c4e37ad51ec5869bae34d1ec2017a7e77e2761a0cb4e19b4e7af22f",
     "revision/train/log_w_d.csv": "e3228068dfe92463874522fe390ccd5813e68e0e73c05d9fd0c8479186d34185",
-    "revision/train/log_w_mbgan.csv": "d5b39bddcda182ba8a28a3970893c71d798be67f331c29bc903c35d120cdb241",
-    "revision/test/log_w_icfm.csv": "7ed75210f7cfbcc7782026fd29f6fb45a8c2d9322823d225a15192337a3c98d5",
+    "revision/train/log_w_mbgan.csv": "508f75519c8a0511e239000893fb1f3b9731304ce26a74c111108787d0483e9d",
+    "revision/test/log_w_icfm.csv": "99deaeed7c48f12e35a068772a7f38759ead1d9a20a4ca1c154cfafb15df344a",
     "revision/test/log_w_dt.csv": "a81285a396a6c01d3fc35d2707dbff3f85b415b83d39f21452e38be142a65c74",
     "revision/test/log_w_d.csv": "2bfec3d3ea66603267964d6fea74e7ae5f0f4c6c140b4e3d8c0c0548e5f071eb",
-    "revision/test/log_w_mbgan.csv": "c656eabc6ccc343e3e79d4a968abc96f9032e7fd0a2285cae78b9846ed0fad7c"
+    "revision/test/log_w_mbgan.csv": "5a5a9c4ce6b93a862a56235905b7bd1fc427173761d8f01051abcdb4a41fbc7f"
   },
   "six_inputs_validated": true,
   "interval_summaries_recomputed": true,
   "pdf_render_warnings": [],
   "text_outside_pages": [],
   "null_intervals_containing_zero": 292,
-  "boosting_at_search_limit": 7,
+  "boosting_at_search_limit": 8,
   "reportlab_version": "5.0.1",
   "pymupdf_version": "1.26.5",
-  "builder_sha256": "af4aea941be548d5ebc9110aae40639a6347a5fdf63dad2ee6fe1f4c5b32485b",
-  "layout_sha256": "a6e82e6aa4d11ee654b1bcdfeea1ea60dc467bb0cc995dbdaaf5d4d95cb4a686"
+  "builder_sha256": "9d4f8e734aaeb2e34b0bdcd587513598443957641d9aad76d6c829c2439438a6",
+  "layout_sha256": "e464263dd2596ce9e5806dd0f82de80d57d0583694ed2b7f13f06ae62f6bb81c"
 }
