@@ -1,0 +1,162 @@
+{
+  "created_utc": "2026-10-14T03:56:06.291202+00:00",
+  "pdf": "case_study_report.pdf",
+  "sha256": "464395c46d43135618c9d73b0e2031429de06e43238e9a3358d250948d614fc6",
+  "pages": 10,
+  "figures": [
+    {
+      "figure": "6",
+      "report_page": 3,
+      "source": "figures/figure6_ggplot2.pdf",
+      "sha256": "a1f7349371dc58f7f3391a1aa03fbab0cbca8b111efe606983a8414625e528d2",
+      "source_points": [
+        1008.0,
+        374.0
+      ],
+      "embedded_points": [
+        48.0,
+        105.0,
+        1056.0,
+        479.0
+      ]
+    },
+    {
+      "figure": "7",
+      "report_page": 4,
+      "source": "figures/figure7_ggplot2.pdf",
+      "sha256": "e82eb195d392ae3a11e2ff5875f7b257b4d24c9a332b6fd955d962bc2f6220da",
+      "source_points": [
+        468.0,
+        468.0
+      ],
+      "embedded_points": [
+        72.0,
+        105.0,
+        540.0,
+        573.0
+      ]
+    },
+    {
+      "figure": "S8",
+      "report_page": 5,
+      "source": "figures/figureS8_ggplot2.pdf",
+      "sha256": "29fb11c38325ebc1f0070c72ebd0fc13da14535311cf635778638c9866870a3f",
+      "source_points": [
+        1008.0,
+        374.0
+      ],
+      "embedded_points": [
+        48.0,
+        105.0,
+        1056.0,
+        479.0
+      ]
+    },
+    {
+      "figure": "S9",
+      "report_page": 6,
+      "source": "figures/figureS9_ggplot2.pdf",
+      "sha256": "3311b2208d5d6bb16b5220308f0fb8c3825a8282868f04670db4e36e1e5751f8",
+      "source_points": [
+        468.0,
+        468.0
+      ],
+      "embedded_points": [
+        72.0,
+        105.0,
+        540.0,
+        573.0
+      ]
+    },
+    {
+      "figure": "S10",
+      "report_page": 7,
+      "source": "figures/figureS10_ggplot2.pdf",
+      "sha256": "4341ffba7f18b797eebd14e7628c02c8df4925ee9f6782da92f3af1ce16df777",
+      "source_points": [
+        864.0,
+        720.0
+      ],
+      "embedded_points": [
+        48.0,
+        105.0,
+        912.0,
+        825.0
+      ]
+    },
+    {
+      "figure": "S11",
+      "report_page": 8,
+      "source": "figures/figureS11_ggplot2.pdf",
+      "sha256": "676a444fa83b23db2495ca69dff785e522d89e8ca2ca2da0611d5356ac2ae41c",
+      "source_points": [
+        864.0,
+        720.0
+      ],
+      "embedded_points": [
+        48.0,
+        105.0,
+        912.0,
+        825.0
+      ]
+    },
+    {
+      "figure": "S12",
+      "report_page": 9,
+      "source": "figures/figureS12_ggplot2.pdf",
+      "sha256": "20e046ef0dd801a0becd7cd775a790f0365b01fae9712ad7da07b929079de064",
+      "source_points": [
+        720.0,
+        374.0
+      ],
+      "embedded_points": [
+        48.0,
+        105.0,
+        768.0,
+        479.0
+      ]
+    }
+  ],
+  "BATTS_commit": "147e511d211919afefb8decac6333e66d24919db",
+  "BATTS_version": "0.3.0",
+  "model_order": [
+    "icfm",
+    "dt",
+    "d",
+    "mbgan"
+  ],
+  "display_order": [
+    "d",
+    "dt",
+    "icfm",
+    "mbgan"
+  ],
+  "input_manifest_sha256": "ffa15fbaaaf791c31dacf051552fdb4264495495be9e63054573ea5e3ca43eb2",
+  "generation_manifest_sha256": "bfbd7653761e2664a289ccecf9bbb991875946c66aefc07aac4fedd6be953faf",
+  "all_generators_trained_from_scratch": true,
+  "independent_training_reproductions_verified": 4,
+  "settings_sha256": "3b2503c8814347a7eb47b9e8019e6e5da2ae054c35362b6c2908760eda0d13a0",
+  "analysis_validation_sha256": "e0516108bfcb904b74a49a6b3915433b779608dba2fc88c825553b0fb1e2aab8",
+  "analysis_complete_sha256": "744d40f690f5e746d2508688a3476a0ce2e64619d3ee2407fee85a72752c2a2a",
+  "eight_estimator_tables_validated": true,
+  "estimator_tables": {
+    "revision/train/log_w_icfm.csv": "d49768ab7c41e355a05d55d07d850a40d7ca24ce1750214702c102cfed978067",
+    "revision/train/log_w_dt.csv": "d258be026c4e37ad51ec5869bae34d1ec2017a7e77e2761a0cb4e19b4e7af22f",
+    "revision/train/log_w_d.csv": "e3228068dfe92463874522fe390ccd5813e68e0e73c05d9fd0c8479186d34185",
+    "revision/train/log_w_mbgan.csv": "fac58bb12a48b98a6aef69f814bb9f57b0f35f5764d86d345f1498b3c903bb7c",
+    "revision/test/log_w_icfm.csv": "99deaeed7c48f12e35a068772a7f38759ead1d9a20a4ca1c154cfafb15df344a",
+    "revision/test/log_w_dt.csv": "a81285a396a6c01d3fc35d2707dbff3f85b415b83d39f21452e38be142a65c74",
+    "revision/test/log_w_d.csv": "2bfec3d3ea66603267964d6fea74e7ae5f0f4c6c140b4e3d8c0c0548e5f071eb",
+    "revision/test/log_w_mbgan.csv": "61210b3ec45b01f9ef68418322093d9cb0c6584cfa1648fb1134592fdbdcf47c"
+  },
+  "six_inputs_validated": true,
+  "interval_summaries_recomputed": true,
+  "pdf_render_warnings": [],
+  "text_outside_pages": [],
+  "null_intervals_containing_zero": 292,
+  "boosting_at_search_limit": 7,
+  "reportlab_version": "5.0.1",
+  "pymupdf_version": "1.26.5",
+  "builder_sha256": "e35581873876e560f3a4a41fd8a2229d910e2fe953f840518b23e15f96761f25",
+  "layout_sha256": "7dfe05b55abf367c4d9dffb98dbf5f0d1256c5861bfe4328670c6cbfb872895c"
+}

@@ -1,0 +1,28 @@
+{
+  "BATTS_commit": "147e511d211919afefb8decac6333e66d24919db",
+  "BATTS_version": "0.3.0",
+  "model_order": ["icfm", "dt", "d", "mbgan"],
+  "display_order": ["d", "dt", "icfm", "mbgan"],
+  "all_generators_trained_from_scratch": true,
+  "independent_training_reproductions_verified": 4,
+  "generation_manifest_sha256": "bfbd7653761e2664a289ccecf9bbb991875946c66aefc07aac4fedd6be953faf",
+  "real_train": 1166,
+  "real_test": 292,
+  "taxa": 123,
+  "generated_per_model": 1000,
+  "validated_comparisons": 8,
+  "validated_estimator_fits": 24,
+  "validated_figures": 7,
+  "null_intervals": 292,
+  "null_intervals_containing_zero": 292,
+  "boosting_at_search_limit": 7,
+  "figure_md5": {
+    "figure6_ggplot2.pdf": "12380c8c9a311eb01d34ad41677ae141",
+    "figure7_ggplot2.pdf": "a4f284f5104d16f196e3e17e7225c324",
+    "figureS8_ggplot2.pdf": "396f1bf1d1d2125cd0387318b5840605",
+    "figureS9_ggplot2.pdf": "7569fb00971d82e6f5e7be981840844a",
+    "figureS10_ggplot2.pdf": "4a34a9eb756b73bb5d77c172977e6d85",
+    "figureS11_ggplot2.pdf": "ece883d9c7d17b706a4469b56a0ca8ad",
+    "figureS12_ggplot2.pdf": "248c6a117c60ff2a0e91538292e0d895"
+  }
+}

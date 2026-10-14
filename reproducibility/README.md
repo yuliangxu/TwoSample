@@ -7,26 +7,32 @@ the wrapper matched the original training loop's parameters and optimizer
 states. The [provenance audit](historical_mbgan_provenance.json) identifies the
 historical code and the two earlier reports.
 
-**Full reproduction and updated results are pending** in job 58514810. The
-short checks do not validate the complete 500,000-iteration trajectory.
-This code release includes real inputs, source, and implementation evidence.
-The preceding connected-gradient-penalty run's synthetic matrices, validation
-records, and reports remain at
-[commit b009075](https://github.com/yuliangxu/TwoSample/tree/b00907514c3bbb7ab17c4eeacc5091ab4f441d8a).
+**Full reproduction and updated results passed** in job 58514810, which
+completed with exit code 0 after 9 hours, 4 minutes, 29 seconds. Both independent
+fitting sequences reproduced all four models exactly, including both complete
+500,000-iteration MBGAN trajectories. The BATTS analysis passed all eight
+comparisons and 24 estimator fits; all 292 null intervals cover zero. Seven
+figures and a ten-page report passed numerical, provenance, and PDF checks.
+The final report was generated on 14 October 2026 at 03:56 UTC
+(13 October at 23:56 EDT).
 
-The [code release manifest](../code_release_manifest.json) binds the packaged
-code, inputs, and evidence. Verify this release with:
+The [full validation](historical_mbgan_full_validation.json) records these
+checks. The [release manifest](../release_manifest.json) binds the packaged
+source, six input matrices, evidence, and completed results. Verify the release
+with:
 
 ```sh
-python3 scripts/verify_code_release.py
+python3 scripts/verify_from_training_release.py
 ```
 
-This checks the code package and its declared validation scope; it does not
-certify completed full training or new analysis results.
+The [report](../results/final/case_study_report.pdf) and
+[figures](../results/final/figures/) use the newly trained MBGAN bank bound by
+[data/generation_manifest.json](../data/generation_manifest.json) and
+[data/evidence/](../data/evidence/).
 
 The restored workflow repeats all four fits from scratch with CPU ICFM and
 historical local CPU MBGAN. MBGAN uses TensorFlow CPU 2.13.1 and Keras 2.13.1,
-with isolated seeded diagnostic randomness. Both full replicas must reproduce
+with isolated seeded diagnostic randomness. Both full replicas reproduced
 exactly within their recorded hardware and software environment. The real data,
 preprocessing, split, other generators, and BATTS recipe remain unchanged.
 
@@ -54,8 +60,8 @@ choice, even though the new fit keeps its fixed seed and final iteration.
 The [preprocessing validation](preprocessing_validation.json) independently
 reconstructs the preserved real matrices. The
 [BATTS update audit](BATTS_update_audit.json) identifies upstream 0.3.0 and its
-pinned commit. Those records remain applicable. A completed restored run must
-have its own numerical and report checks.
+pinned commit. Those records remain applicable. The completed restored run has
+its own numerical, provenance, and report checks in the full validation record.
 The required presentation order remains **D, DT, ICFM, MBGAN**.
 
 ## Reproduce and verify
@@ -77,19 +83,17 @@ sequential fitting. To revalidate the completed bank and evidence:
   --output output/generated_validation
 ```
 
-Generation and validation destinations must be new. After the restored release
-has been exported, compare newly generated data with its reference CSVs,
+Generation and validation destinations must be new. Compare newly generated
+data with the released reference CSVs,
 configurations, fitted-parameter hashes, and recorded states:
 
 ```sh
 python3 scripts/verify_training_reference.py output/generated/data
 ```
 
-The present code-only release does not contain a completed synthetic reference
-bank. Run this comparison after the new results are exported, or supply
-`--reference-dir` pointing to a separately verified bank from the selected
-implementation. The full generation workflow independently compares its two
-fresh replicas without requiring a released reference bank.
+The completed reference bank is included in `data/`. The full generation
+workflow independently compares its two fresh replicas without requiring a
+released reference bank.
 
 The generation gate requires exact equality. MBGAN trajectory comparison excludes
 wall-clock timings. Arrays and explicit states are compared directly or through
@@ -111,14 +115,15 @@ The exporter `scripts/export_training_release.py RUNROOT` accepts completed
 `generators/` and `analysis/` subdirectories. It requires completion markers and
 matching training/analysis provenance before curating a replacement release.
 The resulting `release_manifest.json` binds source, inputs, evidence, and results.
-After export, verify it with:
+Verify the exported release with:
 
 ```sh
 python3 scripts/verify_from_training_release.py
 ```
 
-`release_manifest.json` and the completed-result verification are created only
-after full results are exported. Until then, use `verify_code_release.py` for
-this code release. `verify_release.py` is retained as part of the older executed
-source snapshot; use `verify_from_training_release.py` after the from-training
-results export.
+`verify_release.py` is retained as part of the older executed source snapshot;
+use `verify_from_training_release.py` for this completed from-training release.
+The selected code before full-run completion remains at
+[commit fc7f6fa](https://github.com/yuliangxu/TwoSample/tree/fc7f6fa21e3b834b3be1ff459a473be9c7f30c88).
+The preceding connected-gradient-penalty run's data and results remain at
+[commit b009075](https://github.com/yuliangxu/TwoSample/tree/b00907514c3bbb7ab17c4eeacc5091ab4f441d8a).

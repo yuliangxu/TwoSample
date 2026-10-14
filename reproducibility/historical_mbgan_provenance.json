@@ -1,5 +1,5 @@
 {
-  "status": "provenance_verified_restoration_pending",
+  "status": "provenance_verified_restoration_validated",
   "artifacts": {
     "ibdmdb_report": {
       "path": "/cwork/yx306/TwoSample/reports_20261004/ibdmdb_case_study_report.pdf",
@@ -73,6 +73,7 @@
     "framework": "TensorFlow CPU 2.13.1 / Keras 2.13.1",
     "callback_rng_policy": "isolated_seeded_diagnostics",
     "selection": "Restore the identified historical implementation at user request after inspecting previous analyses; no new search over seeds or checkpoints.",
-    "scope": "Repeatability will be checked by two complete fresh fits. It does not establish optimizer stability, fidelity, equivalence to the published MB-GAN implementation, or recovery of the earlier entropy-dependent training trajectory."
-  }
+    "scope": "Two complete independent 500000-iteration fits reproduced exactly in the recorded environment. This does not establish optimizer stability, fidelity, equivalence to the published MB-GAN implementation, or recovery of the earlier entropy-dependent training trajectory."
+  },
+  "full_validation": "historical_mbgan_full_validation.json"
 }

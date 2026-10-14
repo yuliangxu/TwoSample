@@ -1,0 +1,164 @@
+{
+  "model": "mbgan",
+  "training_input_sha256": "00f4afc44f36563195b12b104b87aeefecaae1dcb79037849dbf640bbf975f56",
+  "trained_from_scratch": true,
+  "test_used_for_training": false,
+  "test_used_for_seed_or_checkpoint_selection": false,
+  "initialization": "random",
+  "configuration": {
+    "training_seed": 1,
+    "sampling_seed": 256,
+    "device": "cpu",
+    "threads": 2,
+    "iterations": 500000,
+    "batch_size": 32,
+    "optimizer": "RMSprop",
+    "learning_rate": 5e-05,
+    "critic_updates": 5,
+    "generator_updates": 1,
+    "latent_dimension": 100,
+    "generator_width": 512,
+    "critic_width": 256,
+    "critic_dropout": 0.25,
+    "gradient_penalty_connected": false,
+    "gradient_penalty_weight": 0.0,
+    "checkpoint_rule": "final update",
+    "variant": "historical_local_no_penalty",
+    "weight_clipping": false,
+    "callback_rng_policy": "isolated_seeded_diagnostics",
+    "tensorflow_version": "2.13.1",
+    "keras_version": "2.13.1",
+    "callback_interval": 10000
+  },
+  "completion": {
+    "completed": true,
+    "completed_steps": 500000
+  },
+  "trainer_metadata": {
+    "configuration": {
+      "schema": "mbgan_historical_from_training_v2",
+      "variant": "historical_local_no_penalty",
+      "initialization": "random",
+      "taxa": 123,
+      "latent": 100,
+      "generator_width": 512,
+      "critic_width": 256,
+      "critic_dropout": 0.25,
+      "taxonomy_log_scale": 1000.0,
+      "optimizer": "RMSprop",
+      "learning_rate": 5e-05,
+      "rho": 0.9,
+      "optimizer_epsilon": 1e-07,
+      "optimizer_momentum": 0.0,
+      "optimizer_centered": false,
+      "gradient_penalty_weight": 0.0,
+      "effective_gradient_penalty": false,
+      "weight_clipping": false,
+      "compiled_loss_weights": [
+        1,
+        1,
+        10
+      ],
+      "batch_size": 32,
+      "n_critic": 5,
+      "n_generator": 1,
+      "iterations": 500000,
+      "seed": 1,
+      "device": "cpu",
+      "threads": 2,
+      "deterministic_ops": true,
+      "execution": "Keras 2.13.1 compiled train_on_batch",
+      "random_stream": "NumPy MT19937 training draws; seeded TensorFlow/Keras stateful dropout",
+      "initialization_rng": "tf.keras.utils.set_random_seed(seed); historical critic constructed before generator",
+      "callback_rng_policy": "isolated_seeded_diagnostics",
+      "callback_interval": 10000,
+      "callback_seed_rule": "(training seed + iteration) modulo 2**32; independent RandomState",
+      "training_rows": 1166,
+      "train_file": "data/sample_train.csv",
+      "train_sha256": "00f4afc44f36563195b12b104b87aeefecaae1dcb79037849dbf640bbf975f56",
+      "normalized_train_tensor_sha256": "005b9b503bff2a791e3dfe21fcd83015dd753b692d26670f98e249df37f160a9",
+      "taxonomy_file": "data/provenance/taxa.txt",
+      "taxonomy_sha256": "323a4aaf5f93bec2574e30be5905098c4c9f1f6b35a0bd68cfdb161ceca10918",
+      "source_sha256": "0dc96019fc7b5b98cc694173a1951ad3eb1e378ac3d1d09d4b44d9888d636046",
+      "historical_source_sha256": "9efc755e7fdcc18310c5fe4405319134f5d6e25ea50afb0a7b776b6971968e18",
+      "historical_source_path": "generators/vendor/historical_mbgan_model.py",
+      "test_data_used": false,
+      "checkpoint_selection": "final prescribed iteration; no validation or test selection",
+      "generator_training_during_critic_steps": false,
+      "critic_dropout_during_generator_steps": true,
+      "training_preprocessing": "CSV float64 values, no additional normalization; Keras casts at model input",
+      "environment": {
+        "python": "3.9.25",
+        "machine": "x86_64",
+        "tensorflow": "2.13.1",
+        "keras": "2.13.1",
+        "numpy": "1.24.3",
+        "h5py": "3.9.0",
+        "tensorflow_devices": [
+          "/physical_device:CPU:0"
+        ],
+        "onednn_enabled": true
+      },
+      "phylogeny_tensor_sha256": "74e89b09bf43f3aee15f867fee5a8cf7db5a5824f16476092832e32b6b2ad13d",
+      "initial_generator_tensor_sha256": "07cf001df6a3bdf6ba53a6f98d5b94579fae13e836a9d86dfc00074a3159b1b6",
+      "initial_critic_tensor_sha256": "4c353470e4c9760e2d4f72b228391ad4328fb33f33f874b815bcaf088b7200a4"
+    },
+    "completion": {
+      "status": "completed",
+      "mode": "from-scratch training",
+      "iterations": 500000,
+      "training_rows": 1166,
+      "elapsed_seconds": 31576.85089884326,
+      "warmed_iteration_seconds": 0.06315061972037898,
+      "all_step_losses_finite": true,
+      "all_checkpoint_tensors_finite": true,
+      "max_generator_parameter_change": 27.29684066772461,
+      "max_critic_parameter_change": 73.09117889404297,
+      "deterministic_save_reload_equal": true,
+      "final_losses": {
+        "critic_loss": -6843247104.0,
+        "generator_loss": 8338707968.0,
+        "critic_update_losses": [
+          [
+            -2501861632.0,
+            3364973312.0,
+            -5866834944.0
+          ],
+          [
+            -5195480064.0,
+            111870208.0,
+            -5307350016.0
+          ],
+          [
+            -6196465152.0,
+            -770810880.0,
+            -5425654272.0
+          ],
+          [
+            -6606953472.0,
+            -1040249088.0,
+            -5566704128.0
+          ],
+          [
+            -6843247104.0,
+            -2627499264.0,
+            -4215747840.0
+          ]
+        ]
+      },
+      "generator_sha256": "30c77bce5e109dc7ebc6f3ff63015ff7cff89637afdbb839ec25e86fb732c84e",
+      "final_generator_tensor_sha256": "6e937a07323d650ef2f6bec0d9650f21507813c29d6a0853ccbcc971f685839c",
+      "final_critic_tensor_sha256": "3fa26d491debd0284df48a6f0867c8762ed467a661ac9232bce85e35a3c4ca01",
+      "final_optimizer_tensor_sha256": "c169945e8b9321ac87098dd15834e867207904ec4d88c1f88a43da463194be47",
+      "optimizer_sha256": "35ce51f8c86ad94a98aa5d041324441f07c524eaa68f9881cc8f4487e781799f",
+      "training_config_sha256": "b15b40b5a2a070c538c9f15bb2ba2681d8dd5ed3050f0b264efaa3cf281028fd",
+      "training_history_sha256": "38142c4919d7d351328adc467f3e47c2b4eeb010b0343a37c950e81dedf8778a",
+      "callback_history_sha256": "139a0552ac065e10352cf50b66b57265f21ff19e7ada6072fc4a6c95aa53714f",
+      "rng_state_sha256": "a8da6edaa1643e6beecca0f6b84a24244106345b1cc12225d8fa9d216c4909df",
+      "source_sha256": "0dc96019fc7b5b98cc694173a1951ad3eb1e378ac3d1d09d4b44d9888d636046",
+      "test_data_used": false,
+      "checkpoint_selection": "final prescribed iteration; no validation or test selection"
+    }
+  },
+  "final_parameter_sha256": "4397e5161e65969d653b9a7601ce64aaf636cc1680a56ba1b1584b718247c0c5"
+}

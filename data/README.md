@@ -4,17 +4,21 @@ All composition CSVs have no header and use the preserved order of 123 taxa.
 The original full pooled real split contains 1,166 training observations and
 292 test observations. These two real matrices remain unchanged.
 
-This code release includes the real matrices and preprocessing provenance.
-Synthetic matrices and full training evidence for the selected historical
-MBGAN implementation are pending completion of two independent full fits
-(job 58514810). The preceding implementation's matrices and results remain
-available at [commit b009075](https://github.com/yuliangxu/TwoSample/tree/b00907514c3bbb7ab17c4eeacc5091ab4f441d8a/data).
+This release includes all six matrices and preprocessing provenance. Two
+independent full fitting sequences passed exact reproduction checks in job
+58514810, including both 500,000-iteration fits of the selected historical
+local MBGAN implementation. The released synthetic matrices are the outputs
+of those completed fits.
 
-The completed workflow produces four 1,000-row synthetic matrices using only
+The completed workflow produced four 1,000-row synthetic matrices using only
 the training matrix. Figures display them in the order **D, DT, ICFM, MBGAN**.
-Its `generation_manifest.json` binds inputs, settings, source, and outputs;
-`evidence/reproduction.json` records exact comparisons between the two complete
-fitting sequences. These files are exported only after full validation passes.
+Its [generation_manifest.json](generation_manifest.json) binds inputs, settings,
+source, and outputs; [evidence/reproduction.json](evidence/reproduction.json)
+records exact comparisons between the two complete fitting sequences. The
+[MBGAN validation](evidence/mbgan_independent_validation.json) additionally
+compares the full recorded trajectories, optimizer arrays, and explicit random
+states. These data supplied the [final report](../results/final/case_study_report.pdf)
+and [figures](../results/final/figures/).
 
 Run the [generator reproduction workflow](../generators/README.md) to create
 `output/generated/data/`. That directory contains all six matrices,

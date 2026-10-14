@@ -10,11 +10,13 @@ and do not enter generator fitting or epoch selection.
 **Selected final MBGAN implementation: historical local variant.**
 [Implementation checks](../reproducibility/historical_mbgan_implementation_validation.json)
 passed for two independent 120-iteration fits and parity with the original
-training loop. Full 500,000-iteration repeatability and updated analysis remain
-pending (job 58514810). This release packages code and real inputs; synthetic
-reference data and report results will be exported after complete validation.
-The preceding implementation's results remain at
-[commit b009075](https://github.com/yuliangxu/TwoSample/tree/b00907514c3bbb7ab17c4eeacc5091ab4f441d8a).
+training loop. **Full reproduction and updated analysis also passed** in job
+58514810: both fitting sequences reproduced all four models exactly, including
+both 500,000-iteration MBGAN trajectories. This release includes the six
+reference matrices, [generation manifest](../data/generation_manifest.json),
+[training evidence](../data/evidence/), [final report](../results/final/case_study_report.pdf),
+and [regenerated figures](../results/final/figures/). See the
+[full validation](../reproducibility/historical_mbgan_full_validation.json).
 
 | Model | Frozen fitting recipe | Training seed | Sampling seed |
 | --- | --- | ---: | ---: |
@@ -68,17 +70,21 @@ Use `output/generated/data` as `TWO_SAMPLE_DATA_DIR` for BATTS. Generator
 completion attests to training and sampling; the analysis has a separate
 completion marker requiring numerical and PDF validation.
 
-After the restored release is exported, compare a newly generated bank with the
-released reference, including all six CSVs, fitted parameter hashes,
+Compare a newly generated bank with the released reference, including all six
+CSVs, fitted parameter hashes,
 configurations, and recorded neural states:
 
 ```sh
 python3 scripts/verify_training_reference.py output/generated/data
 ```
 
-The present code-only release has no completed synthetic reference bank, so
-this reference comparison must wait for export. The generation workflow's
-independent-replica comparison does not require a released reference bank.
+The reference bank is included in `data/`. The generation workflow also
+compares its two independent replicas without requiring a released reference
+bank. Verify the packaged source, data, evidence, and results with:
+
+```sh
+python3 scripts/verify_from_training_release.py
+```
 
 ## Required reproduction checks
 

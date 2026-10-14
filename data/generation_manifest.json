@@ -1,0 +1,209 @@
+{
+  "schema_version": 1,
+  "mode": "from_training",
+  "model_order": [
+    "icfm",
+    "dt",
+    "d",
+    "mbgan"
+  ],
+  "training_input": {
+    "sha256": "00f4afc44f36563195b12b104b87aeefecaae1dcb79037849dbf640bbf975f56",
+    "shape": [
+      1166,
+      123
+    ]
+  },
+  "test_input_sha256": "2c33d8e4ba2ef0dea315a9a5a70aad93acf4cc9fd5beaa63ad9589c4313d012c",
+  "test_used_for_training": false,
+  "test_used_for_seed_or_checkpoint_selection": false,
+  "models": {
+    "icfm": {
+      "initialization": "random",
+      "trained_from_scratch": true,
+      "training_input_sha256": "00f4afc44f36563195b12b104b87aeefecaae1dcb79037849dbf640bbf975f56",
+      "configuration": {
+        "training_seed": 20261003,
+        "sampling_seed": 2,
+        "device": "cpu",
+        "threads": 2,
+        "steps": 20000,
+        "batch_size": 256,
+        "optimizer": "Adam",
+        "learning_rate": 0.001,
+        "hidden_layers": 3,
+        "width": 64,
+        "sigma": 0.0001,
+        "zero_mass": 1e-08,
+        "clip_logratio": 13.815510557964274,
+        "sampling_atol": 0.0001,
+        "sampling_rtol": 0.0001,
+        "checkpoint_rule": "final update"
+      },
+      "completion": {
+        "completed": true,
+        "completed_steps": 20000
+      },
+      "output": {
+        "sha256": "fd0fcc702fd96f6a40a7ecd4a020a86cc95eac05e32a81f1764c6fc568ed89f4",
+        "shape": [
+          1000,
+          123
+        ]
+      },
+      "training_metadata": "evidence/icfm_training.json",
+      "verification": {
+        "passed": true,
+        "method": "independent_rerun",
+        "output_sha256": "fd0fcc702fd96f6a40a7ecd4a020a86cc95eac05e32a81f1764c6fc568ed89f4"
+      }
+    },
+    "dt": {
+      "initialization": "fit_from_training",
+      "trained_from_scratch": true,
+      "training_input_sha256": "00f4afc44f36563195b12b104b87aeefecaae1dcb79037849dbf640bbf975f56",
+      "configuration": {
+        "training_seed": null,
+        "sampling_seed": 1,
+        "fitter": "independent Beta maximum likelihood in positive log parameters",
+        "nodes": 122,
+        "smoothing": 1e-07,
+        "checkpoint_rule": "converged maximum likelihood fit"
+      },
+      "completion": {
+        "completed": true,
+        "completed_steps": null
+      },
+      "output": {
+        "sha256": "6aab2b42f149c365305dc485ee05fd00fac1fdd16e17bd9eccd26edd68d9855b",
+        "shape": [
+          1000,
+          123
+        ]
+      },
+      "training_metadata": "evidence/dt_training.json",
+      "verification": {
+        "passed": true,
+        "method": "independent_rerun",
+        "output_sha256": "6aab2b42f149c365305dc485ee05fd00fac1fdd16e17bd9eccd26edd68d9855b"
+      }
+    },
+    "d": {
+      "initialization": "fit_from_training",
+      "trained_from_scratch": true,
+      "training_input_sha256": "00f4afc44f36563195b12b104b87aeefecaae1dcb79037849dbf640bbf975f56",
+      "configuration": {
+        "training_seed": null,
+        "sampling_seed": 1,
+        "fitter": "Newton Dirichlet maximum likelihood",
+        "clip_min": 1e-10,
+        "checkpoint_rule": "converged maximum likelihood fit"
+      },
+      "completion": {
+        "completed": true,
+        "completed_steps": null
+      },
+      "output": {
+        "sha256": "957df6b4007389c9c51ed5fc224b67e0f9dcc164354948ee16979d152f9f1f99",
+        "shape": [
+          1000,
+          123
+        ]
+      },
+      "training_metadata": "evidence/d_training.json",
+      "verification": {
+        "passed": true,
+        "method": "independent_rerun",
+        "output_sha256": "957df6b4007389c9c51ed5fc224b67e0f9dcc164354948ee16979d152f9f1f99"
+      }
+    },
+    "mbgan": {
+      "initialization": "random",
+      "trained_from_scratch": true,
+      "training_input_sha256": "00f4afc44f36563195b12b104b87aeefecaae1dcb79037849dbf640bbf975f56",
+      "configuration": {
+        "training_seed": 1,
+        "sampling_seed": 256,
+        "device": "cpu",
+        "threads": 2,
+        "iterations": 500000,
+        "batch_size": 32,
+        "optimizer": "RMSprop",
+        "learning_rate": 5e-05,
+        "critic_updates": 5,
+        "generator_updates": 1,
+        "latent_dimension": 100,
+        "generator_width": 512,
+        "critic_width": 256,
+        "critic_dropout": 0.25,
+        "gradient_penalty_connected": false,
+        "gradient_penalty_weight": 0.0,
+        "checkpoint_rule": "final update",
+        "variant": "historical_local_no_penalty",
+        "weight_clipping": false,
+        "callback_rng_policy": "isolated_seeded_diagnostics",
+        "tensorflow_version": "2.13.1",
+        "keras_version": "2.13.1",
+        "callback_interval": 10000
+      },
+      "completion": {
+        "completed": true,
+        "completed_steps": 500000
+      },
+      "output": {
+        "sha256": "9dd567ba828780615ebe3bbd6a5ca80bd4383e9ee1d528ede8c071a65ba016c7",
+        "shape": [
+          1000,
+          123
+        ]
+      },
+      "training_metadata": "evidence/mbgan_training.json",
+      "verification": {
+        "passed": true,
+        "method": "independent_rerun",
+        "output_sha256": "9dd567ba828780615ebe3bbd6a5ca80bd4383e9ee1d528ede8c071a65ba016c7"
+      }
+    }
+  },
+  "source_hashes": {
+    "generators/__init__.py": "ae4f3b8cda4d4e1c2c4561e7b9595b10d68689054164454d5ba49ad4d3d9f13e",
+    "generators/assets/tree/childNode.csv": "c92879e3a4b48db3b2342cffa30768aecebbd4b154654684ffe6a4f9708a03b4",
+    "generators/assets/tree/outTaxa.csv": "806157d70b850318946bd3f3de1508776521ea2e7ccb153fd4152e3a3b9c0e51",
+    "generators/assets/tree/treeTaxa.csv": "c38f1fd38293815fc7d2183deb6ea721460ef5bc8139430755411d9a600be64b",
+    "generators/dirichlet.py": "9b506c66b60a5f1f7346a73c38a3b92dcbfbc665dedc112864d2a2d90a96f6eb",
+    "generators/dirichlet_tree.py": "8c68150ceeb08d31d7afbb1d4bb9e56d9fe6b14a839606d2b701e318c75d4af6",
+    "generators/icfm.py": "dc37ecd913155ffc505b03a8c3da86323fc3f6d04f6be9e0b89a36c1ce7d2cfe",
+    "generators/licenses/KERAS-CONTRIB-MIT.txt": "903be24610c52f32dac3886923878b882b957624ca3e35e48fd4cb163766f7ca",
+    "generators/licenses/MBGAN-GPL-3.0.txt": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+    "generators/manifest.json": "c1dd676f375f1d92a6c4e551b6e1c85803b3742e9f3dc40d93275729410d1f0e",
+    "generators/mbgan.py": "0dc96019fc7b5b98cc694173a1951ad3eb1e378ac3d1d09d4b44d9888d636046",
+    "generators/reproduce.py": "112118b8a27b119dd8dc388bdc744dc0d1d501402b756ee8d75385b4c77d64d7",
+    "generators/requirements-mbgan.txt": "cbc80755a359b8fdfe93605f90ee7d1868f58256c4d64b86e72f00b49dacf4fc",
+    "generators/requirements.txt": "0daa4e0c89229f903b896006573d77837c038bb0044629dbe7fcf5c6a3cd20f3",
+    "generators/training_config.json": "25d6cf867e8f30cdd60c735b83d44fbbb95e3b6a23d23672d0bb9a0376b5d5ed",
+    "generators/tree.py": "b21e5d6d53d993be2d44eeecf9d10880ff93543042d80a8fe48aa436f50dc489",
+    "generators/validate.py": "a87a884dd6d1b542d90faaccf6e0afdfc3c13a44be92b9f8cc9aea45a09762ce",
+    "generators/validate_mbgan_training.py": "b7b5655325862d33743ce82737527cb40898a57eb154c2d0ea299517b43bfa9c",
+    "generators/vendor/SOURCE.json": "7f787b85af2be43171b13a9020bd926cf0fcc4047b6df5e5f6211f186a54ba69",
+    "generators/vendor/__init__.py": "d41ffdcb05c10a3742e0d8db51a92d65bd078fe2e7b9cfd6f415ff1c2cd3e4e0",
+    "generators/vendor/historical_mbgan_model.py": "9efc755e7fdcc18310c5fe4405319134f5d6e25ea50afb0a7b776b6971968e18",
+    "generators/vendor/torchdyn_1_0_6/torchdyn/core/defunc.py": "2891f56e469a582be7ff89f02100696751f83a75293570a6fe5d937b72083f44",
+    "generators/vendor/torchdyn_1_0_6/torchdyn/numerics/odeint.py": "daa4c65fadc3324829aecd8ad2d4b09756e1361ff057e009c34b6d2a1aa68d2e",
+    "generators/vendor/torchdyn_1_0_6/torchdyn/numerics/solvers/_constants.py": "79dd1575fb431a35fc6508b49dd7bd53f45676ba66ca784cb415d361b70fdc9f",
+    "generators/vendor/torchdyn_1_0_6/torchdyn/numerics/solvers/ode.py": "606e7eb4359c3910a6204e835c1a67b1ca89a65229144afd96ce8dc8a70188d1",
+    "generators/vendor/torchdyn_1_0_6/torchdyn/numerics/solvers/templates.py": "f1780bc9db2402ea60bf4b4fde896dfce9a43d46da75c0c8d5908080568d8790",
+    "generators/vendor/torchdyn_1_0_6/torchdyn/numerics/utils.py": "e94170ae229c18b9d0700a0e72f18a19f538b50a51accfea630eeb41f1795c8a",
+    "generators/vendor/torchdyn_numerics.py": "a769a2f6c87b283adb2be8c1627f92debfcd2059323ad965d7c8e5ebe5f8ebf1"
+  },
+  "validation_artifacts": {
+    "evidence/icfm_training.json": "b5a605a6dc95c9e573f051b5a3ccf7c0f874571d54fcdbd3cbefef79a805eb4f",
+    "evidence/dt_training.json": "80305d695814e5ae5c84d5cb2f770e28c895a229cf7882eee4e60316daed4755",
+    "evidence/d_training.json": "46d5498a57d4bc1bce5aecd4bb07d2a59da021d6f37369ae0033ca7be4353d9e",
+    "evidence/mbgan_training.json": "f7226a525f1b8b060b22ea769d0d9a5970bd2fbc15df2f0350263beac6933670",
+    "evidence/reproduction.json": "e5bd85454873cc68fb4510f8bae4504de847dc71d422fdafefa370c91f4e73c6",
+    "evidence/runtime_environment.json": "40dbf46747f3a322dea7967c94b82e824f59fb8dec0e85dd86384df5f4197c47",
+    "evidence/mbgan_independent_validation.json": "d1c709ac9cf40c76154b206954ed28a11d1ee561a3fee06f535f0d5aa3b100dc"
+  },
+  "reproduction_evidence": "evidence/reproduction.json",
+  "mbgan_variant_choice": "retrospective_restoration_after_reviewing_prior_results"
+}

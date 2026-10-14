@@ -1,0 +1,31 @@
+{
+  "status": "passed",
+  "iterations": 500000,
+  "training_rows": 1166,
+  "source_sha256": "0dc96019fc7b5b98cc694173a1951ad3eb1e378ac3d1d09d4b44d9888d636046",
+  "initial_generator_tensor_sha256": "07cf001df6a3bdf6ba53a6f98d5b94579fae13e836a9d86dfc00074a3159b1b6",
+  "initial_critic_tensor_sha256": "4c353470e4c9760e2d4f72b228391ad4328fb33f33f874b815bcaf088b7200a4",
+  "final_generator_tensor_sha256": "6e937a07323d650ef2f6bec0d9650f21507813c29d6a0853ccbcc971f685839c",
+  "final_critic_tensor_sha256": "3fa26d491debd0284df48a6f0867c8762ed467a661ac9232bce85e35a3c4ca01",
+  "final_optimizer_tensor_sha256": "c169945e8b9321ac87098dd15834e867207904ec4d88c1f88a43da463194be47",
+  "all_loss_history_exact": true,
+  "all_generator_and_critic_tensors_exact": true,
+  "all_optimizer_tensors_exact": true,
+  "callback_history_exact": true,
+  "recorded_rng_state_and_replay_position_exact": true,
+  "tensorflow_checkpoint_resume_supported": false,
+  "samples_shape": [
+    1000,
+    123
+  ],
+  "samples_sha256": "9dd567ba828780615ebe3bbd6a5ca80bd4383e9ee1d528ede8c071a65ba016c7",
+  "samples_byte_exact": true,
+  "warmed_iteration_seconds": [
+    0.06315061972037898,
+    0.06339339553693409
+  ],
+  "estimated_hours_500k": [
+    8.770919405608192,
+    8.804638269018623
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "status": "passed",
-  "scope": "120-step implementation checks only; full 500000-iteration reproduction pending",
+  "scope": "120-step implementation checks; separate completed 500000-iteration evidence is in historical_mbgan_full_validation.json",
   "source_sha256": "0dc96019fc7b5b98cc694173a1951ad3eb1e378ac3d1d09d4b44d9888d636046",
   "legacy_parity": {
     "final_generator_tensor_sha256_equal": true,
@@ -43,5 +43,6 @@
     ]
   },
   "callback_interval_for_smoke": 50,
-  "callback_interval_for_full_run": 10000
+  "callback_interval_for_full_run": 10000,
+  "full_validation": "historical_mbgan_full_validation.json"
 }

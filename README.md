@@ -13,7 +13,7 @@ initialization; DT uses stabilized Beta maximum-likelihood fits and D uses a
 Dirichlet maximum-likelihood fit. Historical neural checkpoints are not inputs.
 See [generator documentation](generators/README.md).
 
-## Selected final code
+## Final code and completed results
 
 The **historical local MBGAN implementation** is the selected final code, with
 its diagnostic callback randomness made reproducible. Implementation checks
@@ -21,17 +21,22 @@ passed: two independent 120-iteration fits agreed exactly, and the wrapper
 matched the original training loop's parameters and optimizer states.
 See the [implementation validation](reproducibility/historical_mbgan_implementation_validation.json).
 
-**Full 500,000-iteration reproduction and updated results are pending.** Job
-58514810 runs two complete fitting sequences, followed by BATTS and report
-generation. This code release contains the preserved real inputs and the
-selected workflow; it does not contain synthetic matrices or reports from a
-different MBGAN implementation. The preceding validated results remain available
-at [commit b009075](https://github.com/yuliangxu/TwoSample/tree/b00907514c3bbb7ab17c4eeacc5091ab4f441d8a).
-The [code release manifest](code_release_manifest.json) records this release's
-scope and file hashes. Verify the packaged code and inputs with:
+**Full reproduction, BATTS analysis, and figure generation passed.** Job
+58514810 completed successfully in 9 hours, 4 minutes, 29 seconds. Both complete
+fitting sequences reproduced all four generators exactly; the two MBGAN fits
+each reached 500,000 iterations with identical recorded losses, generator and
+critic arrays, optimizer arrays, explicit Python/NumPy states, and synthetic
+samples. The final report was generated on 14 October 2026 at 03:56 UTC
+(13 October at 23:56 EDT).
+
+Read the [final report](results/final/case_study_report.pdf),
+[regenerated figures](results/final/figures/), and
+[full validation](reproducibility/historical_mbgan_full_validation.json).
+The [release manifest](release_manifest.json) binds the code, all six input
+matrices, training evidence, and results. Verify the release with:
 
 ```sh
-python3 scripts/verify_code_release.py
+python3 scripts/verify_from_training_release.py
 ```
 
 The earlier `ibdmdb_case_study_report.pdf` used a fresh 500,000-iteration fit
@@ -60,22 +65,27 @@ preserves the other generators, real-data preprocessing, split, and BATTS recipe
 
 ## Results and completion
 
-A completed run contains eight comparisons, 24 estimator fits, the null
-diagnostic, seven figures, and a ten-page report. Its final `COMPLETE` marker
-requires numerical, provenance, and PDF validation, in addition to training.
-The new report and figures will be exported only after those checks pass.
-Current [verification records](reproducibility/README.md) distinguish the passed
-implementation checks from the pending complete run.
+The completed run contains eight comparisons, 24 estimator fits, the null
+diagnostic, seven regenerated figures, and a ten-page report. Its final
+`COMPLETE` marker confirms numerical, provenance, and PDF validation in addition
+to training. All 292 null diagnostic intervals cover zero.
+
+For MBGAN's test comparison, none of the pointwise 95% posterior intervals
+exclude zero (0/292 real observations and 0/1,000 generated observations).
+Mean absolute posterior-mean log density ratios are 0.1825404 and 0.1829537,
+respectively. These are results of the newly trained pooled-data model;
+pointwise intervals do not establish global distributional equality or training
+stability across seeds. See the [verification records](reproducibility/README.md).
 
 | Figure | Content |
 | --- | --- |
-| 6 | Test PCoA comparison |
-| 7 | Test density-ratio summaries |
-| S8 | Training PCoA comparison |
-| S9 | Training density-ratio summaries |
-| S10 | Training posterior mean and quantile grids |
-| S11 | Test posterior mean and quantile grids |
-| S12 | Held-out real-data null diagnostic |
+| [6](results/final/figures/figure6_ggplot2.pdf) | Test PCoA comparison |
+| [7](results/final/figures/figure7_ggplot2.pdf) | Test density-ratio summaries |
+| [S8](results/final/figures/figureS8_ggplot2.pdf) | Training PCoA comparison |
+| [S9](results/final/figures/figureS9_ggplot2.pdf) | Training density-ratio summaries |
+| [S10](results/final/figures/figureS10_ggplot2.pdf) | Training posterior mean and quantile grids |
+| [S11](results/final/figures/figureS11_ggplot2.pdf) | Test posterior mean and quantile grids |
+| [S12](results/final/figures/figureS12_ggplot2.pdf) | Held-out real-data null diagnostic |
 
 ## Install
 
@@ -117,16 +127,16 @@ seeds and update counts are recorded, without claiming to checkpoint its
 internal random-operation counters. Exact equality is scoped to the recorded
 hardware and software environment.
 
-After the completed results have been exported, compare a newly generated bank
-with its reference data and parameter hashes:
+Compare a newly generated bank with the released reference data and parameter
+hashes:
 
 ```sh
 python3 scripts/verify_training_reference.py output/generated/data
 ```
 
-This reference comparison is unavailable in the present code-only release;
-the generation command itself still checks exact agreement between its two
-fresh replicas.
+The reference is bound by [data/generation_manifest.json](data/generation_manifest.json)
+and the [training evidence](data/evidence/). The generation command also checks
+exact agreement between its two fresh replicas.
 
 Refit all eight BATTS comparisons and the null experiment, render all seven
 figures, and build the report:
@@ -156,8 +166,8 @@ Rscript scripts/reprocess_microbiome.R
 
 This validates every float32 value against the preserved numerical checksums.
 The [preprocessing provenance](data/provenance/README.md) documents the filters,
-unrecovered split seed, and ambiguous duplicate source profiles. Once the new
-release is exported, verify its source, inputs, results, and evidence with:
+unrecovered split seed, and ambiguous duplicate source profiles. Verify the
+released source, inputs, results, and evidence with:
 
 ```sh
 python3 scripts/verify_from_training_release.py
@@ -195,5 +205,7 @@ Please cite curatedMetagenomicData and the four source studies listed in
 [generator notices](generators/README.md). The pooled data contain observations
 from IBDMDB (931), T2D (277), Hall (209), and Hannigan (41).
 
-Earlier checkpoint-based and connected-gradient-penalty results are preserved
-separately from this selected implementation.
+The selected code before full-run completion is preserved at
+[commit fc7f6fa](https://github.com/yuliangxu/TwoSample/tree/fc7f6fa21e3b834b3be1ff459a473be9c7f30c88).
+Earlier connected-gradient-penalty results remain at
+[commit b009075](https://github.com/yuliangxu/TwoSample/tree/b00907514c3bbb7ab17c4eeacc5091ab4f441d8a).

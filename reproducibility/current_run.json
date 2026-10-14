@@ -1,6 +1,4 @@
 {
-  "status_at_publication": "running",
-  "recorded_utc": "2026-10-13T19:00:42.304978+00:00",
   "job_id": "58514810",
   "run_root": "/cwork/yx306/TwoSample-historical-mbgan-full-20261013",
   "independent_full_runs": 2,
@@ -36,9 +34,17 @@
     "generators/vendor/torchdyn_numerics.py": "a769a2f6c87b283adb2be8c1627f92debfcd2059323ad965d7c8e5ebe5f8ebf1"
   },
   "pretrained_model_inputs": [],
-  "full_training_validation": "pending",
-  "updated_results_included": false,
-  "expected_figures": "/cwork/yx306/TwoSample-historical-mbgan-full-20261013/analysis/figures",
-  "expected_report": "/cwork/yx306/TwoSample-historical-mbgan-full-20261013/analysis/case_study_report.pdf",
-  "scope": "Execution record at publication time; scheduler status can subsequently change. Full completion requires both independent fits and downstream validation."
+  "full_training_validation": "passed",
+  "updated_results_included": true,
+  "scope": "Both complete independent fitting sequences matched exactly; downstream BATTS fits, seven figures, and report passed validation.",
+  "status": "completed",
+  "job_state": "COMPLETED",
+  "job_exit_code": "0:0",
+  "job_elapsed": "09:04:29",
+  "completed_utc": "2026-10-14T03:56:06.291202+00:00",
+  "figures": "/cwork/yx306/TwoSample-historical-mbgan-full-20261013/analysis/figures",
+  "report": "/cwork/yx306/TwoSample-historical-mbgan-full-20261013/analysis/case_study_report.pdf",
+  "report_sha256": "464395c46d43135618c9d73b0e2031429de06e43238e9a3358d250948d614fc6",
+  "generation_manifest_sha256": "bfbd7653761e2664a289ccecf9bbb991875946c66aefc07aac4fedd6be953faf",
+  "mbgan_sample_sha256": "9dd567ba828780615ebe3bbd6a5ca80bd4383e9ee1d528ede8c071a65ba016c7"
 }

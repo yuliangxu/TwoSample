@@ -8,10 +8,13 @@ historical checkpoint, or a prior synthetic matrix. The final prescribed
 variant is the **selected final MBGAN implementation**. Two independent
 120-iteration implementation checks passed, including exact parity with the
 original training loop's parameters and optimizer states.
-**Full 500,000-iteration reproduction and updated analysis are pending** in
-job 58514810. This release contains code and real inputs; the preceding
-implementation's results are preserved at
-[commit b009075](https://github.com/yuliangxu/TwoSample/tree/b00907514c3bbb7ab17c4eeacc5091ab4f441d8a).
+**Both full 500,000-iteration fits and the updated analysis passed** in job
+58514810. The full recorded loss trajectories, generator and critic arrays,
+optimizer arrays, explicit Python/NumPy states, and final synthetic CSVs agreed
+exactly between independent runs. See the
+[full validation](../reproducibility/historical_mbgan_full_validation.json),
+[training evidence](../data/evidence/mbgan_independent_validation.json), and
+[final report](../results/final/case_study_report.pdf).
 
 ## Which earlier report used which MBGAN?
 
@@ -117,12 +120,18 @@ counts; they do not claim to preserve its internal random-operation counters
 or support mid-training resume. Finite losses and parameters are not a claim
 that every gradient was separately inspected.
 
-When both complete fits pass, these checks establish reproducibility in the
-recorded environment. The passed short checks alone do not validate the full
-500,000-iteration trajectory. The checks do
+Both complete fits passed these checks, establishing reproducibility of the
+full 500,000-iteration trajectory in the recorded environment. The checks do
 not establish stability across seeds, convergence of the adversarial objective,
-or agreement between generated and real distributions. BATTS and descriptive
-figures must be interpreted from the completed new run itself.
+or agreement between generated and real distributions.
+
+The regenerated BATTS test comparison has no pointwise 95% posterior intervals
+excluding zero among either the 292 real observations or the 1,000 generated
+observations. Their mean absolute posterior-mean log density ratios are
+0.1825404 and 0.1829537, respectively. These pointwise summaries do not constitute
+a global distributional-equality test. The [figures](../results/final/figures/)
+and report use this completed pooled-data run, with the models displayed in
+the order D, DT, ICFM, MBGAN.
 
 ## Provenance and outputs
 
