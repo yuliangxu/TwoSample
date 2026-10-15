@@ -32,11 +32,14 @@ remain available upstream.
   exporting each split: 1,166 training rows and 292 testing rows, each with
   123 columns. CSV text formatting need not be byte-for-byte identical.
 
-The original `scripts/microbiome_subset.R` filters the full merged collection:
+The selection helper `scripts/microbiome_subset.R` filters the full merged collection:
 samples first require total abundance at least 99; taxa require mean abundance
-at least 0.1 among those samples. Samples are then retained if over 10% of
-retained taxa have zero abundance and their retained-taxon mean is at least
-the across-sample mean. The reconstruction script uses the audited final
+at least 0.1 among those samples. Samples are then retained if their
+retained-taxon mean is at least the across-sample mean. The former requirement
+that over 10% of retained taxa have zero abundance has been removed: it was
+redundant for the audited source observations. Removing it leaves the preserved
+training/testing matrices and analysis results unchanged.
+The reconstruction script uses the audited final
 taxon/sample selection, so it need not download unrelated studies or rerun
 collection-wide thresholds that could change with future package releases.
 
