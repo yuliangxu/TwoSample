@@ -17,10 +17,10 @@ import torch
 from torch import nn
 
 from .tree import TreeTransform
+from .cohort import external_path
 from .vendor.torchdyn_numerics import integrate
 
 PACKAGE = Path(__file__).resolve().parent
-DEFAULT_TREE = PACKAGE / "assets" / "tree"
 FORMAT = "twosample.icfm.from_training.v2"
 
 
@@ -106,6 +106,7 @@ def save_json(path: Path, value):
 
 
 def output_guard(path: Path):
+    external_path(path, "Generator output")
     if path.exists() or path.with_suffix(path.suffix + ".metadata.json").exists():
         raise FileExistsError(f"Output exists: {path}; choose a new path")
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -295,8 +296,8 @@ def main():
     for name in ["train", "sample"]:
         command = commands.add_parser(name)
         command.add_argument("--output", type=Path, required=True)
-        command.add_argument("--tree", type=Path, default=DEFAULT_TREE)
-        command.add_argument("--train", type=Path, default=PACKAGE.parent/"data/sample_train.csv")
+        command.add_argument("--tree", type=Path, required=True)
+        command.add_argument("--train", type=Path, required=True)
         command.add_argument("--seed", type=int, default=2 if name == "sample" else 20261003)
         command.add_argument("--device", choices=["cpu"], default="cpu")
         command.add_argument("--threads", type=int, default=2)

@@ -5,9 +5,9 @@ script_file <- gsub("~+~", " ", sub("^--file=", "", file_arg[[1]]), fixed = TRUE
 root <- dirname(dirname(normalizePath(script_file)))
 source(file.path(root, "scripts", "lib", "case_study_config.R"))
 source(file.path(root, "scripts", "lib", "figure_order.R"))
-run <- Sys.getenv("TWO_SAMPLE_RUN_ROOT", file.path(root, "output", "final"))
-data_dir <- Sys.getenv("TWO_SAMPLE_DATA_DIR", file.path(root, "data"))
-figure_dir <- Sys.getenv("TWO_SAMPLE_FIGURE_DIR", file.path(run, "figures"))
+run <- runtime_path("TWO_SAMPLE_RUN_ROOT")
+data_dir <- runtime_path("TWO_SAMPLE_DATA_DIR")
+figure_dir <- runtime_path("TWO_SAMPLE_FIGURE_DIR", file.path(run, "figures"))
 stopifnot(identical(readLines(file.path(run, "BATTS_commit.txt")), case_study$batts_commit))
 # Numerical completion also requires hash-bound training and independent-rerun evidence.
 python <- Sys.getenv("TWO_SAMPLE_PYTHON", "python3")
@@ -15,6 +15,9 @@ status <- system2(python, c(shQuote(file.path(root, "scripts", "prepare_run.py")
                            "--run-root", shQuote(run), "--verify-generation-only"))
 if (status != 0) stop("From-training generator provenance validation failed.")
 generation_manifest <- file.path(run, "generation", "generation_manifest.json")
+participant <- jsonlite::read_json(file.path(run, "provenance", "participant_overlap.json"),
+                                   simplifyVector = TRUE)
+stopifnot(isTRUE(participant$metadata_available))
 intervals <- diagnostics <- list()
 validated_fits <- 0L
 for (split in c("train", "test")) for (key in case_study$keys) {
@@ -57,10 +60,12 @@ for (split in c("train", "test")) for (key in case_study$keys) {
 ci <- do.call(rbind, intervals)
 cv <- do.call(rbind, diagnostics)
 stopifnot(nrow(ci) == 16L, nrow(cv) == 16L, validated_fits == 24L)
-null_dir <- Sys.getenv("TWO_SAMPLE_NULL_OUTPUT", file.path(run, "null"))
+null_dir <- runtime_path("TWO_SAMPLE_NULL_OUTPUT", file.path(run, "null"))
 null <- read.csv(file.path(null_dir, "test_pointwise_credible_intervals.csv"))
 null_fit <- readRDS(file.path(null_dir, "null_experiment_fit.rds"))
 null_expected <- list(commit = case_study$batts_commit, settings = case_study$null,
+  cohort_id = case_study$cohort_id,
+  training_config_sha256 = case_study$training_config_sha256,
   seed = case_study$null_seed,
   source_hashes = case_study_sources(root, "run_figure_S12_null_experiment.R"),
   inputs = unname(tools::md5sum(file.path(data_dir, paste0("sample_", c("train", "test"), ".csv")))))
@@ -72,6 +77,16 @@ stopifnot(identical(null_fit$fingerprint, null_expected), nrow(null) == case_stu
 null_quantiles <- t(apply(null_fit$log_ratio_draws, 1, quantile, probs=c(.025,.975)))
 stopifnot(max(abs(null_quantiles - as.matrix(null[,c("ci_lower_025","ci_upper_975")]))) < 1e-10,
           identical(null$covers_zero, null$ci_lower_025 <= 0 & null$ci_upper_975 >= 0))
+null_train_sizes <- tabulate(null_fit$train_fold + 1L, nbins = 2L)
+null_test_sizes <- tabulate(null_fit$test_fold + 1L, nbins = 2L)
+null_design <- jsonlite::read_json(file.path(null_dir, "null_design.json"), simplifyVector = TRUE)
+stopifnot(length(null_fit$train_fold) == case_study$dimensions[["train"]],
+          length(null_fit$test_fold) == nrow(null), all(null_fit$train_fold %in% 0:1),
+          all(null_fit$test_fold %in% 0:1), identical(null_fit$test_fold, null$test_fold),
+          diff(range(null_train_sizes)) <= 1L, diff(range(null_test_sizes)) <= 1L,
+          identical(null_design$training_group_sizes, null_train_sizes),
+          identical(null_design$test_group_sizes, null_test_sizes),
+          identical(null_design$cohort_id, case_study$cohort_id))
 figures <- file.path(figure_dir, paste0("figure", case_study$figures, "_ggplot2.pdf"))
 stopifnot(all(file.exists(figures)), all(file.info(figures)$size > 1000))
 for (path in figures) {
@@ -83,6 +98,7 @@ for (path in figures) {
 write.csv(ci, file.path(run, "interval_summary.csv"), row.names = FALSE)
 write.csv(cv, file.path(run, "boosting_cv_summary.csv"), row.names = FALSE)
 validation <- list(BATTS_commit = case_study$batts_commit, BATTS_version = case_study$batts_version,
+  cohort_id = case_study$cohort_id, training_config_sha256 = case_study$training_config_sha256,
   model_order = case_study$keys, display_order = figure_keys,
   all_generators_trained_from_scratch = TRUE,
   independent_training_reproductions_verified = 4L,
@@ -92,6 +108,7 @@ validation <- list(BATTS_commit = case_study$batts_commit, BATTS_version = case_
   generated_per_model = case_study$dimensions[["generated"]],
   validated_comparisons = 8L, validated_estimator_fits = validated_fits,
   validated_figures = length(figures), null_intervals = nrow(null),
+  null_training_group_sizes = null_train_sizes, null_test_group_sizes = null_test_sizes,
   null_intervals_containing_zero = sum(null$ci_lower_025 <= 0 & null$ci_upper_975 >= 0),
   boosting_at_search_limit = sum(cv$selected_at_search_limit),
   figure_md5 = as.list(setNames(unname(tools::md5sum(figures)), basename(figures))))
@@ -99,8 +116,10 @@ jsonlite::write_json(validation, file.path(run, "analysis_validation.json"),
                      pretty = TRUE, auto_unbox = TRUE, digits = NA)
 lines <- c("# Final microbiome case study", "",
   sprintf("BATTS %s, source commit `%s`.", case_study$batts_version, case_study$batts_commit), "",
-  "Original pooled preprocessing and split: 1,166 training observations, 292 test observations, 123 taxa. Each generator contributes 1,000 compositions. Figure and report order: D, DT, ICFM, MBGAN.", "",
-  "All four generators are fitted from the original 1,166 training rows using frozen recipes. ICFM and MBGAN start from seeded random initialization and use their final planned update; no test rows enter generator training or a new seed/checkpoint search. The historical local MBGAN variant was restored retrospectively after inspecting earlier reports. Generation provenance and reproduction evidence must pass validation before completion.", "",
+  sprintf("Corrected four-study cohort: %d training observations, %d test observations, %d taxa. Each generator contributes %d compositions. Figure and report order: D, DT, ICFM, MBGAN.", case_study$dimensions[["train"]], case_study$dimensions[["test"]], case_study$dimensions[["taxa"]], case_study$dimensions[["generated"]]), "",
+  sprintf("The cohort includes %d participants, of whom %d occur in both splits; %d/%d test observations have a participant represented in training. This observation-level comparison does not assess generalization to previously unseen participants.", participant$unique_participants, participant$shared_participants, participant$test_observations_with_training_participant, case_study$dimensions[["test"]]), "",
+  "This analysis supersedes the historical cohort selected using a misaligned positional metadata mask. Eligible observations from the four studies are selected by sample identity, then split by observation with test fraction 0.2 and seed 1. Participants may occur in both splits.", "",
+  "All four generators are refitted from the corrected training rows using frozen recipes. ICFM and MBGAN start from seeded random initialization and use their final planned update; no test rows enter generator training or a new seed/checkpoint search. The historical local MBGAN variant was restored retrospectively after inspecting earlier reports and is retained for this corrected-cohort analysis. Generation provenance and reproduction evidence must pass validation before completion.", "",
   "All eight train/test comparisons are independently fitted. Test density-ratio analyses use the real test observations themselves; they are not predictions from a density-ratio estimator fitted on the training comparison.", "",
   "The previous protocol is explicit: 200 trees, 2,000 burn-in and 1,000 retained iterations, thinning 1, fixed lambda 5, seed 1. Boosting uses five-fold CV, up to 1,000 trees, depth 4, learning rate 0.01, 32 bins, and subsample_fraction = 1. See settings.json for all arguments.", "",
   "## Real-test descriptive summaries", "",
@@ -115,8 +134,17 @@ lines <- c(lines, "",
   "These pointwise posterior intervals are descriptive. Inclusion of zero does not establish distributional equality; one null experiment does not establish a repeated-sampling coverage guarantee.", "",
   sprintf("Null intervals containing zero: %d/%d. Boosting fits at the 1,000-tree cap: %d/16.",
     validation$null_intervals_containing_zero, nrow(null), validation$boosting_at_search_limit), "",
-  "Preprocessing is collection-wide. The original split is by observation and does not establish participant-level separation. Figures 6, 7, S8 and S9 use corrected Bray-Curtis PCoA; S10/S11 retain classical uncorrected PCoA. Posterior intervals are pointwise.", "",
+  sprintf("Null training-group sizes are %d and %d; test-fold sizes are %d and %d. These are balanced within one observation.", null_train_sizes[[1]], null_train_sizes[[2]], null_test_sizes[[1]], null_test_sizes[[2]]), "",
+  "Preprocessing is collection-wide. The corrected split is by observation and does not establish participant-level separation. Figures 6, 7, S8 and S9 use corrected Bray-Curtis PCoA; S10/S11 retain classical uncorrected PCoA. Panel (c) uses 20 generated-bank indices; matching indices across generators refer to different compositions. Posterior intervals concern finite evaluated observations, not the full support.", "",
   "All eight comparison tables, 24 estimator fingerprints, the null diagnostic, and seven PDF signatures passed validation. analysis_validation.json records the checks.")
+lines <- c(lines, "", "## Mean interval widths (training / testing)", "",
+  "| Generator | Real observations | Generated observations |", "| --- | ---: | ---: |")
+for (key in figure_keys) {
+  widths <- function(group) sprintf("%.6f / %.6f",
+    ci$mean_interval_width[ci$split == "train" & ci$generator == key & ci$source == group],
+    ci$mean_interval_width[ci$split == "test" & ci$generator == key & ci$source == group])
+  lines <- c(lines, sprintf("| %s | %s | %s |", case_study$labels[[key]], widths("Real"), widths("Generated")))
+}
 writeLines(lines, file.path(run, "REPORT.md"))
 writeLines(format(Sys.time(), tz = "UTC", usetz = TRUE), file.path(run, "ANALYSIS_COMPLETE"))
 print(ci, row.names = FALSE)

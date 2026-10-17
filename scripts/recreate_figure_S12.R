@@ -3,13 +3,14 @@ file_arg <- grep("^--file=", commandArgs(FALSE), value = TRUE)
 script_path <- gsub("~+~", " ", sub("^--file=", "", file_arg[[1]]), fixed = TRUE)
 script_dir <- dirname(normalizePath(script_path, mustWork = TRUE))
 project_root <- normalizePath(file.path(script_dir, ".."))
+source(file.path(script_dir, "lib", "case_study_config.R"))
 suppressPackageStartupMessages(library(ggplot2))
 
 args <- commandArgs(trailingOnly = TRUE)
-results_dir <- Sys.getenv("TWO_SAMPLE_FIGURE_DIR", file.path(project_root, "output", "final", "figures"))
+results_dir <- runtime_path("TWO_SAMPLE_FIGURE_DIR", file.path(runtime_path("TWO_SAMPLE_RUN_ROOT"), "figures"))
 dir.create(results_dir, recursive = TRUE, showWarnings = FALSE)
 interval_path <- if (length(args)) normalizePath(gsub("~+~", " ", args[[1]], fixed = TRUE), mustWork = TRUE) else
-  Sys.getenv("TWO_SAMPLE_NULL_INTERVALS", file.path(project_root, "results", "final", "null", "test_pointwise_credible_intervals.csv"))
+  runtime_path("TWO_SAMPLE_NULL_INTERVALS", file.path(runtime_path("TWO_SAMPLE_RUN_ROOT"), "null", "test_pointwise_credible_intervals.csv"))
 if (!file.exists(interval_path)) stop("Missing interval table: ", interval_path)
 
 results <- read.csv(interval_path)

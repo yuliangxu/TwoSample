@@ -8,8 +8,10 @@ import numpy as np
 
 try:
     from .mbgan import array_hash, sha256, SCHEMA, HISTORICAL_SOURCE, HISTORICAL_SOURCE_SHA256
+    from .cohort import training_configuration, external_path
 except ImportError:
     from mbgan import array_hash, sha256, SCHEMA, HISTORICAL_SOURCE, HISTORICAL_SOURCE_SHA256
+    from cohort import training_configuration, external_path
 
 
 def validate_run(path):
@@ -58,6 +60,7 @@ def main():
     parser.add_argument("--samples-b", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+    external_path(args.output, "MBGAN validation output")
     if args.output.exists():
         raise FileExistsError(args.output)
     cfg_a, result_a, tensors_a = validate_run(args.run_a)
@@ -88,7 +91,10 @@ def main():
         assert not b.readline(), "Second history is longer"
     assert counts == cfg_a["iterations"]
     samples_a, samples_b = np.loadtxt(args.samples_a, delimiter=","), np.loadtxt(args.samples_b, delimiter=",")
-    assert samples_a.shape == (1000, cfg_a["taxa"])
+    protocol = training_configuration()
+    assert cfg_a["training_rows"] >= 2 and cfg_a["taxa"] >= 2
+    assert cfg_a["iterations"] == protocol["models"]["mbgan"]["iterations"]
+    assert samples_a.shape == (protocol["generated_rows"], cfg_a["taxa"])
     assert np.array_equal(samples_a, samples_b)
     assert sha256(args.samples_a) == sha256(args.samples_b)
     assert np.isfinite(samples_a).all() and (samples_a >= 0).all()

@@ -11,11 +11,11 @@ stopifnot(length(workers) == 1L, !is.na(workers), workers >= 1L)
 source(file.path(script_dir, "lib", "case_study_config.R"))
 check_case_study_batts()
 commit <- case_study$batts_commit
-run_root <- Sys.getenv("TWO_SAMPLE_RUN_ROOT", file.path(project_root, "output", "final"))
+run_root <- runtime_path("TWO_SAMPLE_RUN_ROOT")
 dir.create(run_root, recursive = TRUE, showWarnings = FALSE)
 writeLines(commit, file.path(run_root, "BATTS_commit.txt"))
 writeLines(capture.output(sessionInfo()), file.path(run_root, "sessionInfo.txt"))
-data_dir <- Sys.getenv("TWO_SAMPLE_DATA_DIR", file.path(project_root, "data"))
+data_dir <- runtime_path("TWO_SAMPLE_DATA_DIR")
 inputs <- file.path(data_dir, paste0("sample_", c("train", "test", case_study$keys), ".csv"))
 write.csv(data.frame(file = basename(inputs), md5 = unname(tools::md5sum(inputs))),
           file.path(run_root, "input_checksums.csv"), row.names = FALSE)
@@ -24,6 +24,8 @@ source_hashes <- case_study_sources(project_root, "refit_case_study.R")
 dput(settings, file.path(run_root, "settings.R"))
 jsonlite::write_json(list(batts_repository = settings$batts_repository,
   batts_commit = commit, batts_version = settings$batts_version,
+  dimensions = as.list(settings$dimensions), cohort_id = settings$cohort_id,
+  training_config_sha256 = settings$training_config_sha256,
   model_order = settings$keys, seed = settings$seed, bayes = settings$bayes,
   boosting = settings$boosting, null_seed = settings$null_seed, null = settings$null),
   file.path(run_root, "settings.json"), auto_unbox = TRUE, pretty = TRUE, digits = NA)

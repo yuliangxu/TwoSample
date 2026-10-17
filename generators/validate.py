@@ -1,4 +1,4 @@
-"""Check real inputs, code-only fitting assets, and verified training outputs."""
+"""Verify external cohort/tree assets and newly generated runtime evidence."""
 import argparse
 import hashlib
 import json
@@ -6,10 +6,11 @@ from pathlib import Path
 import sys
 
 import numpy as np
+from .cohort import cohort_binding, expected_rows, external_path, runtime_data
+from .tree import TreeTransform
 
 REPO = Path(__file__).resolve().parents[1]
 MODEL_ORDER = ("icfm", "dt", "d", "mbgan")
-TOLERANCES = {"icfm": 1e-6, "dt": 1e-8, "d": 1e-9, "mbgan": 1e-6}
 
 
 def sha256(path):
@@ -20,22 +21,9 @@ def sha256(path):
     return hasher.hexdigest()
 
 
-def verify_bundle():
-    """Verify preserved real inputs and taxonomy/solver assets; no fitted weights."""
-    manifest = json.loads((REPO / "generators/manifest.json").read_text())
-    verified = {}
-    for entry in manifest["files"]:
-        path = REPO / entry["path"]
-        checksum = sha256(path)
-        if checksum != entry["sha256"]:
-            raise ValueError(f"Bundled checksum mismatch: {entry['path']}")
-        verified[entry["path"]] = checksum
-    return verified
-
-
-def load(path, rows):
+def load(path, rows, taxa):
     values = np.loadtxt(path, delimiter=",")
-    if values.shape != (rows, 123):
+    if values.shape != (rows, taxa):
         raise ValueError(f"Unexpected matrix shape: {path}: {values.shape}")
     if not np.isfinite(values).all() or (values < 0).any() or (values > 1).any():
         raise ValueError(f"Invalid nonnegative compositions: {path}")
@@ -44,59 +32,45 @@ def load(path, rows):
     return values
 
 
-def compare_sample(path, model):
-    values = load(path, 1000)
-    reference_path = REPO / "data" / f"sample_{model}.csv"
-    reference = load(reference_path, 1000)
-    difference = float(np.max(np.abs(values - reference)))
-    checksum, reference_checksum = sha256(path), sha256(reference_path)
-    return {
-        "shape": list(values.shape),
-        "sha256": checksum,
-        "selected_csv_sha256": reference_checksum,
-        "exact_csv_match": checksum == reference_checksum,
-        "exact_numeric_match": bool(np.array_equal(values, reference)),
-        "max_absolute_difference": difference,
-        "absolute_tolerance": TOLERANCES[model],
-        "max_row_sum_error": float(np.max(np.abs(values.sum(axis=1) - 1))),
-        "passed": difference <= TOLERANCES[model],
-    }
+def verify_bundle(data_dir=None):
+    """Verify user-supplied inputs; the repository contains no data or tree."""
+    data = runtime_data(data_dir)
+    config, cohort = cohort_binding(REPO, data_dir=data)
+    for split in ("train", "test"):
+        load(data / f"sample_{split}.csv", config[f"{split if split == 'test' else 'training'}_rows"], config["taxa"])
+    tree = TreeTransform(data / "tree")
+    taxa = (data / "provenance/taxa.txt").read_text().splitlines()
+    if tree.out_taxa != taxa or tree.n_taxa != config["taxa"]:
+        raise ValueError("Runtime tree output order differs from the matrix taxonomy")
+    return cohort["files"]
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--data-dir", type=Path, default=REPO / "data")
-    parser.add_argument("--output", type=Path, default=REPO / "output/generators/validation")
-    parser.add_argument("--check-bundled-hashes", action="store_true",
-                        help="Compatibility flag; bundled hashes are always verified")
+    parser.add_argument("--data-dir", type=Path, required=True)
+    parser.add_argument("--output", type=Path, help="Optional new external verification JSON")
+    parser.add_argument("--inputs-only", action="store_true")
     args = parser.parse_args()
-    verified = verify_bundle()
-    real_data = {}
-    for split, rows in [("train", 1166), ("test", 292)]:
-        path = REPO / "data" / f"sample_{split}.csv"
-        values = load(path, rows)
-        real_data[split] = {"shape": list(values.shape), "sha256": sha256(path)}
-    inputs = {}
-    for key in ("train", "test", *MODEL_ORDER):
-        path = args.data_dir / f"sample_{key}.csv"
-        rows = {"train": 1166, "test": 292}.get(key, 1000)
-        values = load(path, rows)
-        inputs[path.name] = {"shape": list(values.shape), "sha256": sha256(path)}
-    sys.path.insert(0, str(REPO / "scripts"))
-    from prepare_run import validate_generation
-    manifest = validate_generation(args.data_dir / "generation_manifest.json", inputs, REPO)
-    report = {
-        "status": "complete",
-        "model_order": list(MODEL_ORDER),
-        "bundle_files_verified": len(verified),
-        "real_data": real_data,
-        "models": manifest["models"],
-        "scope": "Full training and generation independently repeated twice with identical outputs.",
-    }
-    args.output.mkdir(parents=True, exist_ok=True)
-    with (args.output / "validation.json").open("x") as handle:
-        json.dump(report, handle, indent=2)
-        handle.write("\n")
+    data = runtime_data(args.data_dir)
+    verified = verify_bundle(data)
+    config, _ = cohort_binding(REPO, data_dir=data)
+    report = dict(status="verified", cohort_id=config["cohort_id"], runtime_files_verified=len(verified))
+    if not args.inputs_only:
+        inputs = {}
+        for key, count in expected_rows(config).items():
+            path = data / f"sample_{key}.csv"
+            values = load(path, count, config["taxa"])
+            inputs[path.name] = dict(shape=list(values.shape), sha256=sha256(path))
+        sys.path.insert(0, str(REPO / "scripts"))
+        from prepare_run import validate_generation
+        manifest = validate_generation(data / "generation_manifest.json", inputs, REPO, data_dir=data)
+        report.update(models=manifest["models"], independent_full_training_runs=2)
+    if args.output:
+        target = external_path(args.output, "Verification output")
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with target.open("x") as handle:
+            json.dump(report, handle, indent=2)
+            handle.write("\n")
     print(json.dumps(report, indent=2))
 
 

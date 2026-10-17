@@ -1,157 +1,41 @@
-# Historical local MBGAN trained from random initialization
+# Historical local MBGAN variant
 
-This route restores the local MBGAN implementation used for the earlier
-IBDMDB-only case study. It fits all 1,166 pooled training rows with 123 taxa,
-starting from random initialization, without reading the testing CSV, a
-historical checkpoint, or a prior synthetic matrix. The final prescribed
-500,000th iteration supplies the sampling weights. This historical local
-variant is the **selected final MBGAN implementation**. Two independent
-120-iteration implementation checks passed, including exact parity with the
-original training loop's parameters and optimizer states.
-**Both full 500,000-iteration fits and the updated analysis passed** in job
-58514810. The full recorded loss trajectories, generator and critic arrays,
-optimizer arrays, explicit Python/NumPy states, and final synthetic CSVs agreed
-exactly between independent runs. See the
-[full validation](../reproducibility/historical_mbgan_full_validation.json),
-[training evidence](../data/evidence/mbgan_independent_validation.json), and
-[final report](../results/final/case_study_report.pdf).
+This implementation fits a local research variant of MBGAN from random
+initialization. It preserves the attributed source in
+`vendor/historical_mbgan_model.py` and the GPL/MIT notices in `licenses/`.
+It is not a faithful implementation of the published WGAN-GP objective:
+the historical graph discards its gradient-penalty branch and applies no weight
+clipping. This variant was selected retrospectively in earlier work; its recipe
+is fixed before any new run, without test-based variant, seed, or checkpoint search.
 
-## Which earlier report used which MBGAN?
+The generator uses latent dimension 100, three width-512 Dense/BatchNorm/ReLU
+blocks and a softmax over runtime taxa. The critic aggregates taxonomy prefixes,
+applies `log(1+1000*x)/log(1001)`, then three width-256 Dense/LeakyReLU/dropout
+layers and a scalar output. The effective critic objective is mean(fake score)
+minus mean(real score); the generator minimizes minus mean(critic(fake)).
 
-| Earlier report | Real training / test rows | Taxa | MBGAN source |
-| --- | ---: | ---: | --- |
-| `ibdmdb_case_study_report.pdf` | 945 / 236 | 77 | Fresh 500,000-iteration fit of the historical local Keras 2.13.1 implementation |
-| `updated_generators_case_study_report.pdf` | 1,166 / 292 | 123 | Replay of an older 500,000-iteration generator checkpoint; no new neural training |
-
-The verified IBDMDB training source was
-`ibdmdb_20261003_f713917/historical_code/source/model.py`, with SHA-256
-`9efc755e7fdcc18310c5fe4405319134f5d6e25ea50afb0a7b776b6971968e18`.
-The byte-identical source is retained as
-[`vendor/historical_mbgan_model.py`](vendor/historical_mbgan_model.py). Its runner
-executed the historical model and notebook callback from a new initialization. That callback called `predict(seed=None)`, which invoked
-`np.random.seed(None)` every 10,000 iterations. Thus its initial seed did not
-make the whole trajectory reproducible. The restored callback uses an isolated
-seeded stream without changing the training RNG.
-
-The pooled report's checkpoint was
-`curated_comp_marginal_500000_generator.h5`, with SHA-256
-`457c13dbba3afefd1c0a7979eb6854118d25806143ac5306bd1543740eaf840f`.
-Its original training membership and complete trajectory are unknown. Neither
-that checkpoint nor the IBDMDB fitted weights are inputs to this workflow.
-
-Returning to the historical implementation after viewing earlier results is a
-retrospective method choice. The new run retains the fixed seed and final
-iteration without a new test-based seed or checkpoint search. Favorable results
-on the 77-taxon IBDMDB data do not establish stability or guarantee favorable
-results on the pooled 123-taxon data.
-
-## Commands and environment
-
-Use the separate environment pinned in `requirements-mbgan.txt`: Python 3.9.25,
-TensorFlow CPU 2.13.1, Keras 2.13.1, NumPy 1.24.3, and h5py 3.9.0. Training uses
-two intra-operation numerical threads and one inter-operation thread, enables
-oneDNN and deterministic TensorFlow operations, and disables GPU visibility.
-Run from the repository root:
+Use the separate pinned environment in `requirements-mbgan.txt`, including
+TensorFlow CPU/Keras 2.13.1. The full recipe uses 500,000 generator updates,
+five critic updates each, batch 32, RMSprop rate `5e-5`, seed 1, two CPU numerical
+threads, oneDNN, and deterministic TensorFlow operations. Sampling uses the final
+prescribed update and seed 256; there is no post-sampling thresholding or
+renormalization. Diagnostic callbacks use isolated seeded RNG streams rather
+than reseeding the training stream from entropy.
 
 ```sh
 .venv-mbgan/bin/python -m generators.mbgan train \
-  --train data/sample_train.csv --taxonomy data/provenance/taxa.txt \
-  --output-dir output/mbgan --iterations 500000 --batch-size 32 \
-  --n-critic 5 --seed 1 --threads 2 --device cpu
+  --train /absolute/prepared-data/sample_train.csv \
+  --taxonomy /absolute/prepared-data/provenance/taxa.txt \
+  --output-dir /absolute/new-mbgan
 .venv-mbgan/bin/python -m generators.mbgan sample \
-  --checkpoint output/mbgan/generator.npz \
-  --output output/sample_mbgan.csv --n 1000 --seed 256 \
-  --batch-size 32 --threads 2 --device cpu
+  --checkpoint /absolute/new-mbgan/generator.npz \
+  --output /absolute/new-mbgan/sample.csv --n 1000 --seed 256
 ```
 
-Output paths must be new. A short implementation check may reduce the iteration
-count, but it cannot replace the final 500,000-iteration fit. The enclosing
-`generators.reproduce` workflow performs two full independent CPU fits,
-concurrently by default or sequentially with `--replica-workers 1`. Exact
-agreement is required within the recorded environment; fixed seeds do not
-promise identical results across library versions, processors, or thread counts.
-
-## Architecture and effective objective
-
-The restored model preserves the historical local source's construction order
-(critic before generator), compiled `train_on_batch` graphs, trainable-layer
-switches, built-in dropout, batch normalization, and RMSprop optimizers.
-
-- Generator: latent dimension 100; three width-512 Dense blocks with batch
-  normalization (momentum 0.8, epsilon 0.001) and ReLU; 123-dimensional softmax.
-  The first Dense also applies ReLU before batch normalization.
-- Critic: taxonomy-prefix aggregation, `log(1+1000*x)/log(1001)`, three width-256
-  Dense layers with LeakyReLU slope 0.2 and dropout 0.25, then a scalar output.
-- Effective critic objective: mean(fake score) minus mean(real score).
-  The historical source constructs a gradient-penalty branch but discards it;
-  the compiled critic has only real and fake outputs and no penalty losses.
-  There is **no effective gradient penalty and no weight clipping**.
-- Generator objective: minus mean(critic(fake)). Historical Keras layer modes
-  and state updates are retained through the original compiled graphs.
-- RMSprop: learning rate `5e-5`, rho `0.9`, epsilon `1e-7`, zero momentum,
-  uncentered. Five critic updates precede each generator update, using batches
-  of 32 observations sampled with replacement. The budget is 500,000 generator
-  updates and 2,500,000 critic updates.
-
-This is a **historical local MBGAN variant**, not a faithful implementation of
-the published WGAN-GP objective. The preceding TensorFlow 2.20 implementation
-connected the gradient penalty and used different training random streams;
-restoring this variant changes that procedure. Removing entropy reseeding also
-means the old IBDMDB trajectory is not recovered byte for byte.
-
-## Randomness and validation
-
-The training seed fixes Python, NumPy, and TensorFlow initialization. Training
-batch indices and latent draws follow the historical NumPy sequence; built-in
-Keras dropout remains in the compiled graphs. At each 10,000-iteration diagnostic interval, sampling uses a private NumPy
-`RandomState((training_seed + iteration) % 2**32)`. It preserves the Python and
-NumPy training states and does not reseed either stream from system entropy.
-Final sampling uses NumPy `RandomState(256)` Gaussian latent vectors in batches
-of 32, with the generator in inference mode. No thresholding or post-sampling
-renormalization is applied.
-
-The full reproduction gate compares two fresh fits, including every recorded
-iteration's losses, generator and critic arrays, optimizer arrays, explicitly
-saved Python and NumPy random states, and the final sample CSV. It also checks
-finite training losses and final arrays, changed parameters, training/source
-hashes, complete update counts, and exact save/reload sampling. Timings are
-excluded from equality. The records document TensorFlow graph seeds and update
-counts; they do not claim to preserve its internal random-operation counters
-or support mid-training resume. Finite losses and parameters are not a claim
-that every gradient was separately inspected.
-
-Both complete fits passed these checks, establishing reproducibility of the
-full 500,000-iteration trajectory in the recorded environment. The checks do
-not establish stability across seeds, convergence of the adversarial objective,
-or agreement between generated and real distributions.
-
-The regenerated BATTS test comparison has no pointwise 95% posterior intervals
-excluding zero among either the 292 real observations or the 1,000 generated
-observations. Their mean absolute posterior-mean log density ratios are
-0.1825404 and 0.1829537, respectively. These pointwise summaries do not constitute
-a global distributional-equality test. The [figures](../results/final/figures/)
-and report use this completed pooled-data run, with the models displayed in
-the order D, DT, ICFM, MBGAN.
-
-## Provenance and outputs
-
-Training records bind the training data, taxonomy, source, normalized input,
-initial and final model arrays, optimizers, dependencies, thread settings,
-randomness policy, per-iteration losses, and parameter changes. A completion
-record requires successful training and save/reload validation.
-
-`generator.npz` stores sampling weights with the immutable training
-configuration; `critic.npz` stores critic weights and `optimizer.npz` stores
-optimizer arrays. `training_history.jsonl` records all five critic-loss vectors
-and the generator loss per iteration; `callback_history.jsonl` records diagnostic
-sample hashes and sparsity. `training_state.*` preserves model and optimizer
-state. `rng_state.json` records Python/NumPy states and TensorFlow graph seeds
-and completed update counts; `rng_state.npy` separately records NumPy MT19937
-keys. These records support the independent-run comparison. The CLI starts
-fresh fits; sampling requires the NPZ and matching completion evidence from a
-completed fit. Historical HDF5 checkpoints cannot substitute for a training run.
-
-See [the generator workflow](README.md) for the full independent reproduction
-gate and [the verification records](../reproducibility/README.md) for completion
-status. [License and attribution notices](licenses/MBGAN-NOTICE.md) credit the
-public MB-GAN implementation and its Keras-contrib sources.
+Paths must be external and new. The [full workflow](README.md) trains twice,
+compares every loss step, model and optimizer arrays, callback outputs, saved RNG
+states, and generated sample bytes, and requires complete finite training and
+save/reload agreement. These are repeatability checks, not evidence of fidelity
+or convergence. Native checkpoints and all outputs are runtime artifacts, not
+repository contents. TensorFlow RNG replay positions do not constitute supported
+mid-training checkpoint resume.

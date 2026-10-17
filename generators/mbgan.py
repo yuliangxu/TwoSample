@@ -18,8 +18,7 @@ import numpy as np
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
-TRAIN = ROOT / "data/sample_train.csv"
-TAXA = ROOT / "data/provenance/taxa.txt"
+from .cohort import external_path
 SCHEMA = "mbgan_historical_from_training_v2"
 HISTORICAL_SOURCE = HERE / "vendor/historical_mbgan_model.py"
 HISTORICAL_SOURCE_SHA256 = "9efc755e7fdcc18310c5fe4405319134f5d6e25ea50afb0a7b776b6971968e18"
@@ -242,8 +241,8 @@ def train_command(args):
         raise ValueError("The historical recipe uses compiled Keras train_on_batch")
     if args.output_dir.exists():
         raise FileExistsError("Training requires a new output directory")
-    if args.train.resolve() == (ROOT / "data/sample_test.csv").resolve():
-        raise ValueError("The bundled testing split cannot be used for training")
+    if args.train.name == "sample_test.csv":
+        raise ValueError("The testing split cannot be used for training")
     # Exact historical input path: CSV float64 values, no new normalization.
     x = np.loadtxt(args.train, delimiter=",")
     taxa = [s.strip() for s in args.taxonomy.read_text().splitlines() if s.strip()]
@@ -388,8 +387,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
     train = commands.add_parser("train", help="fit a fresh model from random initialization")
-    train.add_argument("--train", type=Path, default=TRAIN)
-    train.add_argument("--taxonomy", type=Path, default=TAXA)
+    train.add_argument("--train", type=Path, required=True)
+    train.add_argument("--taxonomy", type=Path, required=True)
     train.add_argument("--output-dir", type=Path, required=True)
     train.add_argument("--iterations", type=int, default=500000)
     train.add_argument("--batch-size", type=int, default=32)
@@ -408,6 +407,7 @@ def main():
         sub.add_argument("--threads", type=int, default=2)
         sub.add_argument("--device", choices=["cpu", "gpu"], default="cpu")
     args = parser.parse_args()
+    external_path(args.output if args.command == "sample" else args.output_dir, "MBGAN output")
     if args.threads < 1:
         parser.error("--threads must be positive")
     sample_command(args) if args.command == "sample" else train_command(args)

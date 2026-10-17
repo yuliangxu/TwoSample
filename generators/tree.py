@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy as np
 from scipy.special import expit
 
-DEFAULT_TREE_DIR = Path(__file__).resolve().parent / "assets" / "tree"
+DEFAULT_TREE_DIR = None
 
 
 def _rows(path):
@@ -22,6 +22,8 @@ class TreeTransform:
     """Validated fixed tree with explicit preprocessing and inverse precision."""
 
     def __init__(self, directory=DEFAULT_TREE_DIR):
+        if directory is None:
+            raise ValueError("Supply an external tree directory; no tree assets are bundled")
         self.directory = Path(directory)
         children = _rows(self.directory / "childNode.csv")
         self.internal_nodes = [row[0] for row in children]

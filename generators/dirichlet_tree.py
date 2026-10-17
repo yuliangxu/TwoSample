@@ -17,7 +17,7 @@ from scipy.special import betaln, polygamma, psi
 
 from .tree import DEFAULT_TREE_DIR, TreeTransform
 
-DEFAULT_TRAIN = Path(__file__).resolve().parents[1]/"data"/"sample_train.csv"
+from .cohort import external_path
 FORMAT = "twosample-dirichlet-tree-v1"
 
 
@@ -130,16 +130,22 @@ def main():
     commands = parser.add_subparsers(dest="command",required=True)
     for command in ["fit","sample","fit-sample"]:
         sub = commands.add_parser(command)
-        sub.add_argument("--tree",type=Path,default=DEFAULT_TREE_DIR)
+        sub.add_argument("--tree",type=Path,required=True)
         sub.add_argument("--checkpoint",type=Path,required=True)
         if command!="sample":
-            sub.add_argument("--train",type=Path,default=DEFAULT_TRAIN)
+            sub.add_argument("--train",type=Path,required=True)
         if command!="fit":
             sub.add_argument("--output",type=Path,required=True)
             sub.add_argument("--n-samples",type=int,default=1000)
             sub.add_argument("--seed",type=int,default=1)
         sub.add_argument("--report",type=Path)
     args = parser.parse_args()
+    for name in ("checkpoint", "output", "report"):
+        path = getattr(args, name, None)
+        if path is not None:
+            external_path(path, name)
+            if path.exists() and not (name == "checkpoint" and args.command == "sample"):
+                raise FileExistsError(f"Refusing to overwrite {path}")
     tree = TreeTransform.from_directory(args.tree)
     if args.command!="sample":
         train = np.load(args.train) if args.train.suffix==".npy" else np.loadtxt(args.train,delimiter=",")

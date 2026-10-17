@@ -1,7 +1,8 @@
 """Portable recovered Newton Dirichlet fit and legacy NumPy sampler.
 
-The selected seed-1 output numerically reproduces the paper's Dirichlet sample
-within about 8.71e-11; it is not bitwise equal to that historical sample.
+The recovered fitting and seed-1 sampling recipe is retained, with parameters
+fitted afresh for the corrected cohort. Historical generated samples are not a
+reference target for these new inputs.
 Only --train is read for fitting, and no reference synthetic data are needed.
 """
 import argparse
@@ -15,7 +16,7 @@ import scipy
 from scipy.special import psi,polygamma
 
 FORMAT = "twosample-dirichlet-v1"
-DEFAULT_TRAIN = Path(__file__).resolve().parents[1]/"data"/"sample_train.csv"
+from .cohort import external_path
 
 
 def _moments_concentration(data,eps=1e-8):
@@ -131,13 +132,19 @@ def main():
         sub = commands.add_parser(command)
         sub.add_argument("--checkpoint",type=Path,required=True)
         if command!="sample":
-            sub.add_argument("--train",type=Path,default=DEFAULT_TRAIN)
+            sub.add_argument("--train",type=Path,required=True)
         if command!="fit":
             sub.add_argument("--output",type=Path,required=True)
             sub.add_argument("--n-samples",type=int,default=1000)
             sub.add_argument("--seed",type=int,default=1)
         sub.add_argument("--report",type=Path)
     args = parser.parse_args()
+    for name in ("checkpoint", "output", "report"):
+        path = getattr(args, name, None)
+        if path is not None:
+            external_path(path, name)
+            if path.exists() and not (name == "checkpoint" and args.command == "sample"):
+                raise FileExistsError(f"Refusing to overwrite {path}")
     if args.command!="sample":
         train = np.load(args.train) if args.train.suffix==".npy" else np.loadtxt(args.train,delimiter=",")
         alpha,metadata = fit(train)

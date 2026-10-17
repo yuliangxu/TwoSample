@@ -3,10 +3,11 @@
 file_arg <- grep("^--file=", commandArgs(FALSE), value = TRUE)
 script_file <- gsub("~+~", " ", sub("^--file=", "", file_arg[[1]]), fixed = TRUE)
 root <- dirname(dirname(normalizePath(script_file)))
+source(file.path(root, "scripts", "lib", "case_study_config.R"))
 args <- commandArgs(TRUE)
 workers <- if (length(args)) as.integer(args[[1]]) else 1L
 stopifnot(length(workers) == 1L, !is.na(workers), workers >= 1L)
-run <- Sys.getenv("TWO_SAMPLE_RUN_ROOT", file.path(root, "output", "final"))
+run <- runtime_path("TWO_SAMPLE_RUN_ROOT")
 dir.create(run, recursive = TRUE, showWarnings = FALSE)
 run <- normalizePath(run)
 Sys.setenv(TWO_SAMPLE_RUN_ROOT = run,
@@ -19,7 +20,7 @@ run_script <- function(name, args = character()) {
                     c(shQuote(file.path(root, "scripts", name)), shQuote(as.character(args))))
   if (status != 0) stop(name, " failed with status ", status)
 }
-input_dir <- Sys.getenv("TWO_SAMPLE_DATA_DIR", file.path(root, "data"))
+input_dir <- runtime_path("TWO_SAMPLE_DATA_DIR")
 python <- Sys.getenv("TWO_SAMPLE_PYTHON", "python3")
 status <- system2(python, c(shQuote(file.path(root, "scripts", "prepare_run.py")),
                            "--run-root", shQuote(run), "--data-dir", shQuote(input_dir)))

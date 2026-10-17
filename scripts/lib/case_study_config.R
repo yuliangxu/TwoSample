@@ -1,11 +1,54 @@
-# Frozen final-case-study protocol. All model ordering and fitting settings live here.
+# Frozen estimator recipe; cohort dimensions come from external runtime inputs.
+.source_files <- vapply(sys.frames(), function(frame) {
+  if (is.null(frame$ofile)) "" else as.character(frame$ofile)[[1]]
+}, character(1))
+.configuration_source <- tail(.source_files[basename(.source_files) == "case_study_config.R"], 1L)
+stopifnot(length(.configuration_source) == 1L)
+.project_root <- normalizePath(file.path(dirname(.configuration_source), "..", ".."), mustWork = TRUE)
+runtime_path <- function(name, default = NULL) {
+  value <- Sys.getenv(name, "")
+  if (!nzchar(value)) value <- default
+  if (is.null(value) || !nzchar(value)) stop("Set ", name, "; no runtime data or outputs are bundled.")
+  if (!grepl("^/", value)) value <- file.path(getwd(), value)
+  # Resolve existing ancestors so a not-yet-created output cannot hide a path
+  # inside the source checkout through a symbolic link.
+  parent <- value; suffix <- character()
+  while (!file.exists(parent) && !dir.exists(parent)) {
+    suffix <- c(basename(parent), suffix)
+    next_parent <- dirname(parent)
+    if (identical(parent, next_parent)) stop("Cannot resolve runtime path: ", value)
+    parent <- next_parent
+  }
+  value <- do.call(file.path, as.list(c(normalizePath(parent, mustWork = TRUE), suffix)))
+  pieces <- strsplit(value, "/", fixed = TRUE)[[1]]; clean <- character()
+  for (piece in pieces) {
+    if (!nzchar(piece) || piece == ".") next
+    if (piece == "..") { if (length(clean)) clean <- head(clean, -1L) } else clean <- c(clean, piece)
+  }
+  value <- paste0("/", paste(clean, collapse = "/"))
+  if (identical(value, .project_root) || startsWith(value, paste0(.project_root, "/")))
+    stop(name, " must be outside the code repository: ", value)
+  value
+}
+.configuration_path <- file.path(.project_root, "generators", "training_config.json")
+.training_config <- jsonlite::read_json(.configuration_path, simplifyVector = TRUE)
+.runtime_cohort <- jsonlite::read_json(file.path(runtime_path("TWO_SAMPLE_DATA_DIR"),
+  "provenance", "cohort_manifest.json"), simplifyVector = TRUE)
+.dimensions <- as.integer(c(.runtime_cohort$training_rows, .runtime_cohort$test_rows,
+                           .training_config$generated_rows, .runtime_cohort$taxa))
+stopifnot(length(.dimensions) == 4L, all(is.finite(.dimensions)), all(.dimensions > 0L),
+          identical(.runtime_cohort$status, "verified"),
+          is.character(.runtime_cohort$cohort_id), length(.runtime_cohort$cohort_id) == 1L)
+names(.dimensions) <- c("train", "test", "generated", "taxa")
 case_study <- list(
   batts_repository = "nawaya040/BATTS",
   batts_commit = "147e511d211919afefb8decac6333e66d24919db",
   batts_version = "0.3.0",
   keys = c("icfm", "dt", "d", "mbgan"),
   labels = c(icfm = "ICFM", dt = "DT", d = "D", mbgan = "MBGAN"),
-  dimensions = c(train = 1166L, test = 292L, generated = 1000L, taxa = 123L),
+  dimensions = .dimensions,
+  cohort_id = .runtime_cohort$cohort_id,
+  training_config_sha256 = digest::digest(file = .configuration_path, algo = "sha256"),
   seed = 1L,
   bayes = list(num_trees = 200L, max_resol = 0L, learn_rate = 0.01,
                n_bins = 100L, n_min_obs_per_node = 1L, n_ratio_per_node = 1e-100,

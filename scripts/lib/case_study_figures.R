@@ -2,9 +2,9 @@ source(file.path(project_root, "scripts", "lib", "case_study_config.R"))
 source(file.path(project_root, "scripts", "lib", "figure_order.R"))
 suppressPackageStartupMessages({ library(ggplot2); library(vegan); library(patchwork) })
 
-data_dir <- Sys.getenv("TWO_SAMPLE_DATA_DIR", file.path(project_root, "data"))
-ratio_root <- Sys.getenv("TWO_SAMPLE_RATIO_ROOT", file.path(project_root, "results", "final", "revision"))
-output_dir <- Sys.getenv("TWO_SAMPLE_FIGURE_DIR", file.path(project_root, "output", "final", "figures"))
+data_dir <- runtime_path("TWO_SAMPLE_DATA_DIR")
+ratio_root <- runtime_path("TWO_SAMPLE_RATIO_ROOT", file.path(runtime_path("TWO_SAMPLE_RUN_ROOT"), "revision"))
+output_dir <- runtime_path("TWO_SAMPLE_FIGURE_DIR", file.path(runtime_path("TWO_SAMPLE_RUN_ROOT"), "figures"))
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
 keys <- figure_keys
@@ -167,7 +167,7 @@ make_result_figure <- function(split, number) {
     geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2,
       position = position_dodge(width = 0.7)) +
     geom_point(position = position_dodge(width = 0.7), size = 1.5) +
-    labs(x = "Generated-sample row", y = "Log density ratio (95% CI)",
+    labs(x = "Generated-bank row index", y = "Log density ratio (95% CI)",
          color = NULL, tag = "(c)") +
     theme_result +
     theme(legend.position = "bottom", legend.key.height = unit(4.5, "mm"),

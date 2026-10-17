@@ -1,211 +1,111 @@
-# TwoSample: microbiome case study reproduced from training
+# TwoSample: reproducible case-study code
 
-Training and analysis workflow for the pooled microbiome case study in
-*Two-sample Comparison through Additive Tree Models for Density Ratios*.
-Figures, legends, and the report use **D, DT, ICFM, MBGAN**. The recorded fitting
-sequence remains ICFM, DT, D, MBGAN.
+This repository contains code, configuration, dependency requirements, and
+documentation for the corrected microbiome case study: preprocessing, four
+generators, synthetic sampling, BATTS fitting, and seven figures. Data,
+sample/participant identifiers, tree tables, trained checkpoints, fitted
+objects, results, and rendered figures are external runtime files and are not
+distributed in the current source tree.
 
-This workflow preserves the original full pooled data and preprocessing:
-**1,166 training observations, 292 test observations, and 123 taxa**, from four
-studies. Each generator supplies 1,000 compositions. All four generators use
-only the training observations. ICFM and MBGAN start from seeded random
-initialization; DT uses stabilized Beta maximum-likelihood fits and D uses a
-Dirichlet maximum-likelihood fit. Historical neural checkpoints are not inputs.
-See [generator documentation](generators/README.md).
+## Prepare inputs
 
-## Final code and completed results
+Follow [PREPROCESSING.md](PREPROCESSING.md) to reconstruct the corrected
+2,052-observation, 123-taxon cohort with 1,641 training and 411 test observations.
+The rule uses full-collection thresholds, keyed study/sample matching, and no
+sparsity filter. Exact historical reproduction requires the external dated
+source resources, metadata, species universe, taxon/sample ordering, and tree
+topology. These data dependencies are listed explicitly in that document;
+cloning this code alone does not supply them.
 
-The **historical local MBGAN implementation** is the selected final code, with
-its diagnostic callback randomness made reproducible. Implementation checks
-passed: two independent 120-iteration fits agreed exactly, and the wrapper
-matched the original training loop's parameters and optimizer states.
-See the [implementation validation](reproducibility/historical_mbgan_implementation_validation.json).
+Preparation creates an external directory containing the two real matrices,
+their provenance and cohort manifest, and the tree files. Subsequent stages
+verify these inputs by hash. Each output command requires a fresh destination.
 
-**Full reproduction, BATTS analysis, and figure generation passed.** Job
-58514810 completed successfully in 9 hours, 4 minutes, 29 seconds. Both complete
-fitting sequences reproduced all four generators exactly; the two MBGAN fits
-each reached 500,000 iterations with identical recorded losses, generator and
-critic arrays, optimizer arrays, explicit Python/NumPy states, and synthetic
-samples. The final report was generated on 14 October 2026 at 03:56 UTC
-(13 October at 23:56 EDT).
+## Environments
 
-Read the [final report](results/final/case_study_report.pdf),
-[regenerated figures](results/final/figures/), and
-[full validation](reproducibility/historical_mbgan_full_validation.json).
-The [release manifest](release_manifest.json) binds the code, all six input
-matrices, training evidence, and results. Verify the release with:
+Use separate Python environments for the parametric/ICFM models and historical
+TensorFlow MBGAN; their validated NumPy versions differ. Python 3.9.25 was used
+for the final experiment. From the repository root:
 
 ```sh
-python3 scripts/verify_from_training_release.py
-```
-
-The earlier `ibdmdb_case_study_report.pdf` used a fresh 500,000-iteration fit
-with 945 training observations, 236 test observations, and 77 taxa. The earlier
-`updated_generators_case_study_report.pdf` used the full pooled 123-taxon data
-and replayed an older MBGAN checkpoint. Its MBGAN was not newly trained. The
-restoration fits the historical local variant on the full pooled training set;
-its results need not match either earlier report.
-
-The restored variant has **no effective gradient penalty and no weight
-clipping**. It preserves the historical Keras 2.13.1 graphs and CPU training
-recipe; it should not be described as the published WGAN-GP implementation.
-Its former diagnostic callback reseeded NumPy from system entropy. The new
-callback uses an isolated seeded random stream, defining a reproducible new
-trajectory rather than recovering the historical weights. Reproducibility and
-favorable plots alone would not establish training stability or distributional
-agreement. See [MBGAN methods and provenance](generators/MBGAN.md).
-
-The analysis uses **BATTS 0.3.0**, pinned to
-[`147e511d211919afefb8decac6333e66d24919db`](https://github.com/nawaya040/BATTS/commit/147e511d211919afefb8decac6333e66d24919db).
-The MaStatLab fork was checked on 13 October 2026 and remained at `fccebbf`;
-its documented upstream released 0.3.0 that day. The update audit compared
-upstream 0.2.2 (`77c2172`) with 0.3.0. All fitting parameters are explicit,
-including the retained **boosting subsample_fraction = 1**. This restoration
-preserves the other generators, real-data preprocessing, split, and BATTS recipe.
-
-## Results and completion
-
-The completed run contains eight comparisons, 24 estimator fits, the null
-diagnostic, seven regenerated figures, and a ten-page report. Its final
-`COMPLETE` marker confirms numerical, provenance, and PDF validation in addition
-to training. All 292 null diagnostic intervals cover zero.
-
-For MBGAN's test comparison, none of the pointwise 95% posterior intervals
-exclude zero (0/292 real observations and 0/1,000 generated observations).
-Mean absolute posterior-mean log density ratios are 0.1825404 and 0.1829537,
-respectively. These are results of the newly trained pooled-data model;
-pointwise intervals do not establish global distributional equality or training
-stability across seeds. See the [verification records](reproducibility/README.md).
-
-| Figure | Content |
-| --- | --- |
-| [6](results/final/figures/figure6_ggplot2.pdf) | Test PCoA comparison |
-| [7](results/final/figures/figure7_ggplot2.pdf) | Test density-ratio summaries |
-| [S8](results/final/figures/figureS8_ggplot2.pdf) | Training PCoA comparison |
-| [S9](results/final/figures/figureS9_ggplot2.pdf) | Training density-ratio summaries |
-| [S10](results/final/figures/figureS10_ggplot2.pdf) | Training posterior mean and quantile grids |
-| [S11](results/final/figures/figureS11_ggplot2.pdf) | Test posterior mean and quantile grids |
-| [S12](results/final/figures/figureS12_ggplot2.pdf) | Held-out real-data null diagnostic |
-
-## Install
-
-Use R with a C++17 toolchain and separate Python environments for PyTorch,
-TensorFlow, and report rendering. The tested generator Python version is
-3.9.25. ICFM and restored MBGAN use CPU execution with two numerical threads.
-The MBGAN environment pins TensorFlow CPU 2.13.1 and Keras 2.13.1.
-
-```sh
-python3 -m venv .venv-generators
-.venv-generators/bin/python -m pip install -r generators/requirements.txt
-python3 -m venv .venv-mbgan
-.venv-mbgan/bin/python -m pip install -r generators/requirements-mbgan.txt
-python3 -m venv .venv-report
-.venv-report/bin/python -m pip install -r requirements-report.txt
+python3.9 -m venv .venv-generators
+.venv-generators/bin/pip install -r generators/requirements.txt -r requirements-preprocessing.txt
+python3.9 -m venv .venv-mbgan
+.venv-mbgan/bin/pip install -r generators/requirements-mbgan.txt
 Rscript scripts/install_dependencies.R
 ```
 
-## Reproduce
+The R installer pins the direct plotting/analysis package versions and requires BATTS 0.3.0 at commit
+`147e511d211919afefb8decac6333e66d24919db`; the fitting scripts check that version
+and source revision. R 4.6.0 was used for the completed analysis. Use
+`Rscript scripts/install_dependencies.R --check` to verify installed direct
+dependencies without installing packages. Transitive and system dependencies
+must remain compatible. The dated source replay additionally needs
+`Rscript scripts/install_preprocessing.R` when downloading through
+curatedMetagenomicData. The validated data package was 3.20.0; exact source
+hashes and numeric checks are still required. Source-cache reconstruction can
+use the existing external RData files without downloading them again.
 
-Run from the repository root. Fit every generator twice independently, generate
-1,000 compositions per model in each run, then compare fitted parameters and
-synthetic CSVs exactly:
+## Train, sample, fit, and plot
 
-```sh
-.venv-generators/bin/python -m generators.reproduce \
-  --tensorflow-python .venv-mbgan/bin/python \
-  --output output/generated
-```
-
-Choose a new output directory. Two CPU replicas run concurrently by default;
-add `--replica-workers 1` to run them sequentially. The command creates
-`replicate_1/` and `replicate_2/`, then writes the six verified matrices and
-training evidence to `output/generated/data/`. Newly fitted weights are
-intermediate outputs, not input checkpoints. MBGAN validation compares every
-recorded training iteration, generator and critic arrays, optimizer arrays,
-and the explicitly recorded Python and NumPy random states. TensorFlow graph
-seeds and update counts are recorded, without claiming to checkpoint its
-internal random-operation counters. Exact equality is scoped to the recorded
-hardware and software environment.
-
-Compare a newly generated bank with the released reference data and parameter
-hashes:
+Set absolute paths to the prepared input directory and a new run directory:
 
 ```sh
-python3 scripts/verify_training_reference.py output/generated/data
+export GENERATOR_PYTHON="$PWD/.venv-generators/bin/python"
+export MBGAN_PYTHON="$PWD/.venv-mbgan/bin/python"
+export CASE_STUDY_RSCRIPT=Rscript
+export WORKERS=8
+bash scripts/run_pipeline.sh /absolute/prepared-data /absolute/new-run
 ```
 
-The reference is bound by [data/generation_manifest.json](data/generation_manifest.json)
-and the [training evidence](data/evidence/). The generation command also checks
-exact agreement between its two fresh replicas.
+The runner trains two independent replicas of D, DT, ICFM, and MBGAN, verifies
+parameter and sample replay, and generates 1,000 compositions per model. It
+then performs eight real-versus-generated comparisons with three estimators
+per comparison, runs the held-out null diagnostic, and creates Figures 6, 7,
+S8, S9, S10, S11, and S12 under the external analysis directory. Checkpoint
+files are produced during training for local replay; they are not published.
+Training includes 20,000 ICFM steps and 500,000 MBGAN updates per replica and
+can take several hours. See the [generator instructions](generators/README.md)
+for separate training/sampling commands and the [Slurm template](hpc/README.md)
+for cluster execution.
 
-Refit all eight BATTS comparisons and the null experiment, render all seven
-figures, and build the report:
+The generator recipes are in
+[training_config.json](generators/training_config.json), the estimator recipes
+in [case_study_config.R](scripts/lib/case_study_config.R), and the figure
+implementation in [case_study_figures.R](scripts/lib/case_study_figures.R).
+ICFM and DT preserve their distinct tree transforms. MBGAN is the historical
+local implementation with no effective gradient penalty or weight clipping;
+its selection was retrospective in the earlier cohort, before the corrected
+cohort was trained. See [MBGAN.md](generators/MBGAN.md) and the bundled third-party
+license notices.
+
+To redraw figures from a completed external run, point the plotting scripts at
+that run's data and analysis directories:
 
 ```sh
-export TWO_SAMPLE_DATA_DIR="$PWD/output/generated/data"
-export TWO_SAMPLE_RUN_ROOT="$PWD/output/final"
-Rscript scripts/reproduce_case_study_batts.R 8
-.venv-report/bin/python scripts/build_report.py "$TWO_SAMPLE_RUN_ROOT"
+export TWO_SAMPLE_DATA_DIR=/absolute/new-run/generators/data
+export TWO_SAMPLE_RUN_ROOT=/absolute/new-run/analysis
+Rscript scripts/recreate_all_case_study_figures.R
 ```
 
-The integer selects comparison workers; use 1 for serial execution. Fit caches
-are bound to the inputs, BATTS commit, settings, and fitting source. Every
-input directory must include its validated `generation_manifest.json` and
-evidence. The analysis freezes them under `generation/`. The complete cluster
-workflow is [`hpc/from_training.slurm`](hpc/from_training.slurm);
-[`hpc/case_study.slurm`](hpc/case_study.slurm) analyzes already verified generated
-data. See [cluster execution](hpc/README.md).
+The split is by observation and shares participants across training and test
+banks. Generator training excludes real test rows; the main test-versus-model
+BATTS fits use those test rows themselves. Only the null diagnostic evaluates
+observations held out from its BATTS fit. Pointwise intervals and PCoA plots
+do not establish global distributional equality.
 
-The real matrices can also be reconstructed from the four dated
-curatedMetagenomicData resources and the exact sample/taxon manifests:
+## Keep the repository code-only
+
+Runtime inputs and outputs belong outside the checkout. Before
+committing, check the staged source tree:
 
 ```sh
-Rscript scripts/install_preprocessing.R
-Rscript scripts/reprocess_microbiome.R
+python3 -B scripts/verify_code_only.py
 ```
 
-This validates every float32 value against the preserved numerical checksums.
-The [preprocessing provenance](data/provenance/README.md) documents the filters,
-unrecovered split seed, and ambiguous duplicate source profiles. Verify the
-released source, inputs, results, and evidence with:
-
-```sh
-python3 scripts/verify_from_training_release.py
-```
-
-## Statistical scope
-
-Each training/test-versus-generator comparison is fitted separately. Test panels
-use real test observations in the density-ratio fit; they are not predictions
-from the density-ratio fit to the training comparison. The null experiment alone
-evaluates observations held out from its BATTS fit.
-
-Generators use only the 1,166 preserved training observations. The restored
-MBGAN recipe fixes seed 1, 500,000 generator iterations, five critic updates per
-iteration, RMSprop at rate 0.00005, batch 32, and the final update. No new
-seed or checkpoint search uses the test results. However, returning to this
-historical implementation after inspecting previous reports is a retrospective
-method choice; it is not a blind, prespecified comparison of MBGAN variants.
-ICFM retains 20,000 updates of a three-layer width-64 MLP with Adam at rate
-0.001, batch 256, flow noise 0.0001, and training seed 20261003.
-
-Preprocessing was applied collection-wide before the preserved observation
-split. The split does not establish participant-level separation. The new
-neural fits do not recover unknown historical training trajectories.
-
-Intervals are pointwise posterior intervals from the retained single-chain
-protocol, not global distributional-equality tests, simultaneous bands, or a
-repeated-sampling coverage guarantee. PCoA is descriptive. Matching generated-row
-numbers across models identify different compositions.
-
-## Data and attribution
-
-Please cite curatedMetagenomicData and the four source studies listed in
-[data/CITATIONS.md](data/CITATIONS.md). See [data terms](data/DATA_TERMS.md) and
-[generator notices](generators/README.md). The pooled data contain observations
-from IBDMDB (931), T2D (277), Hall (209), and Hannigan (41).
-
-The selected code before full-run completion is preserved at
-[commit fc7f6fa](https://github.com/yuliangxu/TwoSample/tree/fc7f6fa21e3b834b3be1ff459a473be9c7f30c88).
-Earlier connected-gradient-penalty results remain at
-[commit b009075](https://github.com/yuliangxu/TwoSample/tree/b00907514c3bbb7ab17c4eeacc5091ab4f441d8a).
+The same check runs in GitHub Actions on the committed tree. It rejects data,
+tree assets, checkpoints, result tables, figures, binary payloads, symlinks,
+and unrecognized release paths. To check an unpacked source archive, use
+`--directory`; that mode checks every file on disk. This update removes former
+data and figure files from the current branch contents. Earlier public Git
+commits remain in history.

@@ -9,10 +9,10 @@ source(file.path(script_dir, "lib", "case_study_config.R"))
 check_case_study_batts()
 
 seed <- case_study$null_seed
-data_dir <- Sys.getenv("TWO_SAMPLE_DATA_DIR", file.path(project_root, "data"))
+data_dir <- runtime_path("TWO_SAMPLE_DATA_DIR")
 train_path <- file.path(data_dir, "sample_train.csv")
 test_path <- file.path(data_dir, "sample_test.csv")
-output_dir <- Sys.getenv("TWO_SAMPLE_NULL_OUTPUT", file.path(Sys.getenv("TWO_SAMPLE_RUN_ROOT", file.path(project_root, "output", "final")), "null"))
+output_dir <- runtime_path("TWO_SAMPLE_NULL_OUTPUT", file.path(runtime_path("TWO_SAMPLE_RUN_ROOT"), "null"))
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
 train <- read_case_study_matrix(train_path, case_study$dimensions[["train"]])
@@ -27,6 +27,13 @@ make_balanced_folds <- function(n) {
 set.seed(seed)
 train_fold <- make_balanced_folds(nrow(train))
 test_fold <- make_balanced_folds(nrow(test))
+train_sizes <- tabulate(train_fold + 1L, nbins = 2L)
+test_sizes <- tabulate(test_fold + 1L, nbins = 2L)
+stopifnot(diff(range(train_sizes)) <= 1L, diff(range(test_sizes)) <= 1L)
+jsonlite::write_json(list(cohort_id = case_study$cohort_id, seed = seed,
+  training_group_sizes = train_sizes, test_group_sizes = test_sizes,
+  split_unit = "observation; participants may occur in both splits"),
+  file.path(output_dir, "null_design.json"), pretty = TRUE, auto_unbox = TRUE)
 
 # margin_scale < 0 tells BATTS the data already occupy the [0,1]^d domain.
 # This preserves the compositional data exactly and avoids division by zero for
@@ -76,6 +83,8 @@ write.csv(results, file.path(output_dir, "test_pointwise_credible_intervals.csv"
 write.csv(coverage, file.path(output_dir, "coverage_summary.csv"), row.names = FALSE)
 write.csv(results[!results$covers_zero, ], file.path(output_dir, "intervals_excluding_zero.csv"), row.names = FALSE)
 fingerprint <- list(commit = case_study$batts_commit, settings = case_study$null,
+                    cohort_id = case_study$cohort_id,
+                    training_config_sha256 = case_study$training_config_sha256,
                     seed = seed,
                     source_hashes = case_study_sources(project_root, "run_figure_S12_null_experiment.R"),
                     inputs = unname(tools::md5sum(c(train_path, test_path))))
